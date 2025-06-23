@@ -45,6 +45,8 @@ include_directories(external)
 add_executable(
   gpe
   main.cpp
+  process_file.cpp
+  utils.cpp
 )
 
 target_link_libraries(gpe fmt::fmt)
