@@ -11,3 +11,8 @@ class TestMisc(TestCase):
                 command = [get_gpe_binary(), option]
                 process = run(command, stdout=PIPE, stderr=PIPE, text=True)
                 self.assertEqual(process.returncode, 0, process.stderr)
+
+    def test_no_opts_or_args(self) -> None:
+        command = [get_gpe_binary()]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0, process.stderr)
