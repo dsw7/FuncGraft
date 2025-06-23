@@ -62,6 +62,7 @@ include_directories(external)
 
 add_executable(
   gpe
+  curl_base.cpp
   main.cpp
   process_file.cpp
   prompt.cpp
