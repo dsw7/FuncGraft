@@ -1,6 +1,7 @@
 #include "process_file.hpp"
 
 #include "prompt.hpp"
+#include "query_openai.hpp"
 #include "utils.hpp"
 
 #include <filesystem>
@@ -53,20 +54,17 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &cli_params)
 {
-    params::InternalParameters internal_params;
-
-    internal_params.input_text = load_input_text_from_file(cli_params);
-    internal_params.instructions = load_instructions(cli_params);
-    internal_params.input_file_extension = cli_params.input_file.extension();
-
-    const std::string prompt = prompt::build_prompt(internal_params);
+    const std::string input_text = load_input_text_from_file(cli_params);
+    const std::string instructions = load_instructions(cli_params);
+    const std::string input_file_extension = cli_params.input_file.extension();
+    const std::string prompt = prompt::build_prompt(instructions, input_text, input_file_extension);
 
     if (cli_params.verbose) {
         fmt::print("The prompt was:\n");
         fmt::print(fg(blue), "{}", prompt);
     }
 
-    const std::string output_text = internal_params.input_text;
+    const std::string output_text = query_openai::run_query(prompt);
 
     if (cli_params.output_file) {
         utils::write_to_file(cli_params.output_file.value(), output_text);

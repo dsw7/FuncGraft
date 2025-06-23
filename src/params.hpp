@@ -15,10 +15,4 @@ struct CommandLineParameters {
     std::optional<std::string> rule;
 };
 
-struct InternalParameters {
-    std::string input_file_extension;
-    std::string input_text;
-    std::string instructions;
-};
-
 } // namespace params

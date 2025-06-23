@@ -65,6 +65,7 @@ add_executable(
   main.cpp
   process_file.cpp
   prompt.cpp
+  query_openai.cpp
   utils.cpp
 )
 

@@ -59,13 +59,13 @@ std::string get_code_block(const std::string &body, const std::optional<std::str
 
 namespace prompt {
 
-std::string build_prompt(const params::InternalParameters &params)
+std::string build_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
 {
     std::string prompt = "I am editing some code. Apply the following instructions:\n";
 
-    prompt += get_code_block(params.instructions, "plaintext");
+    prompt += get_code_block(instructions, "plaintext");
     prompt += "To the following code:\n";
-    prompt += get_code_block(params.input_text, resolve_label_from_extension(params.input_file_extension));
+    prompt += get_code_block(input_text, resolve_label_from_extension(extension));
     prompt += "Return the code edits in a JSON format with keys \"code\" and \"description.\" For example:\n";
 
     const nlohmann::json example = {
