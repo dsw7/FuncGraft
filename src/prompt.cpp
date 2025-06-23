@@ -1,6 +1,7 @@
 #include "prompt.hpp"
 
 #include <fmt/core.h>
+#include <json.hpp>
 #include <optional>
 
 namespace {
@@ -25,13 +26,14 @@ std::string build_prompt(const params::InternalParameters &params)
     prompt += get_code_block(params.instructions, "plaintext");
     prompt += "To the following code:\n";
     prompt += get_code_block(params.input_text);
+    prompt += "Return the code edits in a JSON format with keys \"code\" and \"description.\" For example:\n";
 
-    prompt += ("Please return the code edits in a JSON format with keys \"code\" and \"description.\" "
-               "For example:\n"
-               "{{\n"
-               "  \"code\": \"Your updated code here\",\n"
-               "  \"description\": \"A brief explanation of the changes\",\n"
-               "}}\n");
+    const nlohmann::json example = {
+        { "code", "Your updated code here" },
+        { "description", "A brief explanation of the changes" }
+    };
+
+    prompt += example.dump(4) + '\n';
     return prompt;
 }
 
