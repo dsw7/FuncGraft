@@ -57,6 +57,7 @@ void process_file(const params::CommandLineParameters &cli_params)
 
     internal_params.input_text = load_input_text_from_file(cli_params);
     internal_params.instructions = load_instructions(cli_params);
+    internal_params.input_file_extension = cli_params.input_file.extension();
 
     const std::string prompt = prompt::build_prompt(internal_params);
 
