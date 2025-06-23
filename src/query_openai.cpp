@@ -28,15 +28,8 @@ public:
     std::string create_chat_completion(const std::string &request);
 
 private:
-    CURL *handle = nullptr;
-    struct curl_slist *headers = nullptr;
-
-    void reset_easy_handle();
-    void reset_headers_list();
-    void set_auth_token();
-    void set_writefunction();
-    void set_content_type_transmit_json();
-    void run_easy_perform();
+    CURL *handle_ = nullptr;
+    struct curl_slist *headers_ = nullptr;
 };
 
 CurlBase::CurlBase()
@@ -45,82 +38,53 @@ CurlBase::CurlBase()
         throw std::runtime_error("Something went wrong when initializing libcurl");
     }
 
-    this->handle = curl_easy_init();
+    this->handle_ = curl_easy_init();
 
-    if (this->handle == nullptr) {
+    if (this->handle_ == nullptr) {
         throw std::runtime_error("Something went wrong when starting libcurl easy session");
     }
 }
 
 CurlBase::~CurlBase()
 {
-    if (this->handle) {
-        curl_slist_free_all(this->headers);
-        curl_easy_cleanup(this->handle);
+    if (this->handle_) {
+        curl_slist_free_all(this->headers_);
+        curl_easy_cleanup(this->handle_);
     }
 
     curl_global_cleanup();
 }
 
-void CurlBase::reset_easy_handle()
+std::string CurlBase::create_chat_completion(const std::string &request)
 {
-    if (this->handle) {
-        curl_easy_reset(this->handle);
+    if (this->handle_) {
+        curl_easy_reset(this->handle_);
     }
-}
 
-void CurlBase::reset_headers_list()
-{
-    curl_slist_free_all(this->headers);
-    this->headers = nullptr;
-}
+    curl_slist_free_all(this->headers_);
+    this->headers_ = nullptr;
 
-void CurlBase::set_writefunction()
-{
-    curl_easy_setopt(this->handle, CURLOPT_WRITEFUNCTION, write_callback);
-}
+    const std::string header_auth = "Authorization: Bearer " + utils::get_user_api_key();
+    this->headers_ = curl_slist_append(this->headers_, header_auth.c_str());
 
-void CurlBase::set_auth_token()
-{
-    const std::string token = utils::get_user_api_key();
-    const std::string header = "Authorization: Bearer " + token;
-    this->headers = curl_slist_append(this->headers, header.c_str());
-}
+    const std::string header_content_type = "Content-Type: application/json";
+    this->headers_ = curl_slist_append(this->headers_, header_content_type.c_str());
 
-void CurlBase::set_content_type_transmit_json()
-{
-    const std::string header = "Content-Type: application/json";
-    this->headers = curl_slist_append(this->headers, header.c_str());
-}
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
+    curl_easy_setopt(this->handle_, CURLOPT_URL, URL_CHAT_COMPLETIONS.c_str());
+    curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
+    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
-void CurlBase::run_easy_perform()
-{
-    const CURLcode code = curl_easy_perform(this->handle);
+    std::string response;
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
+
+    const CURLcode code = curl_easy_perform(this->handle_);
 
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
-}
 
-std::string CurlBase::create_chat_completion(const std::string &request)
-{
-    this->reset_easy_handle();
-    this->reset_headers_list();
-    this->set_writefunction();
-    this->set_auth_token();
-
-    this->set_content_type_transmit_json();
-    curl_easy_setopt(this->handle, CURLOPT_HTTPHEADER, this->headers);
-
-    curl_easy_setopt(this->handle, CURLOPT_URL, URL_CHAT_COMPLETIONS.c_str());
-
-    curl_easy_setopt(this->handle, CURLOPT_POST, 1L);
-    curl_easy_setopt(this->handle, CURLOPT_POSTFIELDS, request.c_str());
-
-    std::string response;
-    curl_easy_setopt(this->handle, CURLOPT_WRITEDATA, &response);
-
-    this->run_easy_perform();
     return response;
 }
 
