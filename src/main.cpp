@@ -17,6 +17,7 @@ void print_help()
     fmt::print(" -o <file>, --output=<file>        Place output into <file>\n");
     fmt::print(" -i <file>, --instructions=<file>  Read instructions from <file>\n");
     fmt::print(" -r <text>, --rule=<text>          Read instructions via command line\n");
+    fmt::print(" -v, --verbose                     Be more verbose with output\n");
 }
 
 int main(int argc, char **argv)
@@ -35,11 +36,12 @@ int main(int argc, char **argv)
             { "output", required_argument, 0, 'o' },
             { "instructions", required_argument, 0, 'i' },
             { "rule", required_argument, 0, 'r' },
+            { "verbose", required_argument, 0, 'v' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "hm:o:i:r:", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "hm:o:i:r:v", long_options, &option_index);
 
         if (opt == -1) {
             break;
@@ -60,6 +62,9 @@ int main(int argc, char **argv)
                 break;
             case 'r':
                 params.rule = optarg;
+                break;
+            case 'v':
+                params.verbose = true;
                 break;
             default:
                 print_help();

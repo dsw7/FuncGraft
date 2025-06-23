@@ -59,8 +59,11 @@ void process_file(const params::CommandLineParameters &cli_params)
     internal_params.instructions = load_instructions(cli_params);
 
     const std::string prompt = prompt::build_prompt(internal_params);
-    fmt::print("The prompt was:\n");
-    fmt::print(fg(blue), "{}", prompt);
+
+    if (cli_params.verbose) {
+        fmt::print("The prompt was:\n");
+        fmt::print(fg(blue), "{}", prompt);
+    }
 
     const std::string output_text = internal_params.input_text;
 
