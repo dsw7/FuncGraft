@@ -3,13 +3,34 @@
 #include "utils.hpp"
 
 #include <filesystem>
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <stdexcept>
 
 namespace {
 
-std::string process_input(const std::string &input)
+fmt::terminal_color blue = fmt::terminal_color::bright_blue;
+
+std::string build_prompt(const std::string &instructions, const std::string &input)
 {
+    return fmt::format(
+        "I am editing some code. Apply the following instructions:\n"
+        "```plaintext\n{}\n```\n"
+        "To the following code:\n```\n{}\n```\n"
+        "Please return the code edits in a JSON format with keys \"code\" and \"description.\" "
+        "For example:\n"
+        "{{\n"
+        "  \"code\": \"Your updated code here\",\n"
+        "  \"description\": \"A brief explanation of the changes\",\n"
+        "}}\n",
+        instructions, input);
+}
+
+std::string process_input(const std::string &input, const std::string &instructions)
+{
+    const std::string prompt = build_prompt(instructions, input);
+    fmt::print("The prompt was:\n");
+    fmt::print(fg(blue), "{}", prompt);
     return std::string(input);
 }
 
@@ -50,7 +71,7 @@ void process_file(const cli_params::Parameters &params)
         }
     }
 
-    const std::string output_text = process_input(input_text);
+    const std::string output_text = process_input(input_text, instructions);
 
     if (params.output_file) {
         utils::write_to_file(params.output_file.value(), output_text);
