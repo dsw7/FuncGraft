@@ -1,5 +1,6 @@
 #include "process_file.hpp"
 
+#include "prompt.hpp"
 #include "utils.hpp"
 
 #include <filesystem>
@@ -46,21 +47,6 @@ std::string load_instructions(const params::CommandLineParameters &params)
     return utils::read_from_file(instructions_file);
 }
 
-std::string build_prompt(const params::InternalParameters &internal_params)
-{
-    return fmt::format(
-        "I am editing some code. Apply the following instructions:\n"
-        "```plaintext\n{}\n```\n"
-        "To the following code:\n```\n{}\n```\n"
-        "Please return the code edits in a JSON format with keys \"code\" and \"description.\" "
-        "For example:\n"
-        "{{\n"
-        "  \"code\": \"Your updated code here\",\n"
-        "  \"description\": \"A brief explanation of the changes\",\n"
-        "}}\n",
-        internal_params.instructions, internal_params.input_text);
-}
-
 } // namespace
 
 namespace process_file {
@@ -72,7 +58,7 @@ void process_file(const params::CommandLineParameters &cli_params)
     internal_params.input_text = load_input_text_from_file(cli_params);
     internal_params.instructions = load_instructions(cli_params);
 
-    const std::string prompt = build_prompt(internal_params);
+    const std::string prompt = prompt::build_prompt(internal_params);
     fmt::print("The prompt was:\n");
     fmt::print(fg(blue), "{}", prompt);
 

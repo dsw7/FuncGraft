@@ -46,6 +46,7 @@ add_executable(
   gpe
   main.cpp
   process_file.cpp
+  prompt.cpp
   utils.cpp
 )
 
