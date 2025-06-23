@@ -1,4 +1,5 @@
 #include "cli_params.hpp"
+#include "process_file.hpp"
 
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -9,17 +10,13 @@
 
 void print_help()
 {
-    fmt::print("Usage: gpe [OPTION]\n\n");
+    fmt::print("Usage: gpe [OPTION] file\n\n");
     fmt::print("Options:\n");
-    fmt::print(" -h, --help  Print help menu\n");
-}
-
-void run_command(const std::string &command)
-{
-    if (command == "-h" or command == "--help") {
-        print_help();
-        return;
-    }
+    fmt::print(" -h, --help                        Print help menu\n");
+    fmt::print(" -m <model>, --model=<model>       Select model\n");
+    fmt::print(" -o <file>, --output=<file>        Place output into <file>\n");
+    fmt::print(" -i <file>, --instructions=<file>  Read instructions from <file>\n");
+    fmt::print(" -r <text>, --rule=<text>          Read instructions via command line\n");
 }
 
 int main(int argc, char **argv)
@@ -78,7 +75,7 @@ int main(int argc, char **argv)
     }
 
     try {
-        run_command(argv[1]);
+        process_file::process_file(params);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;
