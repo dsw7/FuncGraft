@@ -22,9 +22,9 @@ std::string serialize_request(const std::string &prompt, const std::string &mode
 
 namespace query_openai {
 
-std::string run_query(const std::string &prompt)
+std::string run_query(const std::string &prompt, const std::string &model)
 {
-    const std::string request = serialize_request(prompt, "abc");
+    const std::string request = serialize_request(prompt, model);
 
     curl_base::Curl curl;
     const std::string response = curl.create_chat_completion(request);

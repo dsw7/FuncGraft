@@ -52,23 +52,31 @@ std::string load_instructions(const params::CommandLineParameters &params)
 
 namespace process_file {
 
-void process_file(const params::CommandLineParameters &cli_params)
+void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = load_input_text_from_file(cli_params);
-    const std::string instructions = load_instructions(cli_params);
-    const std::string input_file_extension = cli_params.input_file.extension();
+    const std::string input_text = load_input_text_from_file(params);
+    const std::string instructions = load_instructions(params);
+    const std::string input_file_extension = params.input_file.extension();
     const std::string prompt = prompt::build_prompt(instructions, input_text, input_file_extension);
 
-    if (cli_params.verbose) {
+    if (params.verbose) {
         fmt::print("The prompt was:\n");
         fmt::print(fg(blue), "{}", prompt);
     }
 
-    const std::string output_text = query_openai::run_query(prompt);
+    std::string model;
 
-    if (cli_params.output_file) {
-        utils::write_to_file(cli_params.output_file.value(), output_text);
-        fmt::print("Exported updated content to file '{}'\n", cli_params.output_file.value().string());
+    if (params.model) {
+        model = params.model.value();
+    } else {
+        model = "gpt-4";
+    }
+
+    const std::string output_text = query_openai::run_query(prompt, model);
+
+    if (params.output_file) {
+        utils::write_to_file(params.output_file.value(), output_text);
+        fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
     } else {
         fmt::print("Results:\n{}", output_text);
     }
