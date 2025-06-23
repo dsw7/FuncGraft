@@ -69,7 +69,7 @@ add_executable(
   utils.cpp
 )
 
-target_link_libraries(gpe fmt::fmt)
+target_link_libraries(gpe fmt::fmt curl)
 
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 install(TARGETS gpe DESTINATION bin)
