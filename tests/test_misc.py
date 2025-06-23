@@ -17,6 +17,12 @@ class TestMisc(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
+    def test_input_file_is_not_a_file(self) -> None:
+        command = [get_gpe_binary(), "/tmp"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("Input '/tmp' is not a file!", process.stderr)
+
     def test_missing_input_file(self) -> None:
         command = [get_gpe_binary(), "abc.txt"]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
