@@ -1,0 +1,11 @@
+# Compilation / testing artifacts
+build
+
+# External libs
+external
+
+# Python unit tests
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache
