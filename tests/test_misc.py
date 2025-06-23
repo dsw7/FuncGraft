@@ -16,3 +16,23 @@ class TestMisc(TestCase):
         command = [get_gpe_binary()]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
+
+    def test_missing_input_file(self) -> None:
+        command = [get_gpe_binary(), "abc.txt"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("File 'abc.txt' does not exist!", process.stderr)
+
+    def test_missing_instructions(self) -> None:
+        command = [get_gpe_binary(), "tests/dummy.py"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn(
+            "No instructions provided by file or command line", process.stderr
+        )
+
+    def test_missing_instructions_file(self) -> None:
+        command = [get_gpe_binary(), "tests/dummy.py", "--instructions=foo.txt"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("File 'foo.txt' does not exist!", process.stderr)
