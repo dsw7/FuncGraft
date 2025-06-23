@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cli_params.hpp"
+#include "params.hpp"
 
 namespace process_file {
-void process_file(const cli_params::Parameters &params);
+void process_file(const params::CommandLineParameters &params);
 }

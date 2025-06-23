@@ -38,7 +38,7 @@ std::string process_input(const std::string &input, const std::string &instructi
 
 namespace process_file {
 
-void process_file(const cli_params::Parameters &params)
+void process_file(const params::CommandLineParameters &params)
 {
     if (not std::filesystem::exists(params.input_file)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", params.input_file.string()));

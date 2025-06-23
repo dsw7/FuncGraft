@@ -1,4 +1,4 @@
-#include "cli_params.hpp"
+#include "params.hpp"
 #include "process_file.hpp"
 
 #include <fmt/color.h>
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    cli_params::Parameters params;
+    params::CommandLineParameters params;
 
     while (true) {
         static struct option long_options[] = {
