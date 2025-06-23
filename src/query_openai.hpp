@@ -3,5 +3,14 @@
 #include <string>
 
 namespace query_openai {
-std::string run_query(const std::string &prompt, const std::string &model);
-}
+
+struct QueryResults {
+    int completion_tokens = 0;
+    int prompt_tokens = 0;
+    std::string code;
+    std::string description;
+};
+
+QueryResults run_query(const std::string &prompt, const std::string &model);
+
+} // namespace query_openai

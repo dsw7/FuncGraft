@@ -72,13 +72,13 @@ void process_file(const params::CommandLineParameters &params)
         model = "gpt-4";
     }
 
-    const std::string output_text = query_openai::run_query(prompt, model);
+    const query_openai::QueryResults results = query_openai::run_query(prompt, model);
 
     if (params.output_file) {
-        utils::write_to_file(params.output_file.value(), output_text);
+        utils::write_to_file(params.output_file.value(), results.code);
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
     } else {
-        fmt::print("Results:\n{}", output_text);
+        fmt::print("Results:\n{}", results.code);
     }
 }
 
