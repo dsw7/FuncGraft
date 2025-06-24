@@ -42,3 +42,9 @@ class TestMisc(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn("File 'foo.txt' does not exist!", process.stderr)
+
+    def test_invalid_model(self) -> None:
+        command = [get_gpe_binary(), "tests/dummy.py", "--instructions=tests/edit.txt", "--model=foobar"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("The model `foobar` does not exist or you do not have access to it.", process.stderr)
