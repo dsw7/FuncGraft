@@ -4,8 +4,33 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+namespace {
+
+unsigned short get_terminal_columns()
+{
+    static struct winsize window_size;
+    window_size.ws_col = 0;
+
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &window_size) == 0) {
+        return window_size.ws_col;
+    }
+
+    return 20;
+}
+
+} // namespace
 
 namespace utils {
+
+void print_separator()
+{
+    static unsigned short columns = get_terminal_columns();
+    static std::string separator = std::string(columns, '-');
+    fmt::print("{}\n", separator);
+}
 
 std::string read_from_file(const std::string &filename)
 {
