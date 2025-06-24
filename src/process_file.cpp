@@ -10,7 +10,6 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
-#include <mutex>
 #include <stdexcept>
 #include <thread>
 
@@ -65,23 +64,20 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
     query_openai::QueryResults results;
     bool query_failed = false;
-    std::mutex mutex_print_stderr;
+    std::string errmsg;
 
     try {
         results = query_openai::run_query(prompt, model);
     } catch (std::runtime_error &e) {
+        errmsg = e.what();
         query_failed = true;
-        {
-            std::lock_guard<std::mutex> lock(mutex_print_stderr);
-            fmt::print(stderr, "{}\n", e.what());
-        }
     }
 
     TIMER_ENABLED.store(false);
     timer.join();
 
     if (query_failed) {
-        throw std::runtime_error("Cannot proceed");
+        throw std::runtime_error(errmsg);
     }
 
     return results;
