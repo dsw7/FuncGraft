@@ -60,7 +60,7 @@ void print_updated_code_to_stdout(const std::string &code, const std::string &ex
         code_block = utils::get_code_block(code);
     }
 
-    fmt::print("Results:\n");
+    fmt::print(fmt::emphasis::bold, "Results:\n");
     fmt::print(fg(green), "{}", code_block);
 }
 
@@ -70,6 +70,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
+    utils::print_separator();
     const std::string input_text = load_input_text_from_file(params);
     const std::string instructions = load_instructions(params);
     const std::string input_file_extension = params.input_file.extension();
@@ -87,17 +88,18 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.verbose) {
         utils::print_separator();
-        fmt::print("Prompt:\n");
+        fmt::print(fmt::emphasis::bold, "Prompt:\n");
         fmt::print(fg(blue), "{}", prompt);
     }
 
     utils::print_separator();
 
     const query_openai::QueryResults results = query_openai::run_query(prompt, model);
-    fmt::print("Information:\n", results.prompt_tokens);
+    fmt::print(fmt::emphasis::bold, "Information:\n");
     fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
     fmt::print("Completion tokens: {}\n", results.completion_tokens);
-    fmt::print("Description of changes: {}\n", results.description);
+    fmt::print("Description of changes: ");
+    fmt::print(fg(blue), "{}\n", results.description);
 
     if (params.output_file) {
         utils::write_to_file(params.output_file.value(), results.code);

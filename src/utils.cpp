@@ -104,11 +104,19 @@ std::optional<std::string> resolve_label_from_extension(const std::string &exten
 
 std::string get_code_block(const std::string &body)
 {
+    if (body.back() == '\n') {
+        return fmt::format("```\n{}```\n", body);
+    }
+
     return fmt::format("```\n{}\n```\n", body);
 }
 
 std::string get_code_block(const std::string &body, const std::string &label)
 {
+    if (body.back() == '\n') {
+        return fmt::format("```{}\n{}```\n", label, body);
+    }
+
     return fmt::format("```{}\n{}\n```\n", label, body);
 }
 
