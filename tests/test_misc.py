@@ -44,7 +44,47 @@ class TestMisc(TestCase):
         self.assertIn("File 'foo.txt' does not exist!", process.stderr)
 
     def test_invalid_model(self) -> None:
-        command = [get_gpe_binary(), "tests/dummy.py", "--instructions=tests/edit.txt", "--model=foobar"]
+        command = [
+            get_gpe_binary(),
+            "tests/dummy.py",
+            "--instructions=tests/edit.txt",
+            "--model=foobar",
+        ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
-        self.assertIn("The model `foobar` does not exist or you do not have access to it.", process.stderr)
+        self.assertIn(
+            "The model `foobar` does not exist or you do not have access to it.",
+            process.stderr,
+        )
+
+
+class TestEditing(TestCase):
+
+    def test_read_instructions_from_file(self) -> None:
+        command = [
+            get_gpe_binary(),
+            "tests/dummy.py",
+            "--file=tests/edit.txt",
+            "-o/tmp/dummy.py",
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0)
+
+        process = run(["python3", "/tmp/dummy.py"], stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0)
+        self.assertIn("The sum is 14", process.stdout)
+
+    def test_read_instructions_from_cli(self) -> None:
+        instructions = "Replace the variable `c` with the integer 5"
+        command = [
+            get_gpe_binary(),
+            "tests/dummy.py",
+            f"--instructions='{instructions}'",
+            "-o/tmp/dummy.py",
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0)
+
+        process = run(["python3", "/tmp/dummy.py"], stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0)
+        self.assertIn("The sum is 9", process.stdout)
