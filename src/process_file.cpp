@@ -49,10 +49,19 @@ std::string load_instructions(const params::CommandLineParameters &params)
     return utils::read_from_file(instructions_file);
 }
 
-void print_updated_code_to_stdout(const std::string &code)
+void print_updated_code_to_stdout(const std::string &code, const std::string &extension)
 {
+    const auto label = utils::resolve_label_from_extension(extension);
+    std::string code_block;
+
+    if (label) {
+        code_block = utils::get_code_block(code, label.value());
+    } else {
+        code_block = utils::get_code_block(code);
+    }
+
     fmt::print("Results:\n");
-    fmt::print(fg(green), "{}\n", code);
+    fmt::print(fg(green), "{}", code_block);
 }
 
 } // namespace
@@ -78,16 +87,17 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.verbose) {
         utils::print_separator();
-        fmt::print("The prompt was:\n");
+        fmt::print("Prompt:\n");
         fmt::print(fg(blue), "{}", prompt);
     }
 
     utils::print_separator();
 
     const query_openai::QueryResults results = query_openai::run_query(prompt, model);
-    fmt::print("Usage:\n", results.prompt_tokens);
+    fmt::print("Information:\n", results.prompt_tokens);
     fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
     fmt::print("Completion tokens: {}\n", results.completion_tokens);
+    fmt::print("Description of changes: {}\n", results.description);
 
     if (params.output_file) {
         utils::write_to_file(params.output_file.value(), results.code);
@@ -96,7 +106,7 @@ void process_file(const params::CommandLineParameters &params)
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(results.code);
+    print_updated_code_to_stdout(results.code, input_file_extension);
     utils::print_separator();
 }
 
