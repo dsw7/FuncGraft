@@ -4,15 +4,90 @@
 #include "query_openai.hpp"
 #include "utils.hpp"
 
+#include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <iostream>
+#include <mutex>
 #include <stdexcept>
+#include <thread>
 
 namespace {
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 fmt::terminal_color green = fmt::terminal_color::bright_green;
+
+// Threading ------------------------------------------------------------------------------------------------
+
+std::atomic<bool> TIMER_ENABLED(false);
+
+void time_api_call()
+{
+    const std::chrono::duration delay = std::chrono::milliseconds(50);
+    int counter = 0;
+
+    while (TIMER_ENABLED.load()) {
+        switch (counter) {
+            case 0:
+                std::cout << "·....\r" << std::flush;
+                break;
+            case 5:
+                std::cout << ".·...\r" << std::flush;
+                break;
+            case 10:
+                std::cout << "..·..\r" << std::flush;
+                break;
+            case 15:
+                std::cout << "...·.\r" << std::flush;
+                break;
+            case 20:
+                std::cout << "....·\r" << std::flush;
+                break;
+        }
+        counter++;
+
+        if (counter > 24) {
+            counter = 0;
+        }
+
+        std::this_thread::sleep_for(delay);
+    }
+
+    std::cout << std::string(16, ' ') << '\r' << std::flush;
+}
+
+query_openai::QueryResults run_query_with_threading(const std::string &prompt, const std::string &model)
+{
+    TIMER_ENABLED.store(true);
+    std::thread timer(time_api_call);
+
+    query_openai::QueryResults results;
+    bool query_failed = false;
+    std::mutex mutex_print_stderr;
+
+    try {
+        results = query_openai::run_query(prompt, model);
+    } catch (std::runtime_error &e) {
+        query_failed = true;
+        {
+            std::lock_guard<std::mutex> lock(mutex_print_stderr);
+            fmt::print(stderr, "{}\n", e.what());
+        }
+    }
+
+    TIMER_ENABLED.store(false);
+    timer.join();
+
+    if (query_failed) {
+        throw std::runtime_error("Cannot proceed");
+    }
+
+    return results;
+}
+
+// ----------------------------------------------------------------------------------------------------------
 
 std::string load_input_text_from_file(const params::CommandLineParameters &params)
 {
@@ -102,8 +177,7 @@ void process_file(const params::CommandLineParameters &params)
     }
 
     utils::print_separator();
-
-    const query_openai::QueryResults results = query_openai::run_query(prompt, model);
+    const query_openai::QueryResults results = run_query_with_threading(prompt, model);
 
     report_information_about_query(results);
 
