@@ -12,6 +12,7 @@
 namespace {
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
+fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 std::string load_input_text_from_file(const params::CommandLineParameters &params)
 {
@@ -48,6 +49,12 @@ std::string load_instructions(const params::CommandLineParameters &params)
     return utils::read_from_file(instructions_file);
 }
 
+void print_updated_code_to_stdout(const std::string &code)
+{
+    fmt::print("Results:\n");
+    fmt::print(fg(green), "{}\n", code);
+}
+
 } // namespace
 
 namespace process_file {
@@ -59,11 +66,6 @@ void process_file(const params::CommandLineParameters &params)
     const std::string input_file_extension = params.input_file.extension();
     const std::string prompt = prompt::build_prompt(instructions, input_text, input_file_extension);
 
-    if (params.verbose) {
-        fmt::print("The prompt was:\n");
-        fmt::print(fg(blue), "{}", prompt);
-    }
-
     std::string model;
 
     if (params.model) {
@@ -72,14 +74,30 @@ void process_file(const params::CommandLineParameters &params)
         model = "gpt-4o";
     }
 
+    fmt::print("Using model: {}\n", model);
+
+    if (params.verbose) {
+        utils::print_separator();
+        fmt::print("The prompt was:\n");
+        fmt::print(fg(blue), "{}", prompt);
+    }
+
+    utils::print_separator();
+
     const query_openai::QueryResults results = query_openai::run_query(prompt, model);
+    fmt::print("Usage:\n", results.prompt_tokens);
+    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
+    fmt::print("Completion tokens: {}\n", results.completion_tokens);
 
     if (params.output_file) {
         utils::write_to_file(params.output_file.value(), results.code);
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-    } else {
-        fmt::print("Results:\n{}", results.code);
+        return;
     }
+
+    utils::print_separator();
+    print_updated_code_to_stdout(results.code);
+    utils::print_separator();
 }
 
 } // namespace process_file
