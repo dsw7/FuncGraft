@@ -64,6 +64,15 @@ void print_updated_code_to_stdout(const std::string &code, const std::string &ex
     fmt::print(fg(green), "{}", code_block);
 }
 
+void report_information_about_query(const query_openai::QueryResults &results)
+{
+    fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
+    fmt::print("Completion tokens: {}\n", results.completion_tokens);
+    fmt::print("Description of changes: ");
+    fmt::print(fg(blue), "{}\n", results.description);
+}
+
 } // namespace
 
 namespace process_file {
@@ -95,11 +104,8 @@ void process_file(const params::CommandLineParameters &params)
     utils::print_separator();
 
     const query_openai::QueryResults results = query_openai::run_query(prompt, model);
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
-    fmt::print("Completion tokens: {}\n", results.completion_tokens);
-    fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", results.description);
+
+    report_information_about_query(results);
 
     if (params.output_file) {
         utils::write_to_file(params.output_file.value(), results.code);
