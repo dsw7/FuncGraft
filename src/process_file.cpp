@@ -69,7 +69,7 @@ void process_file(const params::CommandLineParameters &params)
     if (params.model) {
         model = params.model.value();
     } else {
-        model = "gpt-4";
+        model = "gpt-4o";
     }
 
     const query_openai::QueryResults results = query_openai::run_query(prompt, model);
