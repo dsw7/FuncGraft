@@ -85,18 +85,18 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
 // ----------------------------------------------------------------------------------------------------------
 
-std::string load_input_text_from_file(const params::CommandLineParameters &params)
+std::string load_input_text_from_file(const std::string &input_file)
 {
-    if (not std::filesystem::exists(params.input_file)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", params.input_file.string()));
+    if (not std::filesystem::exists(input_file)) {
+        throw std::runtime_error(fmt::format("File '{}' does not exist!", input_file));
     }
 
-    if (not std::filesystem::is_regular_file(params.input_file)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", params.input_file.string()));
+    if (not std::filesystem::is_regular_file(input_file)) {
+        throw std::runtime_error(fmt::format("Input '{}' is not a file!", input_file));
     }
 
-    fmt::print("Loading contents from file '{}' into memory\n", params.input_file.string());
-    return utils::read_from_file(params.input_file);
+    fmt::print("Loading contents from file '{}' into memory\n", input_file);
+    return utils::read_from_file(input_file);
 }
 
 std::string load_instructions(const params::CommandLineParameters &params)
@@ -120,9 +120,9 @@ std::string load_instructions(const params::CommandLineParameters &params)
     return utils::read_from_file(instructions_file);
 }
 
-void print_updated_code_to_stdout(const std::string &code, const std::string &extension)
+void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
 {
-    const auto label = utils::resolve_label_from_extension(extension);
+    const auto label = utils::resolve_label_from_extension(input_file.extension());
     std::string code_block;
 
     if (label) {
@@ -133,6 +133,25 @@ void print_updated_code_to_stdout(const std::string &code, const std::string &ex
 
     fmt::print(fmt::emphasis::bold, "Results:\n");
     fmt::print(fg(green), "{}", code_block);
+
+#ifndef TESTING_ENABLED
+    char choice = 'n';
+
+    while (true) {
+        fmt::print("Overwrite file? [y/n]: ");
+        choice = std::cin.get();
+
+        if (choice == 'y' or choice == 'n') {
+            break;
+        } else {
+            fmt::print("Invalid choice. Input either 'y' or 'n'!\n");
+        }
+    }
+
+    if (choice == 'y') {
+        utils::write_to_file(input_file, code);
+    }
+#endif
 }
 
 void report_information_about_query(const query_openai::QueryResults &results)
@@ -151,10 +170,9 @@ namespace process_file {
 void process_file(const params::CommandLineParameters &params)
 {
     utils::print_separator();
-    const std::string input_text = load_input_text_from_file(params);
+    const std::string input_text = load_input_text_from_file(params.input_file);
     const std::string instructions = load_instructions(params);
-    const std::string input_file_extension = params.input_file.extension();
-    const std::string prompt = prompt::build_prompt(instructions, input_text, input_file_extension);
+    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
 
     std::string model;
 
@@ -184,7 +202,7 @@ void process_file(const params::CommandLineParameters &params)
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(results.code, input_file_extension);
+    print_updated_code_to_stdout(results.code, params.input_file);
     utils::print_separator();
 }
 
