@@ -15,8 +15,8 @@ void print_help()
     fmt::print(" -h, --help                        Print help menu\n");
     fmt::print(" -m <model>, --model=<model>       Select model\n");
     fmt::print(" -o <file>, --output=<file>        Place output into <file>\n");
-    fmt::print(" -i <file>, --instructions=<file>  Read instructions from <file>\n");
-    fmt::print(" -r <text>, --rule=<text>          Read instructions via command line\n");
+    fmt::print(" -f <file>, --file=<file>          Read instructions from <file>\n");
+    fmt::print(" -i <text>, --instructions=<text>  Read instructions via command line\n");
     fmt::print(" -v, --verbose                     Be more verbose with output\n");
 }
 
@@ -34,14 +34,14 @@ int main(int argc, char **argv)
             { "help", no_argument, 0, 'h' },
             { "model", required_argument, 0, 'm' },
             { "output", required_argument, 0, 'o' },
+            { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
-            { "rule", required_argument, 0, 'r' },
             { "verbose", required_argument, 0, 'v' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "hm:o:i:r:v", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "hm:o:f:i:v", long_options, &option_index);
 
         if (opt == -1) {
             break;
@@ -57,11 +57,11 @@ int main(int argc, char **argv)
             case 'o':
                 params.output_file = optarg;
                 break;
-            case 'i':
+            case 'f':
                 params.instructions_file = optarg;
                 break;
-            case 'r':
-                params.rule = optarg;
+            case 'i':
+                params.instructions_from_cli = optarg;
                 break;
             case 'v':
                 params.verbose = true;

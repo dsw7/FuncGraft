@@ -101,9 +101,9 @@ std::string load_input_text_from_file(const params::CommandLineParameters &param
 
 std::string load_instructions(const params::CommandLineParameters &params)
 {
-    if (params.rule) {
+    if (params.instructions_from_cli) {
         fmt::print("Loading instructions from command line\n");
-        return params.rule.value();
+        return params.instructions_from_cli.value();
     }
 
     if (not params.instructions_file) {

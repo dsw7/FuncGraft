@@ -12,7 +12,7 @@ struct CommandLineParameters {
     std::optional<std::filesystem::path> output_file;
     std::optional<std::filesystem::path> instructions_file;
     std::optional<std::string> model;
-    std::optional<std::string> rule;
+    std::optional<std::string> instructions_from_cli;
 };
 
 } // namespace params

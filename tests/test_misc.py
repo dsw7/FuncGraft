@@ -38,7 +38,7 @@ class TestMisc(TestCase):
         )
 
     def test_missing_instructions_file(self) -> None:
-        command = [get_gpe_binary(), "tests/dummy.py", "--instructions=foo.txt"]
+        command = [get_gpe_binary(), "tests/dummy.py", "--file=foo.txt"]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn("File 'foo.txt' does not exist!", process.stderr)
