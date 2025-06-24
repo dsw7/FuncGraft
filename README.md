@@ -9,6 +9,7 @@ I do not believe in letting AI do all the work.
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
+- [Usage](#usage)
 
 ## Prerequisites
 Ensure you possess a valid OpenAI API key. Set it as an environment variable:
@@ -42,3 +43,28 @@ artifacts:
 ```console
 make clean
 ```
+
+## Usage
+
+### Example
+Assume `foo.cpp` uses CamelCase formatting and needs to be converted to snake_case. Outline these changes in a
+simple text file, such as `edit.txt`:
+```plaintext
+Convert all code from CamelCase to snake_case.
+```
+Then run:
+```console
+edit foo.cpp -f edit.txt
+```
+This will print the updated code to `stdout` and prompt whether to overwrite `foo.cpp`. To automatically
+overwrite `foo.cpp`, simply run:
+```console
+edit foo.cpp -i edit.txt -o foo.cpp
+```
+To save the updated code to a new file, such as `bar.cpp`, execute:
+```console
+edit foo.cpp -i edit.txt -o bar.cpp
+```
+> [!NOTE]
+> The instructions in `edit.txt` do not require prompt engineering. When processed, these instructions
+> are combined with additional context and output format specifications to create a complete prompt.
