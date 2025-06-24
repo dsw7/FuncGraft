@@ -32,7 +32,7 @@ clean:
 lint:
 	@cppcheck src --enable=all
 
-test: export PATH_BIN = $(CURDIR)/build/test/gpe
+test: export PATH_BIN = $(CURDIR)/build/test/edit
 test: format
 	@cmake -S src -B build/test -DENABLE_TESTING=ON
 	@make --jobs=12 --directory=build/test

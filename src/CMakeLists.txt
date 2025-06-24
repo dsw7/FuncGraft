@@ -61,7 +61,7 @@ find_package(fmt REQUIRED)
 include_directories(external)
 
 add_executable(
-  gpe
+  edit
   curl_base.cpp
   main.cpp
   process_file.cpp
@@ -70,7 +70,7 @@ add_executable(
   utils.cpp
 )
 
-target_link_libraries(gpe fmt::fmt curl)
+target_link_libraries(edit fmt::fmt curl)
 
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
-install(TARGETS gpe DESTINATION bin)
+install(TARGETS edit DESTINATION bin)

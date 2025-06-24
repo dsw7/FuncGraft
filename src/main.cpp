@@ -10,7 +10,7 @@
 
 void print_help()
 {
-    fmt::print("Usage: gpe [OPTION] file\n\n");
+    fmt::print("Usage: edit [OPTION] file\n\n");
     fmt::print("Options:\n");
     fmt::print(" -h, --help                        Print help menu\n");
     fmt::print(" -m <model>, --model=<model>       Select model\n");
