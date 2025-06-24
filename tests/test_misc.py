@@ -57,6 +57,12 @@ class TestMisc(TestCase):
             process.stderr,
         )
 
+    def test_empty_instructions(self) -> None:
+        command = [get_gpe_binary(), "tests/dummy.py", "--instructions="]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("Instructions are empty!", process.stderr)
+
 
 class TestEditing(TestCase):
 

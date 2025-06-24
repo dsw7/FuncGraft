@@ -170,12 +170,17 @@ namespace process_file {
 void process_file(const params::CommandLineParameters &params)
 {
     utils::print_separator();
+
     const std::string input_text = load_input_text_from_file(params.input_file);
     const std::string instructions = load_instructions(params);
+
+    if (instructions.empty()) {
+        throw std::runtime_error("Instructions are empty!");
+    }
+
     const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
 
     std::string model;
-
     if (params.model) {
         model = params.model.value();
     } else {
