@@ -1,5 +1,6 @@
 #include "process_file.hpp"
 
+#include "file_io.hpp"
 #include "prompt.hpp"
 #include "query_openai.hpp"
 #include "utils.hpp"
@@ -97,20 +98,6 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
 // ----------------------------------------------------------------------------------------------------------
 
-std::string load_input_text_from_file(const std::string &input_file)
-{
-    if (not std::filesystem::exists(input_file)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", input_file));
-    }
-
-    if (not std::filesystem::is_regular_file(input_file)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", input_file));
-    }
-
-    fmt::print("Loading contents from file '{}' into memory\n", input_file);
-    return utils::read_from_file(input_file);
-}
-
 std::string load_instructions(const params::CommandLineParameters &params)
 {
     if (params.instructions_from_cli) {
@@ -183,13 +170,17 @@ void process_file(const params::CommandLineParameters &params)
 {
     utils::print_separator();
 
-    const std::string input_text = load_input_text_from_file(params.input_file);
     const std::string instructions = load_instructions(params);
 
     if (instructions.empty()) {
         throw std::runtime_error("Instructions are empty!");
     }
 
+    file_io::FileIO target;
+    fmt::print("Loading contents from file '{}'\n", params.input_file.string());
+    target.load_input_text_from_file(params.input_file);
+
+    const std::string input_text = target.get_text();
     const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
 
     fmt::print("Using model: {}\n", params.model);
@@ -203,16 +194,17 @@ void process_file(const params::CommandLineParameters &params)
     utils::print_separator();
     const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
 
+    target.set_text(results.output_text);
     report_information_about_query(results);
 
     if (params.output_file) {
-        utils::write_to_file(params.output_file.value(), results.output_text);
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
+        target.dump_output_text_to_file(params.output_file.value());
         return;
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(results.output_text, params.input_file);
+    print_updated_code_to_stdout(target.dump_output_text_to_string(), params.input_file);
     utils::print_separator();
 }
 
