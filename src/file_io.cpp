@@ -39,7 +39,7 @@ Parts unpack_text_into_parts(const std::string &text)
 
 namespace file_io {
 
-void FileIO::load_input_text(const std::filesystem::path &filename)
+void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
@@ -109,7 +109,7 @@ void FileIO::set_text(const std::string &text)
     }
 }
 
-void FileIO::dump_output_text(const std::filesystem::path &filename)
+void FileIO::dump_output_text_to_file(const std::filesystem::path &filename)
 {
     if (this->is_delimited_) {
         if (not this->head_) {

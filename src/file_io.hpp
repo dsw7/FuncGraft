@@ -15,10 +15,10 @@ private:
     std::optional<std::string> text_;
 
 public:
-    void load_input_text(const std::filesystem::path &filename);
+    void load_input_text_from_file(const std::filesystem::path &filename);
     std::string get_text();
     void set_text(const std::string &text);
-    void dump_output_text(const std::filesystem::path &filename);
+    void dump_output_text_to_file(const std::filesystem::path &filename);
 };
 
 } // namespace file_io
