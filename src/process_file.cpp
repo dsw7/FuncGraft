@@ -1,6 +1,7 @@
 #include "process_file.hpp"
 
 #include "file_io.hpp"
+#include "instructions.hpp"
 #include "prompt.hpp"
 #include "query_openai.hpp"
 #include "utils.hpp"
@@ -98,27 +99,6 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
 // ----------------------------------------------------------------------------------------------------------
 
-std::string load_instructions(const params::CommandLineParameters &params)
-{
-    if (params.instructions_from_cli) {
-        fmt::print("Loading instructions from command line\n");
-        return params.instructions_from_cli.value();
-    }
-
-    if (not params.instructions_file) {
-        throw std::runtime_error("No instructions provided by file or command line");
-    }
-
-    const std::string instructions_file = params.instructions_file.value().string();
-
-    if (not std::filesystem::exists(instructions_file)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", instructions_file));
-    }
-
-    fmt::print("Loading instructions from file '{}'\n", instructions_file);
-    return utils::read_from_file(instructions_file);
-}
-
 void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
 {
     const auto label = utils::resolve_label_from_extension(input_file.extension());
@@ -170,20 +150,15 @@ void process_file(const params::CommandLineParameters &params)
 {
     utils::print_separator();
 
-    const std::string instructions = load_instructions(params);
-
-    if (instructions.empty()) {
-        throw std::runtime_error("Instructions are empty!");
-    }
+    fmt::print("Using model: {}\n", params.model);
 
     file_io::FileIO target;
     fmt::print("Loading contents from file '{}'\n", params.input_file.string());
     target.load_input_text_from_file(params.input_file);
 
+    const std::string instructions = instructions::load_instructions(params);
     const std::string input_text = target.get_text();
     const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
-
-    fmt::print("Using model: {}\n", params.model);
 
     if (params.verbose) {
         utils::print_separator();

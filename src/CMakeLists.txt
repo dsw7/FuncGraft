@@ -64,6 +64,7 @@ add_executable(
   edit
   curl_base.cpp
   file_io.cpp
+  instructions.cpp
   main.cpp
   process_file.cpp
   prompt.cpp
