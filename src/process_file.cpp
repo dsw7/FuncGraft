@@ -192,14 +192,7 @@ void process_file(const params::CommandLineParameters &params)
 
     const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
 
-    std::string model;
-    if (params.model) {
-        model = params.model.value();
-    } else {
-        model = "gpt-4o";
-    }
-
-    fmt::print("Using model: {}\n", model);
+    fmt::print("Using model: {}\n", params.model);
 
     if (params.verbose) {
         utils::print_separator();
@@ -208,7 +201,7 @@ void process_file(const params::CommandLineParameters &params)
     }
 
     utils::print_separator();
-    const query_openai::QueryResults results = run_query_with_threading(prompt, model);
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
 
     report_information_about_query(results);
 
