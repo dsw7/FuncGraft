@@ -54,3 +54,15 @@ class TestEditing(TestCase):
         )
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("The sum is 17", process.stdout)
+
+    def test_bad_delim_placement(self) -> None:
+        instructions = "Replace the variable `c` with the integer 3"
+        command = [
+            get_gpe_binary(),
+            LOC_TEST_DATA / "dummy_with_bad_delims.py",
+            f"--instructions='{instructions}'",
+            "-o/tmp/dummy_basic.py",
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("No matching closing delimiter line", process.stderr)
