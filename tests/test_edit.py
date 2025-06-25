@@ -1,23 +1,30 @@
+from os import remove
 from subprocess import run, PIPE
 from unittest import TestCase
 from .utils import get_gpe_binary, LOC_TEST_DATA
 
+OUTPUT_PATH = "/tmp/dummy_basic.py"
+
 
 class TestEditing(TestCase):
+
+    def tearDown(self) -> None:
+        try:
+            remove(OUTPUT_PATH)
+        except FileNotFoundError:
+            pass
 
     def test_read_instructions_from_file(self) -> None:
         command = [
             get_gpe_binary(),
             LOC_TEST_DATA / "dummy_basic.py",
             f'--file={LOC_TEST_DATA / "edit.txt"}',
-            "-o/tmp/dummy_basic.py",
+            f"-o{OUTPUT_PATH}",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
-        process = run(
-            ["python3", "/tmp/dummy_basic.py"], stdout=PIPE, stderr=PIPE, text=True
-        )
+        process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("The sum is 14", process.stdout)
 
@@ -27,14 +34,12 @@ class TestEditing(TestCase):
             get_gpe_binary(),
             LOC_TEST_DATA / "dummy_basic.py",
             f"--instructions='{instructions}'",
-            "-o/tmp/dummy_basic.py",
+            f"-o{OUTPUT_PATH}",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
-        process = run(
-            ["python3", "/tmp/dummy_basic.py"], stdout=PIPE, stderr=PIPE, text=True
-        )
+        process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("The sum is 9", process.stdout)
 
@@ -44,14 +49,12 @@ class TestEditing(TestCase):
             get_gpe_binary(),
             LOC_TEST_DATA / "dummy_with_delims.py",
             f"--instructions='{instructions}'",
-            "-o/tmp/dummy_basic.py",
+            f"-o{OUTPUT_PATH}",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
-        process = run(
-            ["python3", "/tmp/dummy_basic.py"], stdout=PIPE, stderr=PIPE, text=True
-        )
+        process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("The sum is 17", process.stdout)
 
@@ -61,7 +64,7 @@ class TestEditing(TestCase):
             get_gpe_binary(),
             LOC_TEST_DATA / "dummy_with_bad_delims.py",
             f"--instructions='{instructions}'",
-            "-o/tmp/dummy_basic.py",
+            f"-o{OUTPUT_PATH}",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
