@@ -92,10 +92,10 @@ query_openai::QueryResults deserialize_response(const std::string &response)
     }
 
     query_openai::QueryResults results;
-    results.code = json_content["code"];
-    results.description = json_content["description"];
-    results.prompt_tokens = json["usage"]["prompt_tokens"];
     results.completion_tokens = json["usage"]["completion_tokens"];
+    results.description = json_content["description"];
+    results.output_text = json_content["code"];
+    results.prompt_tokens = json["usage"]["prompt_tokens"];
     return results;
 }
 

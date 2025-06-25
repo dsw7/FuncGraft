@@ -206,13 +206,13 @@ void process_file(const params::CommandLineParameters &params)
     report_information_about_query(results);
 
     if (params.output_file) {
-        utils::write_to_file(params.output_file.value(), results.code);
+        utils::write_to_file(params.output_file.value(), results.output_text);
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
         return;
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(results.code, params.input_file);
+    print_updated_code_to_stdout(results.output_text, params.input_file);
     utils::print_separator();
 }
 
