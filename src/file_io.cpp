@@ -65,6 +65,16 @@ void FileIO::load_input_text(const std::filesystem::path &filename)
 
 std::string FileIO::get_text()
 {
+    /*
+     * If file contents follow:
+     * -> "aaaa\n@@@@@\nbbbb\n@@@@@\ncccc\n"
+     * Then return "bbbb\n" for processing
+     *
+     * If file contents follow:
+     * -> "aaaa\nbbbb\ncccc\n"
+     * Then return "aaaa\nbbbb\ncccc\n" for processing
+     */
+
     if (this->is_delimited_) {
         if (not this->core_) {
             throw std::logic_error("The [core_] variable is unset!");
@@ -82,6 +92,16 @@ std::string FileIO::get_text()
 
 void FileIO::set_text(const std::string &text)
 {
+    /*
+     * If file contents were:
+     * -> "aaaa\n@@@@@\nbbbb\n@@@@@\ncccc\n"
+     * Then we overwrite only "bbbb\n" with whatever OpenAI returns
+     *
+     * If file contents follow:
+     * -> "aaaa\nbbbb\ncccc\n"
+     * Then we overwrite "aaaa\nbbbb\ncccc\n" with whatever OpenAI returns
+     */
+
     if (this->is_delimited_) {
         this->core_ = text;
     } else {
