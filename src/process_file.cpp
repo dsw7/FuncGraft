@@ -148,12 +148,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    utils::print_separator();
-
-    fmt::print("Using model: {}\n", params.model);
-
     file_io::FileIO target;
-    fmt::print("Loading contents from file '{}'\n", params.input_file.string());
     target.load_input_text_from_file(params.input_file);
 
     const std::string instructions = instructions::load_instructions(params);
