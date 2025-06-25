@@ -30,7 +30,7 @@ class TestMisc(TestCase):
         self.assertIn("File 'abc.txt' does not exist!", process.stderr)
 
     def test_missing_instructions(self) -> None:
-        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy.py"]
+        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py"]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn(
@@ -38,7 +38,7 @@ class TestMisc(TestCase):
         )
 
     def test_missing_instructions_file(self) -> None:
-        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy.py", "--file=foo.txt"]
+        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py", "--file=foo.txt"]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn("File 'foo.txt' does not exist!", process.stderr)
@@ -46,8 +46,8 @@ class TestMisc(TestCase):
     def test_invalid_model(self) -> None:
         command = [
             get_gpe_binary(),
-            LOC_TEST_DATA / "dummy.py",
-            "--instructions=tests/edit.txt",
+            LOC_TEST_DATA / "dummy_basic.py",
+            "--instructions=A foo that bars",
             "--model=foobar",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
@@ -58,7 +58,11 @@ class TestMisc(TestCase):
         )
 
     def test_empty_instructions(self) -> None:
-        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy.py", "--instructions="]
+        command = [
+            get_gpe_binary(),
+            LOC_TEST_DATA / "dummy_basic.py",
+            "--instructions=",
+        ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn("Instructions are empty!", process.stderr)
