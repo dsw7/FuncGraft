@@ -18,6 +18,7 @@ public:
     void load_input_text_from_file(const std::filesystem::path &filename);
     std::string get_text();
     void set_text(const std::string &text);
+    std::string dump_output_text_to_string();
     void dump_output_text_to_file(const std::filesystem::path &filename);
 };
 

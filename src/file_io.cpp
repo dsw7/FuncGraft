@@ -109,8 +109,10 @@ void FileIO::set_text(const std::string &text)
     }
 }
 
-void FileIO::dump_output_text_to_file(const std::filesystem::path &filename)
+std::string FileIO::dump_output_text_to_string()
 {
+    std::string output;
+
     if (this->is_delimited_) {
         if (not this->head_) {
             throw std::logic_error("The [head_] variable is unset!");
@@ -122,15 +124,21 @@ void FileIO::dump_output_text_to_file(const std::filesystem::path &filename)
             throw std::logic_error("The [tail_] variable is unset!");
         }
 
-        utils::write_to_file(filename, this->head_.value() + this->core_.value() + this->tail_.value());
-        return;
+        output = this->head_.value() + this->core_.value() + this->tail_.value();
+    } else {
+        if (not this->text_) {
+            throw std::logic_error("The [text_] variable is unset!");
+        }
+
+        output = this->text_.value();
     }
 
-    if (not this->text_) {
-        throw std::logic_error("The [text_] variable is unset!");
-    }
+    return output;
+}
 
-    utils::write_to_file(filename, this->text_.value());
+void FileIO::dump_output_text_to_file(const std::filesystem::path &filename)
+{
+    utils::write_to_file(filename, this->dump_output_text_to_string());
 }
 
 } // namespace file_io
