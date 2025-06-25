@@ -1,5 +1,8 @@
 from functools import cache
 from os import environ
+from pathlib import Path
+
+LOC_TEST_DATA = Path("tests/test_files")
 
 
 @cache
