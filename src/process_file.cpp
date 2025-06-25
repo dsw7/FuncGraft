@@ -24,7 +24,7 @@ std::atomic<bool> TIMER_ENABLED(false);
 
 void time_api_call()
 {
-    const std::chrono::duration delay = std::chrono::milliseconds(50);
+    const std::chrono::duration delay = std::chrono::milliseconds(25);
     int counter = 0;
 
     while (TIMER_ENABLED.load()) {
@@ -33,21 +33,33 @@ void time_api_call()
                 std::cout << ">        \r" << std::flush;
                 break;
             case 5:
-                std::cout << "-->      \r" << std::flush;
+                std::cout << "->       \r" << std::flush;
                 break;
             case 10:
-                std::cout << "---->    \r" << std::flush;
+                std::cout << "-->      \r" << std::flush;
                 break;
             case 15:
-                std::cout << "------>  \r" << std::flush;
+                std::cout << "--->     \r" << std::flush;
                 break;
             case 20:
+                std::cout << "---->    \r" << std::flush;
+                break;
+            case 25:
+                std::cout << "----->   \r" << std::flush;
+                break;
+            case 30:
+                std::cout << "------>  \r" << std::flush;
+                break;
+            case 35:
+                std::cout << "-------> \r" << std::flush;
+                break;
+            case 40:
                 std::cout << "-------->\r" << std::flush;
                 break;
         }
         counter++;
 
-        if (counter > 24) {
+        if (counter > 44) {
             counter = 0;
         }
 
