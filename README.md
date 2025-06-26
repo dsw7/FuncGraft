@@ -46,24 +46,30 @@ make clean
 
 ## Usage
 
-### Example
-Assume `foo.cpp` uses CamelCase formatting and needs to be converted to snake_case. Outline these changes in a
-simple text file, such as `edit.txt`:
-```plaintext
-Convert all code from CamelCase to snake_case.
-```
-Then run:
+### Example - read from stdin
+Assume `foo.cpp` uses CamelCase formatting and needs to be converted to snake_case. Run:
 ```console
-edit foo.cpp -f edit.txt
+edit foo.cpp
+```
+Which will begin a basic interactive session. Outline the required changes when prompted:
+```plaintext
+Input: Convert all code from CamelCase to snake_case.
 ```
 This will print the updated code to `stdout` and prompt whether to overwrite `foo.cpp`. To automatically
 overwrite `foo.cpp`, simply run:
 ```console
-edit foo.cpp -i edit.txt -o foo.cpp
+edit foo.cpp -o foo.cpp
 ```
 To save the updated code to a new file, such as `bar.cpp`, execute:
 ```console
-edit foo.cpp -i edit.txt -o bar.cpp
+edit foo.cpp -o bar.cpp
+```
+
+### Example - working with complex prompts
+Complex multiline prompts can be written into a file and read into the program. For example:
+```bash
+echo "Convert all code from CamelCase to snake_case." > edit.txt && \
+edit /tmp/test.py -o /tmp/test.py -f edit.txt
 ```
 > [!NOTE]
 > The instructions in `edit.txt` do not require prompt engineering. When processed, these instructions
@@ -72,12 +78,12 @@ edit foo.cpp -i edit.txt -o bar.cpp
 ### Debugging
 Run the program with the `-v` flag to enable verbosity:
 ```console
-edit foo.cpp -f edit.txt -v
+edit foo.cpp -v
 ```
 This will print out the prompt being sent to OpenAI.
 
 ### Specify a custom model
 Run the program with the `-m` or `--model` option:
 ```console
-edit foo.cpp -f edit.txt -m <your-model>
+edit foo.cpp -m <your-model>
 ```
