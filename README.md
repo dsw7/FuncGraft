@@ -75,6 +75,56 @@ edit /tmp/test.py -o /tmp/test.py -f edit.txt
 > The instructions in `edit.txt` do not require prompt engineering. When processed, these instructions
 > are combined with additional context and output format specifications to create a complete prompt.
 
+### Example - targeted code manipulation
+Suppose we have the file `example.c`:
+```c
+#include <stdio.h>
+
+void printIntAddr()
+{
+    const int i = 42;
+    printf("Value: %d\n", i);
+    printf("Address: %p\n", (void *)&i);
+}
+
+void print_float_addr()
+{
+    const float f = 3.14f;
+    printf("Value: %.2f\n", f);
+    printf("Address: %p\n", (void *)&f);
+}
+
+int main()
+{
+    print_int_addr();
+    print_float_addr();
+    return 0;
+}
+```
+This code will not compile. The case between the two functions that print an integer address are mixed. To
+both resolve this and minimize token usage, the offending code can be isolated with `@@@@@` delimiters:
+```c
+#include <stdio.h>
+
+@@@@@
+void printIntAddr()
+{
+    const int i = 42;
+    printf("Value: %d\n", i);
+    printf("Address: %p\n", (void *)&i);
+}
+@@@@@
+
+void print_float_addr()
+{
+...
+```
+We can then run:
+```console
+edit example.c
+```
+And request a CamelCase to snake_case conversion, thus resolving the missing function definition.
+
 ### Debugging
 Run the program with the `-v` flag to enable verbosity:
 ```console
