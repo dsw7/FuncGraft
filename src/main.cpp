@@ -10,14 +10,35 @@
 
 void print_help()
 {
-    fmt::print("Usage: edit [OPTION] file\n\n");
-    fmt::print("Options:\n");
-    fmt::print(" -h, --help                        Print help menu\n");
-    fmt::print(" -m <model>, --model=<model>       Select model\n");
-    fmt::print(" -o <file>, --output=<file>        Place output into <file>\n");
-    fmt::print(" -f <file>, --file=<file>          Read instructions from <file>\n");
-    fmt::print(" -i <text>, --instructions=<text>  Read instructions via command line\n");
-    fmt::print(" -v, --verbose                     Be more verbose with output\n");
+    const std::string messages = R"(-- FuncGraft | Copyright (C) 2025 by David Weber
+-- See https://github.com/dsw7/FuncGraft for more information
+
+Program for editing individual files using LLMs.
+
+Usage:
+  edit [OPTION] 
+  edit [OPTION]... FILE
+
+Options:
+  -h, --help                       Print help menu
+  -m, --model=MODEL                Select model
+  -o, --output=FILENAME            Place output into FILENAME
+  -f, --file=FILENAME              Read instructions from FILENAME
+  -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
+  -v, --verbose                    Be more verbose with output
+
+Examples:
+  1. Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
+    $ edit foo.cpp
+  2. Edit a file interactively and automatically overwrite file:
+    $ edit foo.cpp -o foo.cpp
+  3. Edit a file interactively and write to a new file:
+    $ edit foo.cpp -o bar.cpp
+  4. Edit a file in accordance with a long, multiline prompt:
+    $ edit foo.cpp -o bar.cpp -f instructions.txt
+)";
+
+    fmt::print("{}", messages);
 }
 
 int main(int argc, char **argv)
