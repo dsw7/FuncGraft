@@ -33,9 +33,9 @@ This program should work on other Unix-like systems (i.e. other Linux distributi
 extensively test these.
 
 ## Setup
-Compile the binary by executing the `make` target:
+Compile the binary by executing the default `make` target:
 ```console
-make compile
+make
 ```
 The binary will be installed into the directory specified by CMake's [install()
 function](https://cmake.org/cmake/help/latest/command/install.html#command:install). To clean up generated

@@ -1,23 +1,5 @@
-.PHONY = help format compile clean lint test
-.DEFAULT_GOAL = help
-
-define HELP_LIST_TARGETS
-To format code:
-    $$ make format
-To compile binary:
-    $$ make compile
-To remove build directory:
-    $$ make clean
-To run cppcheck linter:
-    $$ make lint
-To run unit tests:
-    $$ make test
-endef
-
-export HELP_LIST_TARGETS
-
-help:
-	@echo "$$HELP_LIST_TARGETS"
+.PHONY = format compile clean lint test
+.DEFAULT_GOAL = compile
 
 format:
 	@clang-format -i --verbose --style=file src/*.cpp src/*.hpp
