@@ -16,7 +16,7 @@ void print_help()
 Program for editing individual files using LLMs.
 
 Usage:
-  edit [OPTION] 
+  edit [OPTION]
   edit [OPTION]... FILE
 
 Options:
@@ -28,14 +28,15 @@ Options:
   -v, --verbose                    Be more verbose with output
 
 Examples:
-  1. Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
+  > Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
     $ edit foo.cpp
-  2. Edit a file interactively and automatically overwrite file:
+  > Edit a file interactively and automatically overwrite file:
     $ edit foo.cpp -o foo.cpp
-  3. Edit a file interactively and write to a new file:
+  > Edit a file interactively and write to a new file:
     $ edit foo.cpp -o bar.cpp
-  4. Edit a file in accordance with a long, multiline prompt:
+  > Edit a file in accordance with a long, multiline prompt:
     $ edit foo.cpp -o bar.cpp -f instructions.txt
+
 )";
 
     fmt::print("{}", messages);

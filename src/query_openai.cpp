@@ -22,6 +22,10 @@ std::string get_stringified_json_from_completion(const std::string &completion)
      * ```
      */
 
+    if (completion.empty()) {
+        throw std::runtime_error("Completion is empty. Cannot extract JSON");
+    }
+
     if (completion[0] == '{' and completion.back() == '}') {
         return completion;
     }
