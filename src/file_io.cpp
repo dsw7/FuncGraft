@@ -51,7 +51,7 @@ void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 
     const std::string file_contents = utils::read_from_file(filename);
 
-    if (file_contents.contains(DELIMITER_LINE_)) {
+    if (file_contents.find(DELIMITER_LINE_) != std::string::npos) {
         const Parts parts = unpack_text_into_parts(file_contents);
         this->head_ = parts.head;
         this->core_ = parts.core;

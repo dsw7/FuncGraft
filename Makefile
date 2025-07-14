@@ -1,12 +1,15 @@
-.PHONY = format compile clean lint test
+.PHONY = format compile tidy clean lint test
 .DEFAULT_GOAL = compile
 
 format:
 	@clang-format -i --verbose --style=file src/*.cpp src/*.hpp
 
 compile: format
-	@cmake -S src -B build/prod
 	@make --jobs=12 --directory=build/prod install
+
+tidy:
+	@cmake -S src -B build/prod  # generate build files so clang-tidy can find compile_commands.json
+	@clang-tidy -p build/prod src/*.cpp src/*.hpp
 
 clean:
 	@rm -rfv build
