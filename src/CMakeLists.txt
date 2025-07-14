@@ -5,14 +5,8 @@ project(GPTifierEdit VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
-
-string(TIMESTAMP BUILD_DATE)
-add_compile_definitions(BUILD_DATE="${BUILD_DATE}")
-
-add_compile_options(-Wall -Wextra -pedantic -Werror)
-
-# Need to generate compile_commands.json for clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 # -----------------------------------------------------------------------------------------------------------
 # Testing
