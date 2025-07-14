@@ -5,6 +5,7 @@ format:
 	@clang-format -i --verbose --style=file src/*.cpp src/*.hpp
 
 compile: format
+	@cmake -S src -B build/prod
 	@make --jobs=12 --directory=build/prod install
 
 tidy:
