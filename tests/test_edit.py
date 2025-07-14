@@ -69,3 +69,14 @@ class TestEditing(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn("No matching closing delimiter line", process.stderr)
+
+    def test_work_on_empty_file(self) -> None:
+        instructions = "Replace the variable `c` with the integer 3"
+        command = [
+            get_gpe_binary(),
+            LOC_TEST_DATA / "dummy_empty.py",
+            f"--instructions='{instructions}'",
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1, process.stdout)
+        self.assertIn("Body is empty. Cannot extract code block", process.stderr)
