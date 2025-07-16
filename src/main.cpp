@@ -16,14 +16,13 @@ void print_help()
 Program for editing individual files using LLMs.
 
 Usage:
-  edit [OPTION]
-  edit [OPTION]... FILE
+  edit [OPTIONS] FILENAME
 
 Options:
   -h, --help                       Print help menu
   -m, --model=MODEL                Select model
-  -o, --output=FILENAME            Place output into FILENAME
-  -f, --file=FILENAME              Read instructions from FILENAME
+  -o, --output=FILE                Place output into FILE
+  -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
   -v, --verbose                    Be more verbose with output
 
