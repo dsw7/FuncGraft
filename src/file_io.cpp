@@ -41,6 +41,10 @@ namespace file_io {
 
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
+    if (filename.empty()) {
+        throw std::runtime_error("No filename was provided. Cannot proceed");
+    }
+
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
     }
