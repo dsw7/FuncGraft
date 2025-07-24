@@ -73,6 +73,10 @@ void time_api_call()
 
 query_openai::QueryResults run_query_with_threading(const std::string &prompt, const std::string &model)
 {
+    if (model.empty()) {
+        throw std::runtime_error("Model is empty. Cannot proceed");
+    }
+
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call);
 
