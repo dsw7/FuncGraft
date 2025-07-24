@@ -10,6 +10,12 @@ void CommandLineParameters::validate_params()
         throw std::invalid_argument("No filename was provided. Cannot proceed");
     }
 
+    if (this->output_file) {
+        if (this->output_file.value().empty()) {
+            throw std::invalid_argument("Output filename was not provided. Cannot proceed");
+        }
+    }
+
     if (this->model.empty()) {
         throw std::invalid_argument("Model is empty. Cannot proceed");
     }

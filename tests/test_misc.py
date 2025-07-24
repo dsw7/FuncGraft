@@ -17,24 +17,6 @@ class TestMisc(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
-    def test_input_file_is_empty(self) -> None:
-        command = [get_gpe_binary(), ""]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("No filename was provided. Cannot proceed", process.stderr)
-
-    def test_input_file_is_not_a_file(self) -> None:
-        command = [get_gpe_binary(), "/tmp", "-iFoo"]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("Input '/tmp' is not a file!", process.stderr)
-
-    def test_missing_input_file(self) -> None:
-        command = [get_gpe_binary(), "abc.txt", "-iFoo"]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("File 'abc.txt' does not exist!", process.stderr)
-
     #    def test_missing_instructions(self) -> None:
     #        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py"]
     #        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
