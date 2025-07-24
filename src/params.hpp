@@ -19,6 +19,8 @@ struct CommandLineParameters {
     std::optional<std::filesystem::path> output_file;
     std::optional<std::string> instructions_from_cli;
     std::string model = DEFAULT_MODEL;
+
+    void validate_params();
 };
 
 } // namespace params

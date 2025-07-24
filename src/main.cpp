@@ -101,6 +101,13 @@ int main(int argc, char **argv)
     }
 
     try {
+        params.validate_params();
+    } catch (const std::invalid_argument &e) {
+        fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
+        return 1;
+    }
+
+    try {
         process_file::process_file(params);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
