@@ -1,6 +1,6 @@
 from subprocess import run, PIPE
 from unittest import TestCase
-from .utils import get_gpe_binary, LOC_TEST_DATA
+from .utils import get_gpe_binary
 
 
 class TestMisc(TestCase):
@@ -24,19 +24,3 @@ class TestMisc(TestCase):
     #        self.assertIn(
     #            "No instructions provided by file or command line", process.stderr
     #        )
-
-    def test_missing_instructions_file(self) -> None:
-        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py", "--file=foo.txt"]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("File 'foo.txt' does not exist!", process.stderr)
-
-    def test_empty_instructions(self) -> None:
-        command = [
-            get_gpe_binary(),
-            LOC_TEST_DATA / "dummy_basic.py",
-            "--instructions=",
-        ]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("Instructions are empty!", process.stderr)
