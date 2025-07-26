@@ -17,6 +17,12 @@ class TestMisc(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
 
+    def test_unknown_opt(self) -> None:
+        command = [get_gpe_binary(), "-X"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("Unknown option passed to command", process.stderr)
+
     #    def test_missing_instructions(self) -> None:
     #        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py"]
     #        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
