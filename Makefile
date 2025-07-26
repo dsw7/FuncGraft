@@ -1,4 +1,4 @@
-.PHONY = format compile tidy clean lint test coverage
+.PHONY = format compile tidy clean lint test
 .DEFAULT_GOAL = compile
 
 format:
@@ -20,15 +20,10 @@ lint:
 
 test: export PATH_BIN = $(CURDIR)/build/test/edit
 test: format
-	@cmake -S src -B build/test -DENABLE_TESTING=ON
+	@cmake -S src -B build/test -DENABLE_TESTING=ON -DENABLE_COVERAGE=ON
 	@make --jobs=12 --directory=build/test
 	@python3 -m unittest -v tests/test*.py -f
-
-coverage: export PATH_BIN = $(CURDIR)/build/coverage/edit
-coverage: format
-	@cmake -S src -B build/coverage -DENABLE_TESTING=ON -DENABLE_COVERAGE=ON
-	@make --jobs=12 --directory=build/coverage
-	@python3 -m unittest -v tests/test*.py -f
-	@lcov --capture --directory=build/coverage --output-file build/coverage/coverage.info
-	@genhtml build/coverage/coverage.info --output-directory build/coverage/coverageResults
-	@echo "See coverage report at: build/coverage/coverageResults/index.html"
+	@lcov --capture --directory=build/test --output-file build/test/coverage.info
+	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
+	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
+	@echo "See coverage report at: build/test/coverageResults/index.html"
