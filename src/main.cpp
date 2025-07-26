@@ -88,7 +88,7 @@ int main(int argc, char **argv)
                 params.verbose = true;
                 break;
             default:
-                print_help();
+                fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
                 exit(EXIT_FAILURE);
         }
     }

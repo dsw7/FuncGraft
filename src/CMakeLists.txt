@@ -1,24 +1,43 @@
 cmake_minimum_required(VERSION 3.18)
-
 project(GPTifierEdit VERSION 1.0)
 
+option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
+option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
+set(SRC_FILES
+  curl_base.cpp
+  file_io.cpp
+  instructions.cpp
+  main.cpp
+  params.cpp
+  process_file.cpp
+  prompt.cpp
+  query_openai.cpp
+  utils.cpp
+)
+
 add_compile_options(-Wall -Wextra -pedantic -Werror)
-
-# -----------------------------------------------------------------------------------------------------------
-# Testing
-
-option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 
 if(ENABLE_TESTING)
   add_compile_definitions(TESTING_ENABLED)
 endif()
 
+if(ENABLE_COVERAGE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
+
+include_directories(external)
+
 # -----------------------------------------------------------------------------------------------------------
-# nlohmann/json.hpp
+# External dependencies
+
+find_package(fmt REQUIRED)
 
 message(STATUS "Checking for nlohmann/json.hpp")
 set(NLOHMANN_JSON_HPP_DL "${CMAKE_SOURCE_DIR}/external/json.hpp")
@@ -34,9 +53,6 @@ else()
     SHOW_PROGRESS
   )
 endif()
-
-# -----------------------------------------------------------------------------------------------------------
-# toml++
 
 message(STATUS "Checking for toml++ header file")
 set(TOMLPLUSPLUS_HPP_DL "${CMAKE_SOURCE_DIR}/external/toml.hpp")
@@ -54,23 +70,7 @@ else()
 endif()
 
 # -----------------------------------------------------------------------------------------------------------
-find_package(fmt REQUIRED)
-include_directories(external)
-
-add_executable(
-  edit
-  curl_base.cpp
-  file_io.cpp
-  instructions.cpp
-  main.cpp
-  params.cpp
-  process_file.cpp
-  prompt.cpp
-  query_openai.cpp
-  utils.cpp
-)
+add_executable(edit ${SRC_FILES})
 
 target_link_libraries(edit fmt::fmt curl)
-
-set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
-install(TARGETS edit DESTINATION bin)
+install(TARGETS edit DESTINATION ${CMAKE_INSTALL_PREFIX})
