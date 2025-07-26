@@ -80,3 +80,17 @@ class TestEditing(TestCase):
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1, process.stdout)
         self.assertIn("Body is empty. Cannot extract code block", process.stderr)
+
+    def test_work_on_unknown_file(self) -> None:
+        instructions = "Capitalize all words in the file"
+        command = [
+            get_gpe_binary(),
+            LOC_TEST_DATA / "unknown_file_type.abc",
+            f"--instructions='{instructions}'",
+            f"-o{OUTPUT_PATH}",  # Will write to a .py file but it's okay
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0, process.stderr)
+
+        with open(OUTPUT_PATH) as f:
+            self.assertIn("Foobar", f.read())
