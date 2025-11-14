@@ -23,6 +23,9 @@ set(SRC_FILES
 
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 
+string(TIMESTAMP CURRENT_YEAR "%Y")
+add_compile_definitions(CURRENT_YEAR="${CURRENT_YEAR}")
+
 if(ENABLE_TESTING)
   add_compile_definitions(TESTING_ENABLED)
 endif()
