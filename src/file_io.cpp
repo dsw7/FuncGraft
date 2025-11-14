@@ -7,7 +7,7 @@
 
 namespace {
 
-const std::string DELIMITER_LINE_ = "@@@@@\n";
+const std::string DELIMITER_LINE_ = "@@@\n";
 
 struct Parts {
     std::string head;
@@ -67,7 +67,7 @@ std::string FileIO::get_text()
 {
     /*
      * If file contents follow:
-     * -> "aaaa\n@@@@@\nbbbb\n@@@@@\ncccc\n"
+     * -> "aaaa\n@@@\nbbbb\n@@@\ncccc\n"
      * Then return "bbbb\n" for processing
      *
      * If file contents follow:
@@ -94,7 +94,7 @@ void FileIO::set_text(const std::string &text)
 {
     /*
      * If file contents were:
-     * -> "aaaa\n@@@@@\nbbbb\n@@@@@\ncccc\n"
+     * -> "aaaa\n@@@\nbbbb\n@@@\ncccc\n"
      * Then we overwrite only "bbbb\n" with whatever OpenAI returns
      *
      * If file contents follow:
