@@ -102,18 +102,18 @@ int main()
 }
 ```
 This code will not compile. The case between the two functions that print an integer address are mixed. To
-both resolve this and minimize token usage, the offending code can be isolated with `@@@@@` delimiters:
+both resolve this and minimize token usage, the offending code can be isolated with `@@@` delimiters:
 ```c
 #include <stdio.h>
 
-@@@@@
+@@@
 void printIntAddr()
 {
     const int i = 42;
     printf("Value: %d\n", i);
     printf("Address: %p\n", (void *)&i);
 }
-@@@@@
+@@@
 
 void print_float_addr()
 {

@@ -1,6 +1,6 @@
 def get_sum() -> int:
     return 10 + c
-@@@@@
+@@@
 
 
 def main() -> None:
