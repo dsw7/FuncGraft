@@ -8,6 +8,7 @@
 namespace {
 
 const std::string DELIMITER_LINE_ = "@@@\n";
+const std::size_t SIZE_DELIM_LINE_ = DELIMITER_LINE_.size();
 
 struct Parts {
     std::string head;
@@ -22,7 +23,7 @@ Parts unpack_text_into_parts(const std::string &text)
     Parts parts;
     parts.head = text.substr(0, idx_head);
 
-    const std::string::size_type idx_start_core = idx_head + 6;
+    const std::string::size_type idx_start_core = idx_head + SIZE_DELIM_LINE_;
     const std::string::size_type idx_tail = text.find(DELIMITER_LINE_, idx_start_core);
 
     if (idx_tail == std::string::npos) {
@@ -31,7 +32,7 @@ Parts unpack_text_into_parts(const std::string &text)
 
     const std::string::size_type size_core = idx_tail - idx_start_core;
     parts.core = text.substr(idx_start_core, size_core);
-    parts.tail = text.substr(idx_tail + 6);
+    parts.tail = text.substr(idx_tail + SIZE_DELIM_LINE_);
     return parts;
 }
 
