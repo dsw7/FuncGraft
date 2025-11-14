@@ -10,8 +10,9 @@
 
 void print_help()
 {
-    const std::string messages = R"(-- FuncGraft | Copyright (C) 2025 by David Weber
--- See https://github.com/dsw7/FuncGraft for more information
+    fmt::print("-- FuncGraft | Copyright (C) {} by David Weber\n", CURRENT_YEAR);
+
+    const std::string messages = R"(-- See https://github.com/dsw7/FuncGraft for more information
 
 Program for editing individual files using LLMs.
 

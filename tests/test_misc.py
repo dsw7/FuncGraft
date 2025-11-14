@@ -1,3 +1,4 @@
+from datetime import datetime
 from subprocess import run, PIPE
 from unittest import TestCase
 from .utils import get_gpe_binary
@@ -30,3 +31,11 @@ class TestMisc(TestCase):
     #        self.assertIn(
     #            "No instructions provided by file or command line", process.stderr
     #        )
+
+    def test_copyright(self) -> None:
+        command = [get_gpe_binary(), "--help"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertIn(
+            f"-- FuncGraft | Copyright (C) {datetime.now().year} by David Weber",
+            process.stdout,
+        )
