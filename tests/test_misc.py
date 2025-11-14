@@ -33,8 +33,9 @@ class TestMisc(TestCase):
     #        )
 
     def test_copyright(self) -> None:
-        proc = self.assertSuccess("--help")
+        command = [get_gpe_binary(), "--help"]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertIn(
             f"-- FuncGraft | Copyright (C) {datetime.now().year} by David Weber",
-            proc.stdout.strip(),
+            process.stdout,
         )
