@@ -4,22 +4,52 @@
 
 #include <fmt/core.h>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 
 const std::string DELIMITER_LINE_ = "@@@\n";
 const std::size_t SIZE_DELIM_LINE_ = DELIMITER_LINE_.size();
 
+bool is_text_delimited(const std::string &text)
+{
+    return text.find(DELIMITER_LINE_) != std::string::npos;
+}
+
+struct Positions {
+    std::size_t pos_a = 0;
+    std::size_t pos_b = 0;
+};
+
+Positions get_delimiter_positions(const std::string &text)
+{
+    std::vector<std::size_t> indices;
+    std::size_t pos = text.find(DELIMITER_LINE_);
+
+    while (pos != std::string::npos) {
+        indices.push_back(pos);
+        pos = text.find(DELIMITER_LINE_, pos + SIZE_DELIM_LINE_);
+    }
+
+    int num_indices = indices.size();
+
+    if (num_indices == 1) {
+        throw std::runtime_error("No matching closing delimiter line");
+    } else if (num_indices != 2) {
+        throw std::runtime_error("The number of delimiter lines must be exactly 2");
+    }
+
+    Positions positions;
+    positions.pos_a = indices[0];
+    positions.pos_b = indices[1];
+    return positions;
+}
+
 struct Parts {
     std::string head;
     std::string core;
     std::string tail;
 };
-
-bool is_text_delimited(const std::string &text)
-{
-    return text.find(DELIMITER_LINE_) != std::string::npos;
-}
 
 Parts unpack_text_into_parts(const std::string &text)
 {
