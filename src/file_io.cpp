@@ -16,6 +16,11 @@ struct Parts {
     std::string tail;
 };
 
+bool is_text_delimited(const std::string &text)
+{
+    return text.find(DELIMITER_LINE_) != std::string::npos;
+}
+
 Parts unpack_text_into_parts(const std::string &text)
 {
     const std::string::size_type idx_head = text.find(DELIMITER_LINE_);
@@ -44,7 +49,7 @@ void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
     const std::string file_contents = utils::read_from_file(filename);
 
-    if (file_contents.find(DELIMITER_LINE_) != std::string::npos) {
+    if (is_text_delimited(file_contents)) {
         const Parts parts = unpack_text_into_parts(file_contents);
         this->head_ = parts.head;
         this->core_ = parts.core;
