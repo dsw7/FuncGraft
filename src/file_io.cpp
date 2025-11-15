@@ -4,11 +4,50 @@
 
 #include <fmt/core.h>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 
 const std::string DELIMITER_LINE_ = "@@@\n";
 const std::size_t SIZE_DELIM_LINE_ = DELIMITER_LINE_.size();
+
+bool is_text_delimited(const std::string &text)
+{
+    return text.find(DELIMITER_LINE_) != std::string::npos;
+}
+
+struct Positions {
+    std::size_t pos_start_1 = 0;
+    std::size_t pos_end_1 = 0;
+    std::size_t pos_start_2 = 0;
+    std::size_t pos_end_2 = 0;
+};
+
+Positions get_delimiter_positions(const std::string &text)
+{
+    std::vector<std::size_t> indices;
+    std::size_t pos = text.find(DELIMITER_LINE_);
+
+    while (pos != std::string::npos) {
+        indices.push_back(pos);
+        pos = text.find(DELIMITER_LINE_, pos + SIZE_DELIM_LINE_);
+    }
+
+    int num_indices = indices.size();
+
+    if (num_indices == 1) {
+        throw std::runtime_error("No matching closing delimiter line");
+    } else if (num_indices != 2) {
+        throw std::runtime_error("The number of delimiter lines must be exactly 2");
+    }
+
+    Positions positions;
+    positions.pos_start_1 = indices[0];
+    positions.pos_end_1 = indices[0] + SIZE_DELIM_LINE_;
+    positions.pos_start_2 = indices[1];
+    positions.pos_end_2 = indices[1] + SIZE_DELIM_LINE_;
+    return positions;
+}
 
 struct Parts {
     std::string head;
@@ -18,21 +57,12 @@ struct Parts {
 
 Parts unpack_text_into_parts(const std::string &text)
 {
-    const std::string::size_type idx_head = text.find(DELIMITER_LINE_);
+    const Positions positions = get_delimiter_positions(text);
 
     Parts parts;
-    parts.head = text.substr(0, idx_head);
-
-    const std::string::size_type idx_start_core = idx_head + SIZE_DELIM_LINE_;
-    const std::string::size_type idx_tail = text.find(DELIMITER_LINE_, idx_start_core);
-
-    if (idx_tail == std::string::npos) {
-        throw std::runtime_error("No matching closing delimiter line");
-    }
-
-    const std::string::size_type size_core = idx_tail - idx_start_core;
-    parts.core = text.substr(idx_start_core, size_core);
-    parts.tail = text.substr(idx_tail + SIZE_DELIM_LINE_);
+    parts.head = text.substr(0, positions.pos_start_1);
+    parts.core = text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
+    parts.tail = text.substr(positions.pos_end_2);
     return parts;
 }
 
@@ -42,17 +72,9 @@ namespace file_io {
 
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
-    if (not std::filesystem::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
-    if (not std::filesystem::is_regular_file(filename)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
-    }
-
     const std::string file_contents = utils::read_from_file(filename);
 
-    if (file_contents.find(DELIMITER_LINE_) != std::string::npos) {
+    if (is_text_delimited(file_contents)) {
         const Parts parts = unpack_text_into_parts(file_contents);
         this->head_ = parts.head;
         this->core_ = parts.core;
