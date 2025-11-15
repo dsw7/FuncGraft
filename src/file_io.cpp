@@ -66,6 +66,11 @@ Parts unpack_text_into_parts(const std::string &text)
     return parts;
 }
 
+std::string pack_parts_into_text(const Parts &parts)
+{
+    return parts.head + parts.core + parts.tail;
+}
+
 } // namespace
 
 namespace file_io {
@@ -146,8 +151,11 @@ std::string FileIO::dump_output_text_to_string()
         if (not this->tail_) {
             throw std::logic_error("The [tail_] variable is unset!");
         }
-
-        output = this->head_.value() + this->core_.value() + this->tail_.value();
+        Parts parts;
+        parts.head = this->head_.value();
+        parts.core = this->core_.value();
+        parts.tail = this->tail_.value();
+        output = pack_parts_into_text(parts);
     } else {
         if (not this->text_) {
             throw std::logic_error("The [text_] variable is unset!");
