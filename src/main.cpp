@@ -42,13 +42,8 @@ Examples:
     fmt::print("{}", messages);
 }
 
-int main(int argc, char **argv)
+params::CommandLineParameters parse_opts(int argc, char **argv)
 {
-    if (argc < 2) {
-        print_help();
-        return 0;
-    }
-
     params::CommandLineParameters params;
 
     while (true) {
@@ -100,6 +95,18 @@ int main(int argc, char **argv)
             break;
         }
     }
+
+    return params;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc < 2) {
+        print_help();
+        return 0;
+    }
+
+    params::CommandLineParameters params = parse_opts(argc, argv);
 
     try {
         params.validate_params();
