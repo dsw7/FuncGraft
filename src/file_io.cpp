@@ -17,8 +17,10 @@ bool is_text_delimited(const std::string &text)
 }
 
 struct Positions {
-    std::size_t pos_a = 0;
-    std::size_t pos_b = 0;
+    std::size_t pos_start_1 = 0;
+    std::size_t pos_end_1 = 0;
+    std::size_t pos_start_2 = 0;
+    std::size_t pos_end_2 = 0;
 };
 
 Positions get_delimiter_positions(const std::string &text)
@@ -40,8 +42,10 @@ Positions get_delimiter_positions(const std::string &text)
     }
 
     Positions positions;
-    positions.pos_a = indices[0];
-    positions.pos_b = indices[1];
+    positions.pos_start_1 = indices[0];
+    positions.pos_end_1 = indices[0] + SIZE_DELIM_LINE_;
+    positions.pos_start_2 = indices[1];
+    positions.pos_end_2 = indices[1] + SIZE_DELIM_LINE_;
     return positions;
 }
 
@@ -53,21 +57,12 @@ struct Parts {
 
 Parts unpack_text_into_parts(const std::string &text)
 {
-    const std::string::size_type idx_head = text.find(DELIMITER_LINE_);
+    const Positions positions = get_delimiter_positions(text);
 
     Parts parts;
-    parts.head = text.substr(0, idx_head);
-
-    const std::string::size_type idx_start_core = idx_head + SIZE_DELIM_LINE_;
-    const std::string::size_type idx_tail = text.find(DELIMITER_LINE_, idx_start_core);
-
-    if (idx_tail == std::string::npos) {
-        throw std::runtime_error("No matching closing delimiter line");
-    }
-
-    const std::string::size_type size_core = idx_tail - idx_start_core;
-    parts.core = text.substr(idx_start_core, size_core);
-    parts.tail = text.substr(idx_tail + SIZE_DELIM_LINE_);
+    parts.head = text.substr(0, positions.pos_start_1);
+    parts.core = text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
+    parts.tail = text.substr(positions.pos_end_2);
     return parts;
 }
 
