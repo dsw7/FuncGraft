@@ -82,6 +82,11 @@ std::string pack_parts_into_text(const Parts &parts)
     return parts.head + parts.core + parts.tail;
 }
 
+void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
+{
+    utils::write_to_file(filename, output_text);
+}
+
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {

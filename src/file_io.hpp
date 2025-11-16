@@ -17,6 +17,7 @@ struct Parts {
 
 Parts unpack_text_into_parts(const std::string &input_text);
 std::string pack_parts_into_text(const Parts &parts);
+void write_output_text(const std::filesystem::path &filename, const std::string &output_text);
 
 class FileIO {
 private:
