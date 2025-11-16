@@ -99,6 +99,57 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
 // ----------------------------------------------------------------------------------------------------------
 
+void print_prompt_if_verbose(const std::string &prompt)
+{
+    utils::print_separator();
+    fmt::print(fmt::emphasis::bold, "Prompt:\n");
+    fmt::print(fg(blue), "{}", prompt);
+}
+
+void report_information_about_query(const query_openai::QueryResults &results)
+{
+    fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
+    fmt::print("Completion tokens: {}\n", results.completion_tokens);
+    fmt::print("Description of changes: ");
+    fmt::print(fg(blue), "{}\n", results.description);
+}
+
+std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
+
+    const std::string instructions = instructions::load_instructions(params);
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose(prompt);
+    }
+    utils::print_separator();
+
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    report_information_about_query(results);
+
+    text_parts.core = results.output_text;
+    return file_io::pack_parts_into_text(text_parts);
+}
+
+std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    const std::string instructions = instructions::load_instructions(params);
+    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose(prompt);
+    }
+    utils::print_separator();
+
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    report_information_about_query(results);
+
+    return results.output_text;
+}
+
 void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
 {
     const auto label = utils::resolve_label_from_extension(input_file.extension());
@@ -131,56 +182,6 @@ void print_updated_code_to_stdout(const std::string &code, const std::filesystem
         utils::write_to_file(input_file, code);
     }
 #endif
-}
-
-void report_information_about_query(const query_openai::QueryResults &results)
-{
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
-    fmt::print("Completion tokens: {}\n", results.completion_tokens);
-    fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", results.description);
-}
-
-std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
-{
-    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
-
-    const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
-
-    if (params.verbose) {
-        utils::print_separator();
-        fmt::print(fmt::emphasis::bold, "Prompt:\n");
-        fmt::print(fg(blue), "{}", prompt);
-    }
-
-    utils::print_separator();
-
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
-    report_information_about_query(results);
-
-    text_parts.core = results.output_text;
-    return file_io::pack_parts_into_text(text_parts);
-}
-
-std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
-{
-    const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
-
-    if (params.verbose) {
-        utils::print_separator();
-        fmt::print(fmt::emphasis::bold, "Prompt:\n");
-        fmt::print(fg(blue), "{}", prompt);
-    }
-
-    utils::print_separator();
-
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
-    report_information_about_query(results);
-
-    return results.output_text;
 }
 
 } // namespace
