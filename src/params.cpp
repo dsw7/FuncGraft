@@ -1,6 +1,5 @@
 #include "params.hpp"
 
-#include <fmt/core.h>
 #include <stdexcept>
 
 namespace params {
@@ -9,14 +8,6 @@ void CommandLineParameters::validate_params()
 {
     if (this->input_file.empty()) {
         throw std::invalid_argument("No filename was provided. Cannot proceed");
-    }
-
-    if (not std::filesystem::exists(this->input_file)) {
-        throw std::invalid_argument(fmt::format("File '{}' does not exist!", this->input_file.string()));
-    }
-
-    if (not std::filesystem::is_regular_file(this->input_file)) {
-        throw std::invalid_argument(fmt::format("Input '{}' is not a file!", this->input_file.string()));
     }
 
     if (this->instructions_file) {
