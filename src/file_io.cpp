@@ -68,6 +68,18 @@ bool is_text_delimited(const std::string &input_text)
 
 Parts unpack_text_into_parts(const std::string &input_text)
 {
+    /*
+     * Unpack text of form:
+     * -> "aaaa\n@@@\nbbbb\n@@@\ncccc\n"
+     * Then return "bbbb\n" for processing
+     *
+     * To:
+     * head: aaaa\n
+     * core: bbbb\n
+     * tail: cccc\n
+     *
+     * So we can operate on core only
+     */
     const Positions positions = get_delimiter_positions(input_text);
 
     Parts parts;
@@ -85,111 +97,6 @@ std::string pack_parts_into_text(const Parts &parts)
 void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
 {
     utils::write_to_file(filename, output_text);
-}
-
-void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
-{
-    if (not std::filesystem::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
-    if (not std::filesystem::is_regular_file(filename)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
-    }
-
-    const std::string file_contents = utils::read_from_file(filename);
-
-    if (is_text_delimited(file_contents)) {
-        const Parts parts = unpack_text_into_parts(file_contents);
-        this->head_ = parts.head;
-        this->core_ = parts.core;
-        this->tail_ = parts.tail;
-        this->is_delimited_ = true;
-    } else {
-        this->text_ = file_contents;
-        this->is_delimited_ = false;
-    }
-}
-
-std::string FileIO::get_text()
-{
-    /*
-     * If file contents follow:
-     * -> "aaaa\n@@@\nbbbb\n@@@\ncccc\n"
-     * Then return "bbbb\n" for processing
-     *
-     * If file contents follow:
-     * -> "aaaa\nbbbb\ncccc\n"
-     * Then return "aaaa\nbbbb\ncccc\n" for processing
-     */
-
-    if (this->is_delimited_) {
-        if (not this->core_) {
-            throw std::logic_error("The [core_] variable is unset!");
-        }
-
-        return this->core_.value();
-    }
-
-    if (not this->text_) {
-        throw std::logic_error("The [text_] variable is unset!");
-    }
-
-    return this->text_.value();
-}
-
-void FileIO::set_text(const std::string &text)
-{
-    /*
-     * If file contents were:
-     * -> "aaaa\n@@@\nbbbb\n@@@\ncccc\n"
-     * Then we overwrite only "bbbb\n" with whatever OpenAI returns
-     *
-     * If file contents follow:
-     * -> "aaaa\nbbbb\ncccc\n"
-     * Then we overwrite "aaaa\nbbbb\ncccc\n" with whatever OpenAI returns
-     */
-
-    if (this->is_delimited_) {
-        this->core_ = text;
-    } else {
-        this->text_ = text;
-    }
-}
-
-std::string FileIO::dump_output_text_to_string()
-{
-    std::string output;
-
-    if (this->is_delimited_) {
-        if (not this->head_) {
-            throw std::logic_error("The [head_] variable is unset!");
-        }
-        if (not this->core_) {
-            throw std::logic_error("The [core_] variable is unset!");
-        }
-        if (not this->tail_) {
-            throw std::logic_error("The [tail_] variable is unset!");
-        }
-        Parts parts;
-        parts.head = this->head_.value();
-        parts.core = this->core_.value();
-        parts.tail = this->tail_.value();
-        output = pack_parts_into_text(parts);
-    } else {
-        if (not this->text_) {
-            throw std::logic_error("The [text_] variable is unset!");
-        }
-
-        output = this->text_.value();
-    }
-
-    return output;
-}
-
-void FileIO::dump_output_text_to_file(const std::filesystem::path &filename)
-{
-    utils::write_to_file(filename, this->dump_output_text_to_string());
 }
 
 } // namespace file_io
