@@ -44,28 +44,6 @@ Positions get_delimiter_positions(const std::string &text)
     return positions;
 }
 
-struct Parts {
-    std::string head;
-    std::string core;
-    std::string tail;
-};
-
-Parts unpack_text_into_parts(const std::string &text)
-{
-    const Positions positions = get_delimiter_positions(text);
-
-    Parts parts;
-    parts.head = text.substr(0, positions.pos_start_1);
-    parts.core = text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
-    parts.tail = text.substr(positions.pos_end_2);
-    return parts;
-}
-
-std::string pack_parts_into_text(const Parts &parts)
-{
-    return parts.head + parts.core + parts.tail;
-}
-
 } // namespace
 
 namespace file_io {
@@ -83,9 +61,25 @@ std::string load_input_text(const std::filesystem::path &filename)
     return utils::read_from_file(filename);
 }
 
-bool is_text_delimited(const std::string &text)
+bool is_text_delimited(const std::string &input_text)
 {
-    return text.find(DELIMITER_LINE_) != std::string::npos;
+    return input_text.find(DELIMITER_LINE_) != std::string::npos;
+}
+
+Parts unpack_text_into_parts(const std::string &input_text)
+{
+    const Positions positions = get_delimiter_positions(input_text);
+
+    Parts parts;
+    parts.head = input_text.substr(0, positions.pos_start_1);
+    parts.core = input_text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
+    parts.tail = input_text.substr(positions.pos_end_2);
+    return parts;
+}
+
+std::string pack_parts_into_text(const Parts &parts)
+{
+    return parts.head + parts.core + parts.tail;
 }
 
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
