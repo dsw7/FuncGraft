@@ -190,7 +190,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = file_io::load_input_text(params.input_file);
+    const std::string input_text = file_io::read_input_text(params.input_file);
     std::string output_text;
 
     if (file_io::is_text_delimited(input_text)) {

@@ -5,7 +5,7 @@
 
 namespace file_io {
 
-std::string load_input_text(const std::filesystem::path &filename);
+std::string read_input_text(const std::filesystem::path &filename);
 bool is_text_delimited(const std::string &input_text);
 
 struct Parts {

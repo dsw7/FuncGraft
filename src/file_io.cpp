@@ -48,7 +48,7 @@ Positions get_delimiter_positions(const std::string &text)
 
 namespace file_io {
 
-std::string load_input_text(const std::filesystem::path &filename)
+std::string read_input_text(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
