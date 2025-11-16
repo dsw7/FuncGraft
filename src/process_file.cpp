@@ -142,17 +142,31 @@ void report_information_about_query(const query_openai::QueryResults &results)
     fmt::print(fg(blue), "{}\n", results.description);
 }
 
-} // namespace
-
-namespace process_file {
-
-void process_file(const params::CommandLineParameters &params)
+std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    file_io::FileIO target;
-    target.load_input_text_from_file(params.input_file);
+    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
 
     const std::string instructions = instructions::load_instructions(params);
-    const std::string input_text = target.get_text();
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
+
+    if (params.verbose) {
+        utils::print_separator();
+        fmt::print(fmt::emphasis::bold, "Prompt:\n");
+        fmt::print(fg(blue), "{}", prompt);
+    }
+
+    utils::print_separator();
+
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    report_information_about_query(results);
+
+    text_parts.core = results.output_text;
+    return file_io::pack_parts_into_text(text_parts);
+}
+
+std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
 
     if (params.verbose) {
@@ -162,19 +176,36 @@ void process_file(const params::CommandLineParameters &params)
     }
 
     utils::print_separator();
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
 
-    target.set_text(results.output_text);
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
+
+    return results.output_text;
+}
+
+} // namespace
+
+namespace process_file {
+
+void process_file(const params::CommandLineParameters &params)
+{
+    const std::string input_text = file_io::load_input_text(params.input_file);
+    std::string output_text;
+
+    if (file_io::is_text_delimited(input_text)) {
+        output_text = edit_delimited_text(params, input_text);
+    } else {
+        output_text = edit_full_text(params, input_text);
+    }
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        target.dump_output_text_to_file(params.output_file.value());
+        file_io::write_output_text(params.output_file.value(), output_text);
         return;
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(target.dump_output_text_to_string(), params.input_file);
+    print_updated_code_to_stdout(output_text, params.input_file);
     utils::print_separator();
 }
 
