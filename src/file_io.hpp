@@ -6,6 +6,8 @@
 
 namespace file_io {
 
+std::string load_input_text(const std::filesystem::path &filename);
+
 class FileIO {
 private:
     bool is_delimited_ = false;

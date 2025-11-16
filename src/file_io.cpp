@@ -75,6 +75,19 @@ std::string pack_parts_into_text(const Parts &parts)
 
 namespace file_io {
 
+std::string load_input_text(const std::filesystem::path &filename)
+{
+    if (not std::filesystem::exists(filename)) {
+        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
+    }
+
+    if (not std::filesystem::is_regular_file(filename)) {
+        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
+    }
+
+    return utils::read_from_file(filename);
+}
+
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
