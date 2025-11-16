@@ -11,11 +11,6 @@ namespace {
 const std::string DELIMITER_LINE_ = "@@@\n";
 const std::size_t SIZE_DELIM_LINE_ = DELIMITER_LINE_.size();
 
-bool is_text_delimited(const std::string &text)
-{
-    return text.find(DELIMITER_LINE_) != std::string::npos;
-}
-
 struct Positions {
     std::size_t pos_start_1 = 0;
     std::size_t pos_end_1 = 0;
@@ -86,6 +81,11 @@ std::string load_input_text(const std::filesystem::path &filename)
     }
 
     return utils::read_from_file(filename);
+}
+
+bool is_text_delimited(const std::string &text)
+{
+    return text.find(DELIMITER_LINE_) != std::string::npos;
 }
 
 void FileIO::load_input_text_from_file(const std::filesystem::path &filename)
