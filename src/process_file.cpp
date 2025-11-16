@@ -6,6 +6,7 @@
 #include "query_openai.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -24,47 +25,34 @@ fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 std::atomic<bool> TIMER_ENABLED(false);
 
+void print_progress(const int n)
+{
+    std::string progress = "         \r";
+    static int size_p = progress.size();
+    const int n_c = std::clamp(n, 0, size_p);
+
+    for (int i = 0; i < n_c; i++) {
+        progress[i] = '-';
+    }
+    progress[n_c] = '>';
+
+    std::cout << progress << std::flush;
+}
+
 void time_api_call()
 {
     const std::chrono::duration delay = std::chrono::milliseconds(25);
     int counter = 0;
 
     while (TIMER_ENABLED.load()) {
-        switch (counter) {
-            case 0:
-                std::cout << ">        \r" << std::flush;
-                break;
-            case 5:
-                std::cout << "->       \r" << std::flush;
-                break;
-            case 10:
-                std::cout << "-->      \r" << std::flush;
-                break;
-            case 15:
-                std::cout << "--->     \r" << std::flush;
-                break;
-            case 20:
-                std::cout << "---->    \r" << std::flush;
-                break;
-            case 25:
-                std::cout << "----->   \r" << std::flush;
-                break;
-            case 30:
-                std::cout << "------>  \r" << std::flush;
-                break;
-            case 35:
-                std::cout << "-------> \r" << std::flush;
-                break;
-            case 40:
-                std::cout << "-------->\r" << std::flush;
-                break;
+        if (counter % 5 == 0) {
+            print_progress(counter / 5);
         }
         counter++;
 
         if (counter > 44) {
             counter = 0;
         }
-
         std::this_thread::sleep_for(delay);
     }
 
