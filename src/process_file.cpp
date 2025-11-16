@@ -6,6 +6,7 @@
 #include "query_openai.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -24,47 +25,34 @@ fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 std::atomic<bool> TIMER_ENABLED(false);
 
+void print_progress(const int n)
+{
+    std::string progress = "         \r";
+    static int size_p = progress.size();
+    const int n_c = std::clamp(n, 0, size_p);
+
+    for (int i = 0; i < n_c; i++) {
+        progress[i] = '-';
+    }
+    progress[n_c] = '>';
+
+    std::cout << progress << std::flush;
+}
+
 void time_api_call()
 {
     const std::chrono::duration delay = std::chrono::milliseconds(25);
     int counter = 0;
 
     while (TIMER_ENABLED.load()) {
-        switch (counter) {
-            case 0:
-                std::cout << ">        \r" << std::flush;
-                break;
-            case 5:
-                std::cout << "->       \r" << std::flush;
-                break;
-            case 10:
-                std::cout << "-->      \r" << std::flush;
-                break;
-            case 15:
-                std::cout << "--->     \r" << std::flush;
-                break;
-            case 20:
-                std::cout << "---->    \r" << std::flush;
-                break;
-            case 25:
-                std::cout << "----->   \r" << std::flush;
-                break;
-            case 30:
-                std::cout << "------>  \r" << std::flush;
-                break;
-            case 35:
-                std::cout << "-------> \r" << std::flush;
-                break;
-            case 40:
-                std::cout << "-------->\r" << std::flush;
-                break;
+        if (counter % 5 == 0) {
+            print_progress(counter / 5);
         }
         counter++;
 
         if (counter > 44) {
             counter = 0;
         }
-
         std::this_thread::sleep_for(delay);
     }
 
@@ -98,6 +86,57 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 }
 
 // ----------------------------------------------------------------------------------------------------------
+
+void print_prompt_if_verbose(const std::string &prompt)
+{
+    utils::print_separator();
+    fmt::print(fmt::emphasis::bold, "Prompt:\n");
+    fmt::print(fg(blue), "{}", prompt);
+}
+
+void report_information_about_query(const query_openai::QueryResults &results)
+{
+    fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
+    fmt::print("Completion tokens: {}\n", results.completion_tokens);
+    fmt::print("Description of changes: ");
+    fmt::print(fg(blue), "{}\n", results.description);
+}
+
+std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
+
+    const std::string instructions = instructions::load_instructions(params);
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose(prompt);
+    }
+    utils::print_separator();
+
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    report_information_about_query(results);
+
+    text_parts.core = results.output_text;
+    return file_io::pack_parts_into_text(text_parts);
+}
+
+std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    const std::string instructions = instructions::load_instructions(params);
+    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose(prompt);
+    }
+    utils::print_separator();
+
+    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    report_information_about_query(results);
+
+    return results.output_text;
+}
 
 void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
 {
@@ -133,48 +172,29 @@ void print_updated_code_to_stdout(const std::string &code, const std::filesystem
 #endif
 }
 
-void report_information_about_query(const query_openai::QueryResults &results)
-{
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
-    fmt::print("Completion tokens: {}\n", results.completion_tokens);
-    fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", results.description);
-}
-
 } // namespace
 
 namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    file_io::FileIO target;
-    target.load_input_text_from_file(params.input_file);
+    const std::string input_text = file_io::read_input_text(params.input_file);
+    std::string output_text;
 
-    const std::string instructions = instructions::load_instructions(params);
-    const std::string input_text = target.get_text();
-    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
-
-    if (params.verbose) {
-        utils::print_separator();
-        fmt::print(fmt::emphasis::bold, "Prompt:\n");
-        fmt::print(fg(blue), "{}", prompt);
+    if (file_io::is_text_delimited(input_text)) {
+        output_text = edit_delimited_text(params, input_text);
+    } else {
+        output_text = edit_full_text(params, input_text);
     }
-
-    utils::print_separator();
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
-
-    target.set_text(results.output_text);
-    report_information_about_query(results);
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        target.dump_output_text_to_file(params.output_file.value());
+        file_io::write_output_text(params.output_file.value(), output_text);
         return;
     }
 
     utils::print_separator();
-    print_updated_code_to_stdout(target.dump_output_text_to_string(), params.input_file);
+    print_updated_code_to_stdout(output_text, params.input_file);
     utils::print_separator();
 }
 
