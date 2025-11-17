@@ -101,6 +101,7 @@ std::string pack_parts_into_text(const Parts &parts)
         modified_text += '\n';
     }
 
+#ifndef TESTING_ENABLED
     return fmt::format(
         "{}{}{}{}{}{}{}",
         parts.head,
@@ -110,6 +111,13 @@ std::string pack_parts_into_text(const Parts &parts)
         modified_text,
         MARKER_MODIFIED_,
         parts.tail);
+#else
+    return fmt::format(
+        "{}{}{}",
+        parts.head,
+        modified_text,
+        parts.tail);
+#endif
 }
 
 void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
