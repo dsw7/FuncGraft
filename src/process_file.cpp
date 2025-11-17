@@ -114,10 +114,10 @@ void report_information_about_query(const query_openai::QueryResults &results)
 std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
-    print_code_being_targeted(text_parts.core);
+    print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, params.input_file.extension());
 
     if (params.verbose) {
         print_prompt_if_verbose(prompt);
@@ -126,7 +126,7 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
-    text_parts.core = results.output_text;
+    text_parts.modified_text = results.output_text;
     return file_io::pack_parts_into_text(text_parts);
 }
 
