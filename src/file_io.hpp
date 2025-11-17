@@ -10,7 +10,8 @@ bool is_text_delimited(const std::string &input_text);
 
 struct Parts {
     std::string head;
-    std::string core;
+    std::string original_text;
+    std::string modified_text;
     std::string tail;
 };
 

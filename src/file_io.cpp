@@ -75,23 +75,23 @@ Parts unpack_text_into_parts(const std::string &input_text)
      *
      * To:
      * head: aaaa\n
-     * core: bbbb\n
+     * original_text: bbbb\n
      * tail: cccc\n
      *
-     * So we can operate on core only
+     * So we can operate on the "core" only
      */
     const Positions positions = get_delimiter_positions(input_text);
 
     Parts parts;
     parts.head = input_text.substr(0, positions.pos_start_1);
-    parts.core = input_text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
+    parts.original_text = input_text.substr(positions.pos_end_1, positions.pos_start_2 - positions.pos_end_1);
     parts.tail = input_text.substr(positions.pos_end_2);
     return parts;
 }
 
 std::string pack_parts_into_text(const Parts &parts)
 {
-    return parts.head + parts.core + parts.tail;
+    return parts.head + parts.original_text + parts.tail;
 }
 
 void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
