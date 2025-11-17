@@ -126,7 +126,7 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
-    text_parts.original_text = results.output_text;
+    text_parts.modified_text = results.output_text;
     return file_io::pack_parts_into_text(text_parts);
 }
 
