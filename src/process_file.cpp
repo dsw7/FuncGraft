@@ -87,6 +87,13 @@ query_openai::QueryResults run_query_with_threading(const std::string &prompt, c
 
 // ----------------------------------------------------------------------------------------------------------
 
+void print_code_being_targeted(const std::string &code)
+{
+    utils::print_separator();
+    fmt::print(fmt::emphasis::bold, "Delimited code:\n");
+    fmt::print(fg(blue), "{}", code);
+}
+
 void print_prompt_if_verbose(const std::string &prompt)
 {
     utils::print_separator();
@@ -96,6 +103,7 @@ void print_prompt_if_verbose(const std::string &prompt)
 
 void report_information_about_query(const query_openai::QueryResults &results)
 {
+    utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
     fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
     fmt::print("Completion tokens: {}\n", results.completion_tokens);
@@ -106,6 +114,7 @@ void report_information_about_query(const query_openai::QueryResults &results)
 std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
+    print_code_being_targeted(text_parts.core);
 
     const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_prompt(instructions, text_parts.core, params.input_file.extension());
@@ -113,7 +122,6 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     if (params.verbose) {
         print_prompt_if_verbose(prompt);
     }
-    utils::print_separator();
 
     const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
@@ -130,7 +138,6 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
     if (params.verbose) {
         print_prompt_if_verbose(prompt);
     }
-    utils::print_separator();
 
     const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
