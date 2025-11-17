@@ -95,13 +95,19 @@ Parts unpack_text_into_parts(const std::string &input_text)
 
 std::string pack_parts_into_text(const Parts &parts)
 {
+    std::string modified_text = parts.modified_text;
+
+    if (not modified_text.empty() and modified_text.back() != '\n') {
+        modified_text += '\n';
+    }
+
     return fmt::format(
         "{}{}{}{}{}{}{}",
         parts.head,
         MARKER_ORIGINAL_,
         parts.original_text,
         MARKER_SPLIT_,
-        parts.modified_text,
+        modified_text,
         MARKER_MODIFIED_,
         parts.tail);
 }
