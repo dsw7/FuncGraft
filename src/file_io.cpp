@@ -11,6 +11,10 @@ namespace {
 const std::string DELIMITER_LINE_ = "@@@\n";
 const std::size_t SIZE_DELIM_LINE_ = DELIMITER_LINE_.size();
 
+const std::string MARKER_ORIGINAL_ = "<<<<<<< Original code\n";
+const std::string MARKER_SPLIT_ = "=======\n";
+const std::string MARKER_MODIFIED_ = ">>>>>>> Modified code\n";
+
 struct Positions {
     std::size_t pos_start_1 = 0;
     std::size_t pos_end_1 = 0;
@@ -91,16 +95,15 @@ Parts unpack_text_into_parts(const std::string &input_text)
 
 std::string pack_parts_into_text(const Parts &parts)
 {
-    return fmt::format(R"(
-{}
-<<<<<<< Original code
-{}
-=======
-{}
->>>>>>> Updated code
-{}
-)",
-        parts.head, parts.original_text, parts.modified_text, parts.tail);
+    return fmt::format(
+        "{}{}{}{}{}{}{}",
+        parts.head,
+        MARKER_ORIGINAL_,
+        parts.original_text,
+        MARKER_SPLIT_,
+        parts.modified_text,
+        MARKER_MODIFIED_,
+        parts.tail);
 }
 
 void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
