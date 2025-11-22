@@ -1,4 +1,4 @@
-#include "file_io.hpp"
+#include "import_file.hpp"
 
 #include "utils.hpp"
 
@@ -50,7 +50,7 @@ Positions get_delimiter_positions(const std::string &text)
 
 } // namespace
 
-namespace file_io {
+namespace import_file {
 
 std::string read_input_text(const std::filesystem::path &filename)
 {
@@ -120,4 +120,4 @@ std::string pack_parts_into_text(const Parts &parts)
 #endif
 }
 
-} // namespace file_io
+} // namespace import_file

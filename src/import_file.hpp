@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 
-namespace file_io {
+namespace import_file {
 
 std::string read_input_text(const std::filesystem::path &filename);
 bool is_text_delimited(const std::string &input_text);
@@ -18,4 +18,4 @@ struct Parts {
 Parts unpack_text_into_parts(const std::string &input_text);
 std::string pack_parts_into_text(const Parts &parts);
 
-} // namespace file_io
+} // namespace import_file
