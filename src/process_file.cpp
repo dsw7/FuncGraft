@@ -152,6 +152,11 @@ namespace process_file {
 void process_file(const params::CommandLineParameters &params)
 {
     const std::string input_text = file_io::import_file(params.input_file);
+
+    if (text_manip::is_text_empty(input_text)) {
+        throw std::runtime_error("The file does not contain any code");
+    }
+
     std::string output_text;
 
     if (text_manip::is_text_delimited(input_text)) {
