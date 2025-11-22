@@ -1,4 +1,4 @@
-#include "export_file.hpp"
+#include "file_io.hpp"
 
 #include "utils.hpp"
 
@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace export_file {
+namespace file_io {
 
 std::string import_file(const std::filesystem::path &filename)
 {
@@ -48,4 +48,4 @@ void export_file_with_prompt(const std::string &code, const std::filesystem::pat
     }
 }
 
-} // namespace export_file
+} // namespace file_io

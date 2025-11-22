@@ -1,6 +1,6 @@
 #include "process_file.hpp"
 
-#include "export_file.hpp"
+#include "file_io.hpp"
 #include "import_file.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
@@ -151,7 +151,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = export_file::import_file(params.input_file);
+    const std::string input_text = file_io::import_file(params.input_file);
     std::string output_text;
 
     if (import_file::is_text_delimited(input_text)) {
@@ -162,13 +162,13 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        export_file::export_file(output_text, params.output_file.value());
+        file_io::export_file(output_text, params.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    export_file::export_file_with_prompt(output_text, params.input_file);
+    file_io::export_file_with_prompt(output_text, params.input_file);
     utils::print_separator();
 #endif
 }
