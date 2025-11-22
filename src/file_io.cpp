@@ -8,27 +8,25 @@
 
 namespace file_io {
 
-std::string import_file(const std::filesystem::path &filename)
+std::string import_file(const fs::path &filename)
 {
-    if (not std::filesystem::exists(filename)) {
+    if (not fs::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
     }
 
-    if (not std::filesystem::is_regular_file(filename)) {
+    if (not fs::is_regular_file(filename)) {
         throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
     }
 
     return utils::read_from_file(filename);
 }
 
-void export_file(
-    const std::string &code,
-    const std::filesystem::path &filename)
+void export_file(const std::string &code, const fs::path &filename)
 {
     utils::write_to_file(filename, code);
 }
 
-void export_file_with_prompt(const std::string &code, const std::filesystem::path &filename)
+void export_file_with_prompt(const std::string &code, const fs::path &filename)
 {
     char choice = 'n';
 
