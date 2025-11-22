@@ -43,6 +43,23 @@ class TestEditing(TestCase):
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("The sum is 9", process.stdout)
 
+    def test_print_prompt_with_verbose_flag(self) -> None:
+        instructions = "Replace the variable `c` with the integer 5"
+        command = [
+            get_gpe_binary(),
+            LOC_TEST_DATA / "dummy_basic.py",
+            f"--instructions='{instructions}'",
+            f"-o{OUTPUT_PATH}",
+            "--verbose",
+        ]
+        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("Prompt:", process.stdout)
+
+        process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("The sum is 9", process.stdout)
+
     def test_only_edit_between_delims(self) -> None:
         instructions = "Replace the variable `c` with the integer 3"
         command = [
