@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace import_file {
+namespace text_manip {
 
 bool is_text_delimited(const std::string &input_text);
 
@@ -16,4 +16,4 @@ struct Parts {
 Parts unpack_text_into_parts(const std::string &input_text);
 std::string pack_parts_into_text(const Parts &parts);
 
-} // namespace import_file
+} // namespace text_manip

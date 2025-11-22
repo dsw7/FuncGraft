@@ -1,4 +1,4 @@
-#include "import_file.hpp"
+#include "text_manip.hpp"
 
 #include "utils.hpp"
 
@@ -50,7 +50,7 @@ Positions get_delimiter_positions(const std::string &text)
 
 } // namespace
 
-namespace import_file {
+namespace text_manip {
 
 bool is_text_delimited(const std::string &input_text)
 {
@@ -107,4 +107,4 @@ std::string pack_parts_into_text(const Parts &parts)
 #endif
 }
 
-} // namespace import_file
+} // namespace text_manip
