@@ -42,7 +42,7 @@ void export_file_with_prompt(const std::string &code, const fs::path &filename)
     }
 
     if (choice == 'y') {
-        export_file(filename, code);
+        export_file(code, filename);
     }
 }
 
