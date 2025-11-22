@@ -151,7 +151,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = import_file::read_input_text(params.input_file);
+    const std::string input_text = export_file::import_file(params.input_file);
     std::string output_text;
 
     if (import_file::is_text_delimited(input_text)) {

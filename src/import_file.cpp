@@ -52,19 +52,6 @@ Positions get_delimiter_positions(const std::string &text)
 
 namespace import_file {
 
-std::string read_input_text(const std::filesystem::path &filename)
-{
-    if (not std::filesystem::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
-    if (not std::filesystem::is_regular_file(filename)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
-    }
-
-    return utils::read_from_file(filename);
-}
-
 bool is_text_delimited(const std::string &input_text)
 {
     return input_text.find(DELIMITER_LINE_) != std::string::npos;

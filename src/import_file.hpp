@@ -1,11 +1,9 @@
 #pragma once
 
-#include <filesystem>
 #include <string>
 
 namespace import_file {
 
-std::string read_input_text(const std::filesystem::path &filename);
 bool is_text_delimited(const std::string &input_text);
 
 struct Parts {
