@@ -79,7 +79,7 @@ class TestEditing(TestCase):
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1, process.stdout)
-        self.assertIn("Body is empty. Cannot extract code block", process.stderr)
+        self.assertIn("The file does not contain any code", process.stderr)
 
     def test_work_on_unknown_file(self) -> None:
         instructions = "Capitalize all words in the file"
