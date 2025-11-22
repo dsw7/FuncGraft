@@ -38,6 +38,9 @@ class TestEditing(TestCase):
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertNotIn(
+            "Prompt:", process.stdout
+        )  # Prompt should not print by default
 
         process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 0, process.stderr)
