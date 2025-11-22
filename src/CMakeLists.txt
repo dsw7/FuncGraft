@@ -18,6 +18,7 @@ set(SRC_FILES
   process_file.cpp
   prompt.cpp
   query_openai.cpp
+  text_manip.cpp
   utils.cpp
 )
 

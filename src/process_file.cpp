@@ -4,6 +4,7 @@
 #include "instructions.hpp"
 #include "prompt.hpp"
 #include "query_openai.hpp"
+#include "text_manip.hpp"
 #include "utils.hpp"
 
 #include <algorithm>
@@ -19,7 +20,6 @@
 namespace {
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
-fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -113,7 +113,7 @@ void report_information_about_query(const query_openai::QueryResults &results)
 
 std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
+    text_manip::Parts text_parts = text_manip::unpack_text_into_parts(input_text);
     print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
@@ -127,7 +127,7 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     report_information_about_query(results);
 
     text_parts.modified_text = results.output_text;
-    return file_io::pack_parts_into_text(text_parts);
+    return text_manip::pack_parts_into_text(text_parts);
 }
 
 std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
@@ -145,50 +145,16 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
     return results.output_text;
 }
 
-void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
-{
-    const auto label = utils::resolve_label_from_extension(input_file.extension());
-    std::string code_block;
-
-    if (label) {
-        code_block = utils::get_code_block(code, label.value());
-    } else {
-        code_block = utils::get_code_block(code);
-    }
-
-    fmt::print(fmt::emphasis::bold, "Results:\n");
-    fmt::print(fg(green), "{}", code_block);
-
-#ifndef TESTING_ENABLED
-    char choice = 'n';
-
-    while (true) {
-        fmt::print("Overwrite file? [y/n]: ");
-        choice = std::cin.get();
-
-        if (choice == 'y' or choice == 'n') {
-            break;
-        } else {
-            fmt::print("Invalid choice. Input either 'y' or 'n'!\n");
-        }
-    }
-
-    if (choice == 'y') {
-        utils::write_to_file(input_file, code);
-    }
-#endif
-}
-
 } // namespace
 
 namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = file_io::read_input_text(params.input_file);
+    const std::string input_text = file_io::import_file(params.input_file);
     std::string output_text;
 
-    if (file_io::is_text_delimited(input_text)) {
+    if (text_manip::is_text_delimited(input_text)) {
         output_text = edit_delimited_text(params, input_text);
     } else {
         output_text = edit_full_text(params, input_text);
@@ -196,13 +162,15 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        file_io::write_output_text(params.output_file.value(), output_text);
+        file_io::export_file(output_text, params.output_file.value());
         return;
     }
 
+#ifndef TESTING_ENABLED
     utils::print_separator();
-    print_updated_code_to_stdout(output_text, params.input_file);
+    file_io::export_file_with_prompt(output_text, params.input_file);
     utils::print_separator();
+#endif
 }
 
 } // namespace process_file
