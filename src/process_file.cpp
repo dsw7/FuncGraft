@@ -114,6 +114,11 @@ void report_information_about_query(const query_openai::QueryResults &results)
 std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     text_manip::Parts text_parts = text_manip::unpack_text_into_parts(input_text);
+
+    if (text_manip::is_text_empty(text_parts.original_text)) {
+        throw std::runtime_error("The delimited block does not contain any code");
+    }
+
     print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
