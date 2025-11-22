@@ -4,6 +4,7 @@
 
 namespace text_manip {
 
+bool is_text_empty(const std::string &input_text);
 bool is_text_delimited(const std::string &input_text);
 
 struct Parts {
