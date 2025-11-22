@@ -19,7 +19,6 @@
 namespace {
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
-fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -147,18 +146,6 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
 
 void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
 {
-    const auto label = utils::resolve_label_from_extension(input_file.extension());
-    std::string code_block;
-
-    if (label) {
-        code_block = utils::get_code_block(code, label.value());
-    } else {
-        code_block = utils::get_code_block(code);
-    }
-
-    fmt::print(fmt::emphasis::bold, "Results:\n");
-    fmt::print(fg(green), "{}", code_block);
-
 #ifndef TESTING_ENABLED
     char choice = 'n';
 
