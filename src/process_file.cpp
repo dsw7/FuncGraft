@@ -1,7 +1,7 @@
 #include "process_file.hpp"
 
 #include "export_file.hpp"
-#include "file_io.hpp"
+#include "import_file.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
 #include "query_openai.hpp"
@@ -113,7 +113,7 @@ void report_information_about_query(const query_openai::QueryResults &results)
 
 std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    file_io::Parts text_parts = file_io::unpack_text_into_parts(input_text);
+    import_file::Parts text_parts = import_file::unpack_text_into_parts(input_text);
     print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
@@ -127,7 +127,7 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     report_information_about_query(results);
 
     text_parts.modified_text = results.output_text;
-    return file_io::pack_parts_into_text(text_parts);
+    return import_file::pack_parts_into_text(text_parts);
 }
 
 std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
@@ -151,10 +151,10 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = file_io::read_input_text(params.input_file);
+    const std::string input_text = import_file::read_input_text(params.input_file);
     std::string output_text;
 
-    if (file_io::is_text_delimited(input_text)) {
+    if (import_file::is_text_delimited(input_text)) {
         output_text = edit_delimited_text(params, input_text);
     } else {
         output_text = edit_full_text(params, input_text);
