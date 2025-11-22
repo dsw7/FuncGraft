@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 
+#include <algorithm>
 #include <fmt/core.h>
 #include <stdexcept>
 #include <vector>
@@ -51,6 +52,17 @@ Positions get_delimiter_positions(const std::string &text)
 } // namespace
 
 namespace text_manip {
+
+bool is_text_empty(const std::string &input_text)
+{
+    if (input_text.empty()) {
+        return false;
+    }
+
+    return std::all_of(input_text.begin(), input_text.end(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    });
+}
 
 bool is_text_delimited(const std::string &input_text)
 {
