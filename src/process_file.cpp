@@ -144,9 +144,8 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
     return results.output_text;
 }
 
-void print_updated_code_to_stdout(const std::string &code, const std::filesystem::path &input_file)
+void prompt_to_overwrite_file(const std::string &code, const std::filesystem::path &input_file)
 {
-#ifndef TESTING_ENABLED
     char choice = 'n';
 
     while (true) {
@@ -163,7 +162,6 @@ void print_updated_code_to_stdout(const std::string &code, const std::filesystem
     if (choice == 'y') {
         utils::write_to_file(input_file, code);
     }
-#endif
 }
 
 } // namespace
@@ -187,9 +185,11 @@ void process_file(const params::CommandLineParameters &params)
         return;
     }
 
+#ifndef TESTING_ENABLED
     utils::print_separator();
-    print_updated_code_to_stdout(output_text, params.input_file);
+    prompt_to_overwrite_file(output_text, params.input_file);
     utils::print_separator();
+#endif
 }
 
 } // namespace process_file
