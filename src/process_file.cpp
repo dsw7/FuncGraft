@@ -1,5 +1,6 @@
 #include "process_file.hpp"
 
+#include "export_file.hpp"
 #include "file_io.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
@@ -144,26 +145,6 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
     return results.output_text;
 }
 
-void prompt_to_overwrite_file(const std::string &code, const std::filesystem::path &input_file)
-{
-    char choice = 'n';
-
-    while (true) {
-        fmt::print("Overwrite file? [y/n]: ");
-        choice = std::cin.get();
-
-        if (choice == 'y' or choice == 'n') {
-            break;
-        } else {
-            fmt::print("Invalid choice. Input either 'y' or 'n'!\n");
-        }
-    }
-
-    if (choice == 'y') {
-        utils::write_to_file(input_file, code);
-    }
-}
-
 } // namespace
 
 namespace process_file {
@@ -181,13 +162,13 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        file_io::write_output_text(params.output_file.value(), output_text);
+        export_file::export_file(output_text, params.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    prompt_to_overwrite_file(output_text, params.input_file);
+    export_file::export_file_with_prompt(output_text, params.input_file);
     utils::print_separator();
 #endif
 }

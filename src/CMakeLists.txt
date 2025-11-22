@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 set(SRC_FILES
   curl_base.cpp
+  export_file.cpp
   file_io.cpp
   instructions.cpp
   main.cpp

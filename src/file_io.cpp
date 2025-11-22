@@ -120,9 +120,4 @@ std::string pack_parts_into_text(const Parts &parts)
 #endif
 }
 
-void write_output_text(const std::filesystem::path &filename, const std::string &output_text)
-{
-    utils::write_to_file(filename, output_text);
-}
-
 } // namespace file_io
