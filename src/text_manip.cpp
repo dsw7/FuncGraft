@@ -56,7 +56,7 @@ namespace text_manip {
 bool is_text_empty(const std::string &input_text)
 {
     if (input_text.empty()) {
-        return false;
+        return true;
     }
 
     return std::all_of(input_text.begin(), input_text.end(), [](char c) {
