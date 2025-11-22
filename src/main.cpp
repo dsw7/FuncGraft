@@ -53,7 +53,7 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
             { "output", required_argument, 0, 'o' },
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
-            { "verbose", required_argument, 0, 'v' },
+            { "verbose", no_argument, 0, 'v' },
             { 0, 0, 0, 0 }
         };
 
