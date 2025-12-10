@@ -2,8 +2,21 @@
 
 #include <curl/curl.h>
 #include <string>
+#include <variant>
 
 namespace curl_base {
+
+struct Ok {
+    long code = -1;
+    std::string response;
+};
+
+struct Err {
+    long code = -1;
+    std::string response;
+};
+
+using Result = std::variant<Ok, Err>;
 
 class Curl {
 public:
@@ -15,7 +28,7 @@ public:
     // be called for each copy)
     Curl(const Curl &) = delete;
     Curl &operator=(const Curl &) = delete;
-    std::string create_chat_completion(const std::string &request);
+    Result create_chat_completion(const std::string &request);
 
 private:
     CURL *handle_ = nullptr;

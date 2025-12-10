@@ -56,7 +56,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-std::string Curl::create_chat_completion(const std::string &request)
+Result Curl::create_chat_completion(const std::string &request)
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
@@ -81,12 +81,18 @@ std::string Curl::create_chat_completion(const std::string &request)
     curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
 
     const CURLcode code = curl_easy_perform(this->handle_);
+    long http_status_code = -1;
+    curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
 
-    return response;
+    if (http_status_code == 200) {
+        return Ok { http_status_code, response };
+    }
+
+    return Err { http_status_code, response };
 }
 
 } // namespace curl_base
