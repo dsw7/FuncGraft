@@ -4,8 +4,34 @@
 
 #include <fmt/core.h>
 #include <json.hpp>
+#include <variant>
 
 namespace {
+
+std::string serialize_request(const std::string &prompt, const std::string &model)
+{
+    const nlohmann::json messages = { { "role", "developer" }, { "content", prompt } };
+    const nlohmann::json data = {
+        { "model", model },
+        { "temperature", 1.00 },
+        { "messages", nlohmann::json::array({ messages }) },
+    };
+
+    return data.dump();
+}
+
+nlohmann::json parse_json(const std::string &response)
+{
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
+
+    return json;
+}
 
 std::string get_stringified_json_from_completion(const std::string &completion)
 {
@@ -54,31 +80,15 @@ std::string get_stringified_json_from_completion(const std::string &completion)
     return raw_json;
 }
 
-std::string serialize_request(const std::string &prompt, const std::string &model)
+void deserialize_error(const curl_base::Err &error)
 {
-    const nlohmann::json messages = { { "role", "developer" }, { "content", prompt } };
-    const nlohmann::json data = {
-        { "model", model },
-        { "temperature", 1.00 },
-        { "messages", nlohmann::json::array({ messages }) },
-    };
-
-    return data.dump();
+    const nlohmann::json json = parse_json(error.response);
+    throw std::runtime_error(json["error"]["message"]);
 }
 
-query_openai::QueryResults deserialize_response(const std::string &response)
+query_openai::QueryResults deserialize_result(const curl_base::Ok &result)
 {
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    if (json.contains("error")) {
-        throw std::runtime_error(json["error"]["message"]);
-    }
+    const nlohmann::json json = parse_json(result.response);
 
     if (json["object"] != "chat.completion") {
         throw std::runtime_error("The returned object is not a chat completion!");
@@ -87,13 +97,7 @@ query_openai::QueryResults deserialize_response(const std::string &response)
     const std::string content = json["choices"][0]["message"]["content"];
     const std::string raw_json = get_stringified_json_from_completion(content);
 
-    nlohmann::json json_content;
-
-    try {
-        json_content = nlohmann::json::parse(raw_json);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse content: {}", e.what()));
-    }
+    const nlohmann::json json_content = parse_json(raw_json);
 
     query_openai::QueryResults results;
     results.completion_tokens = json["usage"]["completion_tokens"];
@@ -112,8 +116,13 @@ QueryResults run_query(const std::string &prompt, const std::string &model)
     const std::string request = serialize_request(prompt, model);
 
     curl_base::Curl curl;
-    const std::string response = curl.create_chat_completion(request);
-    return deserialize_response(response);
+    const curl_base::Result result = curl.create_chat_completion(request);
+
+    if (std::holds_alternative<curl_base::Err>(result)) {
+        deserialize_error(std::get<curl_base::Err>(result));
+    }
+
+    return deserialize_result(std::get<curl_base::Ok>(result));
 }
 
 } // namespace query_openai
