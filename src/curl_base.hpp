@@ -1,8 +1,8 @@
 #pragma once
 
 #include <curl/curl.h>
+#include <expected>
 #include <string>
-#include <variant>
 
 namespace curl_base {
 
@@ -11,12 +11,12 @@ struct Ok {
     std::string response;
 };
 
-struct Err {
+struct Error {
     long code = -1;
     std::string response;
 };
 
-using Result = std::variant<Ok, Err>;
+using CurlResult = std::expected<Ok, Error>;
 
 class Curl {
 public:
@@ -28,7 +28,7 @@ public:
     // be called for each copy)
     Curl(const Curl &) = delete;
     Curl &operator=(const Curl &) = delete;
-    Result create_chat_completion(const std::string &request);
+    CurlResult create_chat_completion(const std::string &request);
 
 private:
     CURL *handle_ = nullptr;
