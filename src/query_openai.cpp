@@ -4,7 +4,6 @@
 
 #include <fmt/core.h>
 #include <json.hpp>
-#include <variant>
 
 namespace {
 
@@ -80,15 +79,15 @@ std::string get_stringified_json_from_completion(const std::string &completion)
     return raw_json;
 }
 
-void deserialize_error(const curl_base::Err &error)
+void deserialize_and_throw_error(const std::string &response)
 {
-    const nlohmann::json json = parse_json(error.response);
+    const nlohmann::json json = parse_json(response);
     throw std::runtime_error(json["error"]["message"]);
 }
 
-query_openai::QueryResults deserialize_result(const curl_base::Ok &result)
+query_openai::QueryResults deserialize_result(const std::string &response)
 {
-    const nlohmann::json json = parse_json(result.response);
+    const nlohmann::json json = parse_json(response);
 
     if (json["object"] != "chat.completion") {
         throw std::runtime_error("The returned object is not a chat completion!");
@@ -116,13 +115,13 @@ QueryResults run_query(const std::string &prompt, const std::string &model)
     const std::string request = serialize_request(prompt, model);
 
     curl_base::Curl curl;
-    const curl_base::Result result = curl.create_chat_completion(request);
+    const auto result = curl.create_chat_completion(request);
 
-    if (std::holds_alternative<curl_base::Err>(result)) {
-        deserialize_error(std::get<curl_base::Err>(result));
+    if (not result) {
+        deserialize_and_throw_error(result.error().response);
     }
 
-    return deserialize_result(std::get<curl_base::Ok>(result));
+    return deserialize_result(result->response);
 }
 
 } // namespace query_openai
