@@ -82,6 +82,15 @@ std::string get_stringified_json_from_completion(const std::string &completion)
 void deserialize_and_throw_error(const std::string &response)
 {
     const nlohmann::json json = parse_json(response);
+
+    if (not json.contains("error")) {
+        throw std::runtime_error("An error occurred but 'error' key not found in the response JSON");
+    }
+
+    if (not json["error"].contains("message")) {
+        throw std::runtime_error("An error occurred but 'error.message' not found in the response JSON");
+    }
+
     throw std::runtime_error(json["error"]["message"]);
 }
 
