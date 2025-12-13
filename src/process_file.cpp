@@ -105,8 +105,8 @@ void report_information_about_query(const query_openai::QueryResults &results)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Prompt tokens: {}\n", results.prompt_tokens);
-    fmt::print("Completion tokens: {}\n", results.completion_tokens);
+    fmt::print("Input tokens: {}\n", results.input_tokens);
+    fmt::print("Output tokens: {}\n", results.output_tokens);
     fmt::print("Description of changes: ");
     fmt::print(fg(blue), "{}\n", results.description);
 }

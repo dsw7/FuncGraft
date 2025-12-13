@@ -31,7 +31,7 @@ nlohmann::json parse_json(const std::string &response)
     return json;
 }
 
-std::string get_stringified_json_from_completion(const std::string &completion)
+std::string get_stringified_json_from_output(const std::string &output)
 {
     /*
      * Some models return a JSON completion without triple backticks:
@@ -46,17 +46,17 @@ std::string get_stringified_json_from_completion(const std::string &completion)
      * ```
      */
 
-    if (completion.empty()) {
-        throw std::runtime_error("Completion is empty. Cannot extract JSON");
+    if (output.empty()) {
+        throw std::runtime_error("Output from OpenAI is empty. Cannot extract JSON");
     }
 
-    if (completion[0] == '{' and completion.back() == '}') {
-        return completion;
+    if (output[0] == '{' and output.back() == '}') {
+        return output;
     }
 
     bool append_enabled = false;
     std::string line;
-    std::stringstream ss(completion);
+    std::stringstream ss(output);
     std::string raw_json;
 
     while (std::getline(ss, line)) {
@@ -135,13 +135,13 @@ query_openai::QueryResults deserialize_result(const std::string &response)
         throw std::runtime_error("Some unknown object type was returned from OpenAI");
     }
 
-    const std::string raw_json = get_stringified_json_from_completion(output);
+    const std::string raw_json = get_stringified_json_from_output(output);
     const nlohmann::json json_content = parse_json(raw_json);
 
-    results.completion_tokens = json["usage"]["output_tokens"];
+    results.output_tokens = json["usage"]["output_tokens"];
     results.description = json_content["description"];
     results.output_text = json_content["code"];
-    results.prompt_tokens = json["usage"]["input_tokens"];
+    results.input_tokens = json["usage"]["input_tokens"];
     return results;
 }
 
@@ -154,7 +154,7 @@ QueryResults run_query(const std::string &prompt, const std::string &model)
     const std::string request = serialize_request(prompt, model);
 
     curl_base::Curl curl;
-    const auto result = curl.create_chat_completion(request);
+    const auto result = curl.create_response(request);
 
     if (not result) {
         deserialize_and_throw_error(result.error().response);

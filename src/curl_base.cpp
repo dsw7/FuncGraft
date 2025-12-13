@@ -56,7 +56,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-CurlResult Curl::create_chat_completion(const std::string &request)
+CurlResult Curl::create_response(const std::string &request)
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
