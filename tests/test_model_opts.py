@@ -24,21 +24,18 @@ class TestModelOptions(TestCase):
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
-        self.assertIn(
-            "The model `foobar` does not exist or you do not have access to it.",
-            process.stderr,
-        )
+        self.assertIn("The requested model 'foobar' does not exist.", process.stderr)
 
     def test_wrong_model(self) -> None:
         command = [
             get_gpe_binary(),
             LOC_TEST_DATA / "dummy_basic.py",
             "--instructions=A foo that bars",
-            "--model=tts-1-hd",
+            "--model=gpt-image-1",
         ]
         process = run(command, stdout=PIPE, stderr=PIPE, text=True)
         self.assertEqual(process.returncode, 1)
         self.assertIn(
-            "This is not a chat model and thus not supported in the v1/chat/completions endpoint. Did you mean to use v1/completions?",
+            "The requested model 'gpt-image-1' is not supported with the Responses API.",
             process.stderr,
         )

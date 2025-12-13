@@ -5,7 +5,7 @@
 
 namespace {
 
-const std::string URL_CHAT_COMPLETIONS = "https://api.openai.com/v1/chat/completions";
+const std::string URL_CHAT_COMPLETIONS = "https://api.openai.com/v1/responses";
 
 std::string get_user_api_key()
 {
@@ -56,7 +56,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-CurlResult Curl::create_chat_completion(const std::string &request)
+CurlResult Curl::create_response(const std::string &request)
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
