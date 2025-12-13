@@ -9,13 +9,12 @@ namespace {
 
 std::string serialize_request(const std::string &prompt, const std::string &model)
 {
-    const nlohmann::json messages = { { "role", "developer" }, { "content", prompt } };
     const nlohmann::json data = {
+        { "input", prompt },
         { "model", model },
+        { "store", false },
         { "temperature", 1.00 },
-        { "messages", nlohmann::json::array({ messages }) },
     };
-
     return data.dump();
 }
 
@@ -98,20 +97,51 @@ query_openai::QueryResults deserialize_result(const std::string &response)
 {
     const nlohmann::json json = parse_json(response);
 
-    if (json["object"] != "chat.completion") {
-        throw std::runtime_error("The returned object is not a chat completion!");
+    if (json.contains("object")) {
+        if (json["object"] != "response") {
+            throw std::runtime_error("The response from OpenAI is not an OpenAI Response");
+        }
+    } else {
+        throw std::runtime_error("The response from OpenAI does not contain an 'object' key");
     }
 
-    const std::string content = json["choices"][0]["message"]["content"];
-    const std::string raw_json = get_stringified_json_from_completion(content);
+    nlohmann::json content;
+    bool job_complete = false;
 
-    const nlohmann::json json_content = parse_json(raw_json);
+    for (const auto &item: json["output"]) {
+        if (item["type"] != "message") {
+            continue;
+        }
+
+        if (item["status"] == "completed") {
+            content = item["content"][0];
+            job_complete = true;
+            break;
+        }
+    }
+
+    if (not job_complete) {
+        throw std::runtime_error("OpenAI did not complete the transaction");
+    }
 
     query_openai::QueryResults results;
-    results.completion_tokens = json["usage"]["completion_tokens"];
+    std::string output;
+
+    if (content["type"] == "output_text") {
+        output = content["text"];
+    } else if (content["type"] == "refusal") {
+        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", content["refusal"]));
+    } else {
+        throw std::runtime_error("Some unknown object type was returned from OpenAI");
+    }
+
+    const std::string raw_json = get_stringified_json_from_completion(output);
+    const nlohmann::json json_content = parse_json(raw_json);
+
+    results.completion_tokens = json["usage"]["output_tokens"];
     results.description = json_content["description"];
     results.output_text = json_content["code"];
-    results.prompt_tokens = json["usage"]["prompt_tokens"];
+    results.prompt_tokens = json["usage"]["input_tokens"];
     return results;
 }
 
