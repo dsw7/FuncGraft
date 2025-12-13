@@ -5,7 +5,7 @@
 
 namespace {
 
-const std::string URL_CHAT_COMPLETIONS = "https://api.openai.com/v1/chat/completions";
+const std::string URL_CHAT_COMPLETIONS = "https://api.openai.com/v1/responses";
 
 std::string get_user_api_key()
 {
