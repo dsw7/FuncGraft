@@ -11,6 +11,6 @@ struct ResultsOpenAI {
     std::string output_text;
 };
 
-ResultsOpenAI run_query(const std::string &prompt, const std::string &model);
+ResultsOpenAI run_openai_query(const std::string &prompt, const std::string &model);
 
 } // namespace query_llm

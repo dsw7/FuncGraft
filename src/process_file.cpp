@@ -59,7 +59,7 @@ void time_api_call()
     std::cout << std::string(16, ' ') << '\r' << std::flush;
 }
 
-query_llm::ResultsOpenAI run_query_with_threading(const std::string &prompt, const std::string &model)
+query_llm::ResultsOpenAI run_openai_query_with_threading(const std::string &prompt, const std::string &model)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call);
@@ -69,7 +69,7 @@ query_llm::ResultsOpenAI run_query_with_threading(const std::string &prompt, con
     std::string errmsg;
 
     try {
-        results = query_llm::run_query(prompt, model);
+        results = query_llm::run_openai_query(prompt, model);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -122,13 +122,13 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, params.input_file.extension());
+    const std::string prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
 
     if (params.verbose) {
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::ResultsOpenAI results = run_query_with_threading(prompt, params.model);
+    const query_llm::ResultsOpenAI results = run_openai_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
     text_parts.modified_text = results.output_text;
@@ -138,13 +138,13 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
 std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_prompt(instructions, input_text, params.input_file.extension());
+    const std::string prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
 
     if (params.verbose) {
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::ResultsOpenAI results = run_query_with_threading(prompt, params.model);
+    const query_llm::ResultsOpenAI results = run_openai_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
     return results.output_text;

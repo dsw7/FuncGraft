@@ -8,7 +8,7 @@
 
 namespace {
 
-std::string serialize_request(const std::string &prompt, const std::string &model)
+std::string serialize_openai_request(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json data = {
         { "input", prompt },
@@ -66,7 +66,7 @@ std::string get_stringified_json_from_output(const std::string &output)
     return raw_json;
 }
 
-void deserialize_and_throw_error(const std::string &response)
+void deserialize_openai_response_and_throw_error(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
 
@@ -81,7 +81,7 @@ void deserialize_and_throw_error(const std::string &response)
     throw std::runtime_error(json["error"]["message"]);
 }
 
-query_llm::ResultsOpenAI deserialize_result(const std::string &response)
+query_llm::ResultsOpenAI deserialize_openai_response(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
 
@@ -137,18 +137,18 @@ query_llm::ResultsOpenAI deserialize_result(const std::string &response)
 
 namespace query_llm {
 
-ResultsOpenAI run_query(const std::string &prompt, const std::string &model)
+ResultsOpenAI run_openai_query(const std::string &prompt, const std::string &model)
 {
-    const std::string request = serialize_request(prompt, model);
+    const std::string request = serialize_openai_request(prompt, model);
 
     curl_base::Curl curl;
     const auto result = curl.create_openai_response(request);
 
     if (not result) {
-        deserialize_and_throw_error(result.error().response);
+        deserialize_openai_response_and_throw_error(result.error().response);
     }
 
-    return deserialize_result(result->response);
+    return deserialize_openai_response(result->response);
 }
 
 } // namespace query_llm
