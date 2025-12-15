@@ -154,7 +154,7 @@ QueryResults run_query(const std::string &prompt, const std::string &model)
     const std::string request = serialize_request(prompt, model);
 
     curl_base::Curl curl;
-    const auto result = curl.create_response(request);
+    const auto result = curl.create_openai_response(request);
 
     if (not result) {
         deserialize_and_throw_error(result.error().response);

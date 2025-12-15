@@ -28,7 +28,7 @@ public:
     // be called for each copy)
     Curl(const Curl &) = delete;
     Curl &operator=(const Curl &) = delete;
-    CurlResult create_response(const std::string &request);
+    CurlResult create_openai_response(const std::string &request);
 
 private:
     CURL *handle_ = nullptr;

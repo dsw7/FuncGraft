@@ -5,9 +5,7 @@
 
 namespace {
 
-const std::string URL_CHAT_COMPLETIONS = "https://api.openai.com/v1/responses";
-
-std::string get_user_api_key()
+std::string get_openai_user_api_key()
 {
     static std::string api_key;
 
@@ -56,7 +54,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-CurlResult Curl::create_response(const std::string &request)
+CurlResult Curl::create_openai_response(const std::string &request)
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
@@ -65,7 +63,7 @@ CurlResult Curl::create_response(const std::string &request)
     curl_slist_free_all(this->headers_);
     this->headers_ = nullptr;
 
-    const std::string header_auth = "Authorization: Bearer " + get_user_api_key();
+    const std::string header_auth = "Authorization: Bearer " + get_openai_user_api_key();
     this->headers_ = curl_slist_append(this->headers_, header_auth.c_str());
 
     const std::string header_content_type = "Content-Type: application/json";
@@ -73,7 +71,9 @@ CurlResult Curl::create_response(const std::string &request)
 
     curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
-    curl_easy_setopt(this->handle_, CURLOPT_URL, URL_CHAT_COMPLETIONS.c_str());
+
+    static std::string url_openai_responses = "https://api.openai.com/v1/responses";
+    curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
