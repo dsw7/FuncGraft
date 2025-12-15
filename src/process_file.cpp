@@ -3,7 +3,7 @@
 #include "file_io.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
-#include "query_openai.hpp"
+#include "query_llm.hpp"
 #include "text_manip.hpp"
 #include "utils.hpp"
 
@@ -59,17 +59,17 @@ void time_api_call()
     std::cout << std::string(16, ' ') << '\r' << std::flush;
 }
 
-query_openai::QueryResults run_query_with_threading(const std::string &prompt, const std::string &model)
+query_llm::ResultsOpenAI run_query_with_threading(const std::string &prompt, const std::string &model)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call);
 
-    query_openai::QueryResults results;
+    query_llm::ResultsOpenAI results;
     bool query_failed = false;
     std::string errmsg;
 
     try {
-        results = query_openai::run_query(prompt, model);
+        results = query_llm::run_query(prompt, model);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -101,7 +101,7 @@ void print_prompt_if_verbose(const std::string &prompt)
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_information_about_query(const query_openai::QueryResults &results)
+void report_information_about_query(const query_llm::ResultsOpenAI &results)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
@@ -128,7 +128,7 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
         print_prompt_if_verbose(prompt);
     }
 
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    const query_llm::ResultsOpenAI results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
     text_parts.modified_text = results.output_text;
@@ -144,7 +144,7 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
         print_prompt_if_verbose(prompt);
     }
 
-    const query_openai::QueryResults results = run_query_with_threading(prompt, params.model);
+    const query_llm::ResultsOpenAI results = run_query_with_threading(prompt, params.model);
     report_information_about_query(results);
 
     return results.output_text;

@@ -128,4 +128,17 @@ std::string get_code_block(const std::string &body, const std::string &label)
     return fmt::format("```{}\n{}\n```\n", label, body);
 }
 
+nlohmann::json parse_json(const std::string &response)
+{
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
+
+    return json;
+}
+
 } // namespace utils

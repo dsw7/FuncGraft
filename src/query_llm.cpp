@@ -1,6 +1,7 @@
-#include "query_openai.hpp"
+#include "query_llm.hpp"
 
 #include "curl_base.hpp"
+#include "utils.hpp"
 
 #include <fmt/core.h>
 #include <json.hpp>
@@ -16,19 +17,6 @@ std::string serialize_request(const std::string &prompt, const std::string &mode
         { "temperature", 1.00 },
     };
     return data.dump();
-}
-
-nlohmann::json parse_json(const std::string &response)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    return json;
 }
 
 std::string get_stringified_json_from_output(const std::string &output)
@@ -80,7 +68,7 @@ std::string get_stringified_json_from_output(const std::string &output)
 
 void deserialize_and_throw_error(const std::string &response)
 {
-    const nlohmann::json json = parse_json(response);
+    const nlohmann::json json = utils::parse_json(response);
 
     if (not json.contains("error")) {
         throw std::runtime_error("An error occurred but 'error' key not found in the response JSON");
@@ -93,9 +81,9 @@ void deserialize_and_throw_error(const std::string &response)
     throw std::runtime_error(json["error"]["message"]);
 }
 
-query_openai::QueryResults deserialize_result(const std::string &response)
+query_llm::ResultsOpenAI deserialize_result(const std::string &response)
 {
-    const nlohmann::json json = parse_json(response);
+    const nlohmann::json json = utils::parse_json(response);
 
     if (json.contains("object")) {
         if (json["object"] != "response") {
@@ -124,7 +112,7 @@ query_openai::QueryResults deserialize_result(const std::string &response)
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    query_openai::QueryResults results;
+    query_llm::ResultsOpenAI results;
     std::string output;
 
     if (content["type"] == "output_text") {
@@ -136,7 +124,7 @@ query_openai::QueryResults deserialize_result(const std::string &response)
     }
 
     const std::string raw_json = get_stringified_json_from_output(output);
-    const nlohmann::json json_content = parse_json(raw_json);
+    const nlohmann::json json_content = utils::parse_json(raw_json);
 
     results.output_tokens = json["usage"]["output_tokens"];
     results.description = json_content["description"];
@@ -147,9 +135,9 @@ query_openai::QueryResults deserialize_result(const std::string &response)
 
 } // namespace
 
-namespace query_openai {
+namespace query_llm {
 
-QueryResults run_query(const std::string &prompt, const std::string &model)
+ResultsOpenAI run_query(const std::string &prompt, const std::string &model)
 {
     const std::string request = serialize_request(prompt, model);
 
@@ -163,4 +151,4 @@ QueryResults run_query(const std::string &prompt, const std::string &model)
     return deserialize_result(result->response);
 }
 
-} // namespace query_openai
+} // namespace query_llm
