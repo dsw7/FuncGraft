@@ -113,10 +113,9 @@ CurlResult Curl::create_ollama_response(const std::string &prompt, const std::st
 
     const nlohmann::json response_format = {
         { "type", "object" },
-        { "properties", { { "code", { "type", "string" } }, { "description_of_changes", { "type", "string" } } } },
+        { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } },
         { "required", { "code", "description_of_changes" } }
     };
-
     const nlohmann::json data = {
         { "prompt", prompt },
         { "model", model },
@@ -124,6 +123,7 @@ CurlResult Curl::create_ollama_response(const std::string &prompt, const std::st
         { "format", response_format },
     };
     const std::string request = data.dump();
+
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
     std::string response;
