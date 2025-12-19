@@ -51,7 +51,7 @@ public:
 private:
     CURL *handle_ = nullptr;
     struct curl_slist *headers_ = nullptr;
-    void reset_();
+    void reset_handle_and_headers_();
 };
 
 } // namespace curl_base

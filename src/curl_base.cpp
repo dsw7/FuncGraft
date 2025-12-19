@@ -54,7 +54,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-void Curl::reset_()
+void Curl::reset_handle_and_headers_()
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
@@ -66,7 +66,7 @@ void Curl::reset_()
 
 CurlResult Curl::create_openai_response(const std::string &prompt, const std::string &model)
 {
-    this->reset_();
+    this->reset_handle_and_headers_();
 
     const std::string header_auth = "Authorization: Bearer " + get_openai_user_api_key();
     this->headers_ = curl_slist_append(this->headers_, header_auth.c_str());
