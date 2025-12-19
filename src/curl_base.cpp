@@ -1,7 +1,7 @@
 #include "curl_base.hpp"
 
 #include <cstdlib>
-#include <stdexcept>
+#include <json.hpp>
 
 namespace {
 
@@ -54,7 +54,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-CurlResult Curl::create_openai_response(const std::string &request)
+void Curl::reset_handle_and_headers_()
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
@@ -62,6 +62,11 @@ CurlResult Curl::create_openai_response(const std::string &request)
 
     curl_slist_free_all(this->headers_);
     this->headers_ = nullptr;
+}
+
+CurlResult Curl::create_openai_response(const std::string &prompt, const std::string &model)
+{
+    this->reset_handle_and_headers_();
 
     const std::string header_auth = "Authorization: Bearer " + get_openai_user_api_key();
     this->headers_ = curl_slist_append(this->headers_, header_auth.c_str());
@@ -75,24 +80,57 @@ CurlResult Curl::create_openai_response(const std::string &request)
     static std::string url_openai_responses = "https://api.openai.com/v1/responses";
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
+
+    const nlohmann::json data = {
+        { "input", prompt },
+        { "model", model },
+        { "store", false },
+        { "temperature", 1.00 },
+    };
+    const std::string request = data.dump();
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
     std::string response;
     curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
 
     const CURLcode code = curl_easy_perform(this->handle_);
-    if (code != CURLE_OK) {
-        throw std::runtime_error(curl_easy_strerror(code));
-    }
+    return check_curl_code(this->handle_, code, response);
+}
 
-    long http_status_code = -1;
-    curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
+CurlResult Curl::create_ollama_response(const std::string &prompt, const std::string &model)
+{
+    this->reset_handle_and_headers_();
 
-    if (http_status_code == 200) {
-        return Ok { http_status_code, response };
-    }
+    const std::string header_content_type = "Content-Type: application/json";
+    this->headers_ = curl_slist_append(this->headers_, header_content_type.c_str());
 
-    return std::unexpected(Error { http_status_code, response });
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
+
+    static std::string url_ollama_generate = "http://localhost:11434/api/generate";
+    curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
+    curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
+
+    const nlohmann::json response_format = {
+        { "type", "object" },
+        { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } },
+        { "required", { "code", "description_of_changes" } }
+    };
+    const nlohmann::json data = {
+        { "prompt", prompt },
+        { "model", model },
+        { "stream", false },
+        { "format", response_format },
+    };
+    const std::string request = data.dump();
+
+    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
+
+    std::string response;
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
+
+    const CURLcode code = curl_easy_perform(this->handle_);
+    return check_curl_code(this->handle_, code, response);
 }
 
 } // namespace curl_base

@@ -14,7 +14,10 @@ void print_help()
 
     const std::string messages = R"(-- See https://github.com/dsw7/FuncGraft for more information
 
-Program for editing individual files using LLMs.
+Program for editing individual files using LLMs. This program
+can currently connect to LLMs served by:
+  - OpenAI
+  - Ollama
 
 Usage:
   edit [OPTIONS] FILENAME
@@ -25,6 +28,7 @@ Options:
   -o, --output=FILE                Place output into FILE
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
+  -l, --use-local                  Connect to local LLM
   -v, --verbose                    Be more verbose with output
 
 Examples:
@@ -53,12 +57,13 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
             { "output", required_argument, 0, 'o' },
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
+            { "use-local", no_argument, 0, 'l' },
             { "verbose", no_argument, 0, 'v' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "hm:o:f:i:v", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "hm:o:f:i:lv", long_options, &option_index);
 
         if (opt == -1) {
             break;
@@ -79,6 +84,9 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
                 break;
             case 'i':
                 params.instructions_from_cli = optarg;
+                break;
+            case 'l':
+                params.use_local_llm = true;
                 break;
             case 'v':
                 params.verbose = true;
