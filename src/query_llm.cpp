@@ -151,7 +151,7 @@ query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
     query_llm::LLMResponse results;
     results.input_tokens = json["prompt_eval_count"];
     results.output_tokens = json["eval_count"];
-    results.description = json_content["description"];
+    results.description = json_content["description_of_changes"];
     results.output_text = json_content["code"];
     return results;
 }
