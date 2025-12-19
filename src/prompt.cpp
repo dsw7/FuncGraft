@@ -33,4 +33,23 @@ std::string build_openai_prompt(const std::string &instructions, const std::stri
     return prompt;
 }
 
+std::string build_ollama_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
+{
+    std::string prompt = "I am editing some code. Apply the following instructions:\n";
+
+    prompt += utils::get_code_block(instructions, "plaintext");
+    prompt += "To the following code:\n";
+
+    const auto label = utils::resolve_label_from_extension(extension);
+
+    if (label) {
+        prompt += utils::get_code_block(input_text, label.value());
+    } else {
+        prompt += utils::get_code_block(input_text);
+    }
+
+    prompt += "Respond using JSON.\n";
+    return prompt;
+}
+
 } // namespace prompt
