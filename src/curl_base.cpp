@@ -2,7 +2,6 @@
 
 #include <cstdlib>
 #include <json.hpp>
-#include <stdexcept>
 
 namespace {
 
@@ -90,18 +89,7 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
 
     const CURLcode code = curl_easy_perform(this->handle_);
-    if (code != CURLE_OK) {
-        throw std::runtime_error(curl_easy_strerror(code));
-    }
-
-    long http_status_code = -1;
-    curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
-
-    if (http_status_code == 200) {
-        return Ok { http_status_code, response };
-    }
-
-    return std::unexpected(Error { http_status_code, response });
+    return check_curl_code(this->handle_, code, response);
 }
 
 } // namespace curl_base
