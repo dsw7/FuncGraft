@@ -70,7 +70,18 @@ void deserialize_openai_response_and_throw_error(const std::string &response)
     throw std::runtime_error(json["error"]["message"]);
 }
 
-query_llm::ResultsOpenAI deserialize_openai_response(const std::string &response)
+void deserialize_ollama_response_and_throw_error(const std::string &response)
+{
+    const nlohmann::json json = utils::parse_json(response);
+
+    if (not json.contains("error")) {
+        throw std::runtime_error("An error occurred but 'error' key not found in the response JSON");
+    }
+
+    throw std::runtime_error(json["error"]);
+}
+
+query_llm::LLMResponse deserialize_openai_response(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
 
@@ -101,7 +112,7 @@ query_llm::ResultsOpenAI deserialize_openai_response(const std::string &response
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    query_llm::ResultsOpenAI results;
+    query_llm::LLMResponse results;
     std::string output;
 
     if (content["type"] == "output_text") {
@@ -122,11 +133,34 @@ query_llm::ResultsOpenAI deserialize_openai_response(const std::string &response
     return results;
 }
 
+query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
+{
+    const nlohmann::json json = utils::parse_json(response);
+
+    if (not json.contains("done")) {
+        throw std::runtime_error("The response from Ollama does not contain the 'done' key");
+    }
+
+    if (not json["done"]) {
+        throw std::runtime_error("The response from Ollama indicates the job is not done");
+    }
+
+    const std::string raw_response = json["response"];
+    const nlohmann::json json_content = utils::parse_json(raw_response);
+
+    query_llm::LLMResponse results;
+    results.input_tokens = json["prompt_eval_count"];
+    results.output_tokens = json["eval_count"];
+    results.description = json_content["description"];
+    results.output_text = json_content["code"];
+    return results;
+}
+
 } // namespace
 
 namespace query_llm {
 
-ResultsOpenAI run_openai_query(const std::string &prompt, const std::string &model)
+LLMResponse run_openai_query(const std::string &prompt, const std::string &model)
 {
     curl_base::Curl curl;
     const auto result = curl.create_openai_response(prompt, model);
@@ -136,6 +170,18 @@ ResultsOpenAI run_openai_query(const std::string &prompt, const std::string &mod
     }
 
     return deserialize_openai_response(result->response);
+}
+
+LLMResponse run_ollama_query(const std::string &prompt, const std::string &model)
+{
+    curl_base::Curl curl;
+    const auto result = curl.create_ollama_response(prompt, model);
+
+    if (not result) {
+        deserialize_ollama_response_and_throw_error(result.error().response);
+    }
+
+    return deserialize_ollama_response(result->response);
 }
 
 } // namespace query_llm
