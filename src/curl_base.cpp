@@ -1,6 +1,7 @@
 #include "curl_base.hpp"
 
 #include <cstdlib>
+#include <json.hpp>
 #include <stdexcept>
 
 namespace {
@@ -54,7 +55,7 @@ Curl::~Curl()
     curl_global_cleanup();
 }
 
-CurlResult Curl::create_openai_response(const std::string &request)
+CurlResult Curl::create_openai_response(const std::string &prompt, const std::string &model)
 {
     if (this->handle_) {
         curl_easy_reset(this->handle_);
@@ -75,6 +76,14 @@ CurlResult Curl::create_openai_response(const std::string &request)
     static std::string url_openai_responses = "https://api.openai.com/v1/responses";
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
+
+    const nlohmann::json data = {
+        { "input", prompt },
+        { "model", model },
+        { "store", false },
+        { "temperature", 1.00 },
+    };
+    const std::string request = data.dump();
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
     std::string response;

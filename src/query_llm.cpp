@@ -8,17 +8,6 @@
 
 namespace {
 
-std::string serialize_openai_request(const std::string &prompt, const std::string &model)
-{
-    const nlohmann::json data = {
-        { "input", prompt },
-        { "model", model },
-        { "store", false },
-        { "temperature", 1.00 },
-    };
-    return data.dump();
-}
-
 std::string get_stringified_json_from_output(const std::string &output)
 {
     /*
@@ -139,10 +128,8 @@ namespace query_llm {
 
 ResultsOpenAI run_openai_query(const std::string &prompt, const std::string &model)
 {
-    const std::string request = serialize_openai_request(prompt, model);
-
     curl_base::Curl curl;
-    const auto result = curl.create_openai_response(request);
+    const auto result = curl.create_openai_response(prompt, model);
 
     if (not result) {
         deserialize_openai_response_and_throw_error(result.error().response);
