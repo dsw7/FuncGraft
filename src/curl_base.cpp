@@ -97,4 +97,33 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     return check_curl_code(this->handle_, code, response);
 }
 
+CurlResult Curl::create_ollama_response(const std::string &prompt, const std::string &model)
+{
+    this->reset_handle_and_headers_();
+
+    const std::string header_content_type = "Content-Type: application/json";
+    this->headers_ = curl_slist_append(this->headers_, header_content_type.c_str());
+
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
+
+    static std::string url_ollama_generate = "http://localhost:11434/api/generate";
+    curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
+    curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
+
+    const nlohmann::json data = {
+        { "prompt", prompt },
+        { "model", model },
+        { "stream", false },
+    };
+    const std::string request = data.dump();
+    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
+
+    std::string response;
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
+
+    const CURLcode code = curl_easy_perform(this->handle_);
+    return check_curl_code(this->handle_, code, response);
+}
+
 } // namespace curl_base
