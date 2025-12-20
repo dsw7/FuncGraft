@@ -8,53 +8,6 @@
 
 namespace {
 
-std::string get_stringified_json_from_output(const std::string &output)
-{
-    /*
-     * Some models return a JSON completion without triple backticks:
-     * {
-     *   k: v,
-     * }
-     * Others return a JSON completion with triple backticks:
-     * ```json
-     * {
-     *   k: v,
-     * }
-     * ```
-     */
-
-    if (output.empty()) {
-        throw std::runtime_error("Output from OpenAI is empty. Cannot extract JSON");
-    }
-
-    if (output[0] == '{' and output.back() == '}') {
-        return output;
-    }
-
-    bool append_enabled = false;
-    std::string line;
-    std::stringstream ss(output);
-    std::string raw_json;
-
-    while (std::getline(ss, line)) {
-        if (line == "```json") {
-            append_enabled = true;
-        } else if (line == "```") {
-            append_enabled = false;
-        } else {
-            if (append_enabled) {
-                raw_json += line;
-            }
-        }
-    }
-
-    if (append_enabled) {
-        throw std::runtime_error("Closing triple backticks not found. Raw JSON might be malformed");
-    }
-
-    return raw_json;
-}
-
 void deserialize_openai_response_and_throw_error(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
@@ -123,8 +76,7 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("Some unknown object type was returned from OpenAI");
     }
 
-    const std::string raw_json = get_stringified_json_from_output(output);
-    const nlohmann::json json_content = utils::parse_json(raw_json);
+    const nlohmann::json json_content = utils::parse_json(output);
 
     results.output_tokens = json["usage"]["output_tokens"];
     results.description = json_content["description_of_changes"];
