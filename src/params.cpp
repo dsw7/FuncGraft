@@ -1,5 +1,6 @@
 #include "params.hpp"
 
+#include <fmt/core.h>
 #include <stdexcept>
 
 namespace params {
@@ -26,10 +27,6 @@ void CommandLineParameters::validate_params()
         if (this->instructions_from_cli.value().empty()) {
             throw std::invalid_argument("CLI instructions are empty. Cannot proceed");
         }
-    }
-
-    if (this->model.empty()) {
-        throw std::invalid_argument("Model is empty. Cannot proceed");
     }
 }
 

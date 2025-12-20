@@ -1,3 +1,4 @@
+#include "configs.hpp"
 #include "params.hpp"
 #include "process_file.hpp"
 
@@ -24,7 +25,6 @@ Usage:
 
 Options:
   -h, --help                       Print help menu
-  -m, --model=MODEL                Select model
   -o, --output=FILE                Place output into FILE
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
@@ -53,7 +53,6 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
-            { "model", required_argument, 0, 'm' },
             { "output", required_argument, 0, 'o' },
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
@@ -63,7 +62,7 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
         };
 
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "hm:o:f:i:lv", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "ho:f:i:lv", long_options, &option_index);
 
         if (opt == -1) {
             break;
@@ -73,9 +72,6 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
             case 'h':
                 print_help();
                 exit(EXIT_SUCCESS);
-            case 'm':
-                params.model = optarg;
-                break;
             case 'o':
                 params.output_file = optarg;
                 break;
@@ -124,6 +120,7 @@ int main(int argc, char **argv)
     }
 
     try {
+        configs.load_configs_from_config_file();
         process_file::process_file(params);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());

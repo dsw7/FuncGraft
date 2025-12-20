@@ -1,15 +1,23 @@
 # FuncGraft
-Ultra lightweight CLI code editor. I tried [codex](https://github.com/openai/codex) but it felt too bloated,
-led to code sprawl, and did not feel targeted enough for me. So I built my own equivalent that operates on
-individual files.
+Ultra lightweight CLI code editor.
 
-🚫 _This code was not AI generated._ I do believe in leveraging AI tools for targeted code manipulations, but
-I do not believe in letting AI do all the work.
+This program is used to selectively edit files using either a locally hosted
+LLM (via [Ollama](https://ollama.com/)) or via models exposed by the OpenAI
+API.
+
+I tried [codex](https://github.com/openai/codex) but it felt too bloated, led
+to code sprawl, and did not feel targeted enough for me. So I built my own
+equivalent that operates on individual files.
+
+🚫 _This code was not AI generated._ I do believe in leveraging AI tools for
+targeted code manipulations, but I do not believe in letting AI do all the
+work.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Togging between LLM providers](#togging-between-llm-providers)
 
 ## Prerequisites
 Ensure you possess a valid OpenAI API key. Set it as an environment variable:
@@ -43,6 +51,11 @@ artifacts:
 ```console
 make clean
 ```
+Then copy the project configuration directory:
+```console
+cp -rv .funcgraft/ ~
+```
+And edit `~/.funcgraft/funcgraft.toml` to match your infrastructure.
 
 ## Usage
 
@@ -130,10 +143,15 @@ Run the program with the `-v` flag to enable verbosity:
 ```console
 edit foo.cpp -v
 ```
-This will print out the prompt being sent to OpenAI.
+This will print out the prompt being sent to the LLM provider.
 
-### Specify a custom model
-Run the program with the `-m` or `--model` option:
+## Togging between LLM providers
+The program will default to querying OpenAI servers. To query a locally hosted
+LLM instead, run a command with the `--use-local` flag:
 ```console
-edit foo.cpp -m <your-model>
+edit foo.cpp --use-local # or -l for short
 ```
+The `--use-local` flag will deploy a job using the parameters specified under
+the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
+that that the Ollama server is up and running on the host and port specified in
+the configuration file.

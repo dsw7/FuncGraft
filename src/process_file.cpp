@@ -43,7 +43,7 @@ void time_api_call()
     std::cout << " \r" << std::flush;
 }
 
-query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt, const std::string &model)
+query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call);
@@ -53,7 +53,7 @@ query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt
     std::string errmsg;
 
     try {
-        results = query_llm::run_openai_query(prompt, model);
+        results = query_llm::run_openai_query(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -69,7 +69,7 @@ query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt
     return results;
 }
 
-query_llm::LLMResponse run_ollama_query_with_threading(const std::string &prompt, const std::string &model)
+query_llm::LLMResponse run_ollama_query_with_threading(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call);
@@ -79,7 +79,7 @@ query_llm::LLMResponse run_ollama_query_with_threading(const std::string &prompt
     std::string errmsg;
 
     try {
-        results = query_llm::run_ollama_query(prompt, model);
+        results = query_llm::run_ollama_query(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -141,9 +141,9 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
     query_llm::LLMResponse results;
 
     if (params.use_local_llm) {
-        results = run_ollama_query_with_threading(prompt, params.model);
+        results = run_ollama_query_with_threading(prompt);
     } else {
-        results = run_openai_query_with_threading(prompt, params.model);
+        results = run_openai_query_with_threading(prompt);
     }
 
     report_query_info(results);
@@ -164,9 +164,9 @@ std::string edit_full_text(const params::CommandLineParameters &params, const st
     query_llm::LLMResponse results;
 
     if (params.use_local_llm) {
-        results = run_ollama_query_with_threading(prompt, params.model);
+        results = run_ollama_query_with_threading(prompt);
     } else {
-        results = run_openai_query_with_threading(prompt, params.model);
+        results = run_openai_query_with_threading(prompt);
     }
 
     report_query_info(results);

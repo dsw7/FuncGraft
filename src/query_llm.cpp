@@ -135,10 +135,10 @@ query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
 
 namespace query_llm {
 
-LLMResponse run_openai_query(const std::string &prompt, const std::string &model)
+LLMResponse run_openai_query(const std::string &prompt)
 {
     curl_base::Curl curl;
-    const auto result = curl.create_openai_response(prompt, model);
+    const auto result = curl.create_openai_response(prompt);
 
     if (not result) {
         deserialize_openai_response_and_throw_error(result.error().response);
@@ -147,10 +147,10 @@ LLMResponse run_openai_query(const std::string &prompt, const std::string &model
     return deserialize_openai_response(result->response);
 }
 
-LLMResponse run_ollama_query(const std::string &prompt, const std::string &model)
+LLMResponse run_ollama_query(const std::string &prompt)
 {
     curl_base::Curl curl;
-    const auto result = curl.create_ollama_response(prompt, model);
+    const auto result = curl.create_ollama_response(prompt);
 
     if (not result) {
         deserialize_ollama_response_and_throw_error(result.error().response);

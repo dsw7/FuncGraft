@@ -11,7 +11,7 @@ struct LLMResponse {
     std::string output_text;
 };
 
-LLMResponse run_openai_query(const std::string &prompt, const std::string &model);
-LLMResponse run_ollama_query(const std::string &prompt, const std::string &model);
+LLMResponse run_openai_query(const std::string &prompt);
+LLMResponse run_ollama_query(const std::string &prompt);
 
 } // namespace query_llm

@@ -4,12 +4,6 @@
 #include <optional>
 #include <string>
 
-namespace {
-
-const std::string DEFAULT_MODEL = "gpt-4o";
-
-}
-
 namespace params {
 
 struct CommandLineParameters {
@@ -19,7 +13,6 @@ struct CommandLineParameters {
     std::optional<std::filesystem::path> instructions_file;
     std::optional<std::filesystem::path> output_file;
     std::optional<std::string> instructions_from_cli;
-    std::string model = DEFAULT_MODEL;
 
     void validate_params();
 };
