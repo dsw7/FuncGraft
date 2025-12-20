@@ -4,11 +4,14 @@
 #include <optional>
 #include <string>
 
-namespace {
+struct Configs {
+    void load_configs_from_config_file();
 
-const std::string DEFAULT_MODEL = "gpt-4o";
+    std::string model_ollama;
+    std::string model_openai;
+};
 
-}
+extern Configs configs;
 
 namespace params {
 
@@ -19,7 +22,7 @@ struct CommandLineParameters {
     std::optional<std::filesystem::path> instructions_file;
     std::optional<std::filesystem::path> output_file;
     std::optional<std::string> instructions_from_cli;
-    std::string model = DEFAULT_MODEL;
+    std::string model = "gpt-4o";
 
     void validate_params();
 };
