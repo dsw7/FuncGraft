@@ -152,6 +152,6 @@ LLM instead, run a command with the `--use-local` flag:
 edit foo.cpp --use-local # or -l for short
 ```
 The `--use-local` flag will deploy a job using the parameters specified under
-the `[ollama]` section in [funcgraft.toml](./funcgraft/funcgraft.toml). Ensure
+the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
 that that the Ollama server is up and running on the host and port specified in
 the configuration file.
