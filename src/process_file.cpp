@@ -8,6 +8,7 @@
 #include "utils.hpp"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -25,38 +26,21 @@ fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
 std::atomic<bool> TIMER_ENABLED(false);
 
-void print_progress(const int n)
-{
-    std::string progress = "         \r";
-    static int size_p = progress.size();
-    const int n_c = std::clamp(n, 0, size_p);
-
-    for (int i = 0; i < n_c; i++) {
-        progress[i] = '-';
-    }
-    progress[n_c] = '>';
-
-    std::cout << progress << std::flush;
-}
-
 void time_api_call()
 {
-    const std::chrono::duration delay = std::chrono::milliseconds(25);
-    int counter = 0;
+    const std::chrono::duration delay = std::chrono::milliseconds(100);
+
+    static std::array spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
+    const int num_frames = spinner.size();
 
     while (TIMER_ENABLED.load()) {
-        if (counter % 5 == 0) {
-            print_progress(counter / 5);
+        for (int i = 0; i < num_frames; ++i) {
+            std::cout << "\r" << spinner[i] << std::flush;
+            std::this_thread::sleep_for(delay);
         }
-        counter++;
-
-        if (counter > 44) {
-            counter = 0;
-        }
-        std::this_thread::sleep_for(delay);
     }
 
-    std::cout << std::string(16, ' ') << '\r' << std::flush;
+    std::cout << " \r" << std::flush;
 }
 
 query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt, const std::string &model)
