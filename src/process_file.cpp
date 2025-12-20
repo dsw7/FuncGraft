@@ -8,6 +8,7 @@
 #include "utils.hpp"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -25,38 +26,21 @@ fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
 std::atomic<bool> TIMER_ENABLED(false);
 
-void print_progress(const int n)
-{
-    std::string progress = "         \r";
-    static int size_p = progress.size();
-    const int n_c = std::clamp(n, 0, size_p);
-
-    for (int i = 0; i < n_c; i++) {
-        progress[i] = '-';
-    }
-    progress[n_c] = '>';
-
-    std::cout << progress << std::flush;
-}
-
 void time_api_call()
 {
-    const std::chrono::duration delay = std::chrono::milliseconds(25);
-    int counter = 0;
+    const std::chrono::duration delay = std::chrono::milliseconds(100);
+
+    static std::array spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
+    const int num_frames = spinner.size();
 
     while (TIMER_ENABLED.load()) {
-        if (counter % 5 == 0) {
-            print_progress(counter / 5);
+        for (int i = 0; i < num_frames; ++i) {
+            std::cout << "\r" << spinner[i] << std::flush;
+            std::this_thread::sleep_for(delay);
         }
-        counter++;
-
-        if (counter > 44) {
-            counter = 0;
-        }
-        std::this_thread::sleep_for(delay);
     }
 
-    std::cout << std::string(16, ' ') << '\r' << std::flush;
+    std::cout << " \r" << std::flush;
 }
 
 query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt, const std::string &model)
@@ -154,29 +138,21 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::LLMResponse results = run_openai_query_with_threading(prompt, params.model);
+    query_llm::LLMResponse results;
+
+    if (params.use_local_llm) {
+        results = run_ollama_query_with_threading(prompt, params.model);
+    } else {
+        results = run_openai_query_with_threading(prompt, params.model);
+    }
+
     report_query_info(results);
 
     text_parts.modified_text = results.output_text;
     return text_manip::pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text_openai(const params::CommandLineParameters &params, const std::string &input_text)
-{
-    const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
-
-    if (params.verbose) {
-        print_prompt_if_verbose(prompt);
-    }
-
-    const query_llm::LLMResponse results = run_openai_query_with_threading(prompt, params.model);
-    report_query_info(results);
-
-    return results.output_text;
-}
-
-std::string edit_full_text_ollama(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
@@ -185,9 +161,15 @@ std::string edit_full_text_ollama(const params::CommandLineParameters &params, c
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::LLMResponse results = run_ollama_query_with_threading(prompt, params.model);
-    report_query_info(results);
+    query_llm::LLMResponse results;
 
+    if (params.use_local_llm) {
+        results = run_ollama_query_with_threading(prompt, params.model);
+    } else {
+        results = run_openai_query_with_threading(prompt, params.model);
+    }
+
+    report_query_info(results);
     return results.output_text;
 }
 
@@ -205,18 +187,10 @@ void process_file(const params::CommandLineParameters &params)
 
     std::string output_text;
 
-    if (params.use_local_llm) {
-        if (text_manip::is_text_delimited(input_text)) {
-            output_text = edit_full_text_ollama(params, input_text);
-        } else {
-            output_text = edit_full_text_ollama(params, input_text);
-        }
+    if (text_manip::is_text_delimited(input_text)) {
+        output_text = edit_delimited_text(params, input_text);
     } else {
-        if (text_manip::is_text_delimited(input_text)) {
-            output_text = edit_delimited_text(params, input_text);
-        } else {
-            output_text = edit_full_text_openai(params, input_text);
-        }
+        output_text = edit_full_text(params, input_text);
     }
 
     if (params.output_file) {
