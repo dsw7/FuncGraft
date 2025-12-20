@@ -127,7 +127,7 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
     const nlohmann::json json_content = utils::parse_json(raw_json);
 
     results.output_tokens = json["usage"]["output_tokens"];
-    results.description = json_content["description"];
+    results.description = json_content["description_of_changes"];
     results.output_text = json_content["code"];
     results.input_tokens = json["usage"]["input_tokens"];
     return results;

@@ -1,6 +1,7 @@
 #include "curl_base.hpp"
 
 #include <cstdlib>
+#include <fmt/core.h>
 #include <json.hpp>
 
 namespace {
@@ -81,9 +82,19 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
-    const nlohmann::json response_format = {
-        { "format", { { "type", "text" } } },
+    /*
+    const nlohmann::json json_schema = {
+        { "name", "foobar" },
+        { "schema", { { "type", "object" }, { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } }, { "required", { "code", "description_of_changes" } } } }
     };
+    */
+    const nlohmann::json json_schema = { { "schema", { { "type", "object" }, { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } }, { "required", { "code", "description_of_changes" } } } } };
+    // const nlohmann::json json_schema = { { "type", "object" }, { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } }, { "required", { "code", "description_of_changes" } } };
+    const nlohmann::json response_format = {
+        {
+            "format",
+            { { "strict", true }, { "type", "json_schema" }, { "schema", json_schema }, { "name", "schema" } },
+        };
     const nlohmann::json data = {
         { "input", prompt },
         { "model", model },
@@ -91,7 +102,9 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
         { "temperature", 1.00 },
         { "text", response_format },
     };
-    const std::string request = data.dump();
+    const std::string request = data.dump(2);
+
+    fmt::print("{}\n", request);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
 
     std::string response;
