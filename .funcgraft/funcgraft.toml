@@ -8,5 +8,11 @@
 model = "gpt-4o"
 
 [ollama]
+# Specify Ollama host
+host = "localhost"
+
+# Specify Ollama port
+port = 11434
+
 # Specify a default Ollama model to use such as "gemma3:latest"
 model = "gemma3:latest"
