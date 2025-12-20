@@ -31,7 +31,6 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, std::string *data)
 
 inline nlohmann::json get_schema()
 {
-    // template seems to be consistent between Ollama and OpenAI
     return {
         { "type", "object" },
         {

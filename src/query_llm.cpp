@@ -98,12 +98,12 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("Some unknown object type was returned from OpenAI");
     }
 
-    const StructuredOutput so = deserialize_structured_output(output);
+    const auto &[code, description] = deserialize_structured_output(output);
 
     query_llm::LLMResponse results;
-    results.description = so.description_of_changes;
+    results.description = description;
     results.input_tokens = json["usage"]["input_tokens"];
-    results.output_text = so.code;
+    results.output_text = code;
     results.output_tokens = json["usage"]["output_tokens"];
     return results;
 }
@@ -121,12 +121,12 @@ query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
     }
 
     const std::string output = json["response"];
-    const StructuredOutput so = deserialize_structured_output(output);
+    const auto &[code, description] = deserialize_structured_output(output);
 
     query_llm::LLMResponse results;
-    results.description = so.description_of_changes;
+    results.description = description;
     results.input_tokens = json["prompt_eval_count"];
-    results.output_text = so.code;
+    results.output_text = code;
     results.output_tokens = json["eval_count"];
     return results;
 }
