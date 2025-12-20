@@ -46,8 +46,10 @@ void Configs::load_configs_from_config_file()
         throw std::runtime_error(e);
     }
 
+    this->host_ollama = table["ollama"]["host"].value_or("localhost");
     this->model_ollama = table["ollama"]["model"].value_or("gemma3:latest");
     this->model_openai = table["openai"]["model"].value_or("gpt-4o");
+    this->port_ollama = table["ollama"]["port"].value_or(11434);
 }
 
 Configs configs;
