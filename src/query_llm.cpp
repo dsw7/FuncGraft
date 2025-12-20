@@ -34,6 +34,29 @@ void deserialize_ollama_response_and_throw_error(const std::string &response)
     throw std::runtime_error(json["error"]);
 }
 
+struct StructuredOutput {
+    std::string code;
+    std::string description_of_changes;
+};
+
+StructuredOutput deserialize_structured_output(const std::string &output)
+{
+    const nlohmann::json json = utils::parse_json(output);
+
+    if (not json.contains("code")) {
+        throw std::runtime_error("Structured output missing 'code' field");
+    }
+
+    if (not json.contains("description_of_changes")) {
+        throw std::runtime_error("Structured output missing 'description_of_changes' field");
+    }
+
+    return {
+        json["description_of_changes"],
+        json["code"],
+    };
+}
+
 query_llm::LLMResponse deserialize_openai_response(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
@@ -65,7 +88,6 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    query_llm::LLMResponse results;
     std::string output;
 
     if (content["type"] == "output_text") {
@@ -76,12 +98,13 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("Some unknown object type was returned from OpenAI");
     }
 
-    const nlohmann::json json_content = utils::parse_json(output);
+    const StructuredOutput so = deserialize_structured_output(output);
 
-    results.output_tokens = json["usage"]["output_tokens"];
-    results.description = json_content["description_of_changes"];
-    results.output_text = json_content["code"];
+    query_llm::LLMResponse results;
+    results.description = so.description_of_changes;
     results.input_tokens = json["usage"]["input_tokens"];
+    results.output_text = so.code;
+    results.output_tokens = json["usage"]["output_tokens"];
     return results;
 }
 
@@ -97,14 +120,14 @@ query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const std::string raw_response = json["response"];
-    const nlohmann::json json_content = utils::parse_json(raw_response);
+    const std::string output = json["response"];
+    const StructuredOutput so = deserialize_structured_output(output);
 
     query_llm::LLMResponse results;
+    results.description = so.description_of_changes;
     results.input_tokens = json["prompt_eval_count"];
+    results.output_text = so.code;
     results.output_tokens = json["eval_count"];
-    results.description = json_content["description_of_changes"];
-    results.output_text = json_content["code"];
     return results;
 }
 
