@@ -27,6 +27,55 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, std::string *data)
     return size * nmemb;
 }
 
+inline nlohmann::json get_schema()
+{
+    // template seems to be consistent between Ollama and OpenAI
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "code", { { "type", "string" } } },
+                { "description_of_changes", { { "type", "string" } } },
+            },
+        },
+        { "required", { "code", "description_of_changes" } },
+        { "additionalProperties", false }, // not sure if ollama needs this
+    };
+}
+
+nlohmann::json post_data_openai(const std::string &prompt, const std::string &model)
+{
+    const nlohmann::json response_format = {
+        {
+            "format",
+            {
+                { "name", "updated_code" },
+                { "schema", get_schema() },
+                { "strict", true },
+                { "type", "json_schema" },
+            },
+        }
+    };
+    return {
+        { "input", prompt },
+        { "model", model },
+        { "store", false },
+        { "temperature", 1.00 },
+        { "text", response_format },
+    };
+}
+
+nlohmann::json post_data_ollama(const std::string &prompt, const std::string &model)
+{
+    return {
+        { "format", get_schema() },
+        { "model", model },
+        { "prompt", prompt },
+        { "stream", false },
+    };
+}
+
 } // namespace
 
 namespace curl_base {
@@ -81,14 +130,9 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
-    const nlohmann::json data = {
-        { "input", prompt },
-        { "model", model },
-        { "store", false },
-        { "temperature", 1.00 },
-    };
-    const std::string request = data.dump();
-    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
+    const nlohmann::json post_data = post_data_openai(prompt, model);
+    const std::string post_data_str = post_data.dump();
+    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_data_str.c_str());
 
     std::string response;
     curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
@@ -111,20 +155,9 @@ CurlResult Curl::create_ollama_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
-    const nlohmann::json response_format = {
-        { "type", "object" },
-        { "properties", { { "code", { { "type", "string" } } }, { "description_of_changes", { { "type", "string" } } } } },
-        { "required", { "code", "description_of_changes" } }
-    };
-    const nlohmann::json data = {
-        { "prompt", prompt },
-        { "model", model },
-        { "stream", false },
-        { "format", response_format },
-    };
-    const std::string request = data.dump();
-
-    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
+    const nlohmann::json post_data = post_data_ollama(prompt, model);
+    const std::string post_data_str = post_data.dump();
+    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_data_str.c_str());
 
     std::string response;
     curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);

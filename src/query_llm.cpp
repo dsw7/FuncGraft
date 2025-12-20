@@ -8,53 +8,6 @@
 
 namespace {
 
-std::string get_stringified_json_from_output(const std::string &output)
-{
-    /*
-     * Some models return a JSON completion without triple backticks:
-     * {
-     *   k: v,
-     * }
-     * Others return a JSON completion with triple backticks:
-     * ```json
-     * {
-     *   k: v,
-     * }
-     * ```
-     */
-
-    if (output.empty()) {
-        throw std::runtime_error("Output from OpenAI is empty. Cannot extract JSON");
-    }
-
-    if (output[0] == '{' and output.back() == '}') {
-        return output;
-    }
-
-    bool append_enabled = false;
-    std::string line;
-    std::stringstream ss(output);
-    std::string raw_json;
-
-    while (std::getline(ss, line)) {
-        if (line == "```json") {
-            append_enabled = true;
-        } else if (line == "```") {
-            append_enabled = false;
-        } else {
-            if (append_enabled) {
-                raw_json += line;
-            }
-        }
-    }
-
-    if (append_enabled) {
-        throw std::runtime_error("Closing triple backticks not found. Raw JSON might be malformed");
-    }
-
-    return raw_json;
-}
-
 void deserialize_openai_response_and_throw_error(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
@@ -79,6 +32,29 @@ void deserialize_ollama_response_and_throw_error(const std::string &response)
     }
 
     throw std::runtime_error(json["error"]);
+}
+
+struct StructuredOutput {
+    std::string code;
+    std::string description_of_changes;
+};
+
+StructuredOutput deserialize_structured_output(const std::string &output)
+{
+    const nlohmann::json json = utils::parse_json(output);
+
+    if (not json.contains("code")) {
+        throw std::runtime_error("Structured output missing 'code' field");
+    }
+
+    if (not json.contains("description_of_changes")) {
+        throw std::runtime_error("Structured output missing 'description_of_changes' field");
+    }
+
+    return {
+        json["code"],
+        json["description_of_changes"],
+    };
 }
 
 query_llm::LLMResponse deserialize_openai_response(const std::string &response)
@@ -112,7 +88,6 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    query_llm::LLMResponse results;
     std::string output;
 
     if (content["type"] == "output_text") {
@@ -123,13 +98,13 @@ query_llm::LLMResponse deserialize_openai_response(const std::string &response)
         throw std::runtime_error("Some unknown object type was returned from OpenAI");
     }
 
-    const std::string raw_json = get_stringified_json_from_output(output);
-    const nlohmann::json json_content = utils::parse_json(raw_json);
+    const StructuredOutput so = deserialize_structured_output(output);
 
-    results.output_tokens = json["usage"]["output_tokens"];
-    results.description = json_content["description"];
-    results.output_text = json_content["code"];
+    query_llm::LLMResponse results;
+    results.description = so.description_of_changes;
     results.input_tokens = json["usage"]["input_tokens"];
+    results.output_text = so.code;
+    results.output_tokens = json["usage"]["output_tokens"];
     return results;
 }
 
@@ -145,14 +120,14 @@ query_llm::LLMResponse deserialize_ollama_response(const std::string &response)
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const std::string raw_response = json["response"];
-    const nlohmann::json json_content = utils::parse_json(raw_response);
+    const std::string output = json["response"];
+    const StructuredOutput so = deserialize_structured_output(output);
 
     query_llm::LLMResponse results;
+    results.description = so.description_of_changes;
     results.input_tokens = json["prompt_eval_count"];
+    results.output_text = so.code;
     results.output_tokens = json["eval_count"];
-    results.description = json_content["description_of_changes"];
-    results.output_text = json_content["code"];
     return results;
 }
 
