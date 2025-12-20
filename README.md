@@ -17,6 +17,7 @@ work.
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Togging between LLM providers](#togging-between-llm-providers)
 
 ## Prerequisites
 Ensure you possess a valid OpenAI API key. Set it as an environment variable:
@@ -143,3 +144,14 @@ Run the program with the `-v` flag to enable verbosity:
 edit foo.cpp -v
 ```
 This will print out the prompt being sent to the LLM provider.
+
+## Togging between LLM providers
+The program will default to querying OpenAI servers. To query a locally hosted
+LLM instead, run a command with the `--use-local` flag:
+```console
+edit foo.cpp --use-local # or -l for short
+```
+The `--use-local` flag will deploy a job using the parameters specified under
+the `[ollama]` section in [funcgraft.toml](./funcgraft/funcgraft.toml). Ensure
+that that the Ollama server is up and running on the host and port specified in
+the configuration file.
