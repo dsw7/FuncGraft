@@ -2,6 +2,7 @@
 #include "configs.hpp"
 
 #include <cstdlib>
+#include <fmt/core.h>
 #include <json.hpp>
 
 namespace {
@@ -152,7 +153,7 @@ CurlResult Curl::create_ollama_response(const std::string &prompt)
     curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
 
-    static std::string url_ollama_generate = "http://localhost:11434/api/generate";
+    static std::string url_ollama_generate = fmt::format("http://{}:{}/api/generate", configs.host_ollama, configs.port_ollama);
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
