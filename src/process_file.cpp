@@ -154,29 +154,21 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::LLMResponse results = run_openai_query_with_threading(prompt, params.model);
+    query_llm::LLMResponse results;
+
+    if (params.use_local_llm) {
+        results = run_ollama_query_with_threading(prompt, params.model);
+    } else {
+        results = run_openai_query_with_threading(prompt, params.model);
+    }
+
     report_query_info(results);
 
     text_parts.modified_text = results.output_text;
     return text_manip::pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text_openai(const params::CommandLineParameters &params, const std::string &input_text)
-{
-    const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
-
-    if (params.verbose) {
-        print_prompt_if_verbose(prompt);
-    }
-
-    const query_llm::LLMResponse results = run_openai_query_with_threading(prompt, params.model);
-    report_query_info(results);
-
-    return results.output_text;
-}
-
-std::string edit_full_text_ollama(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
@@ -185,9 +177,15 @@ std::string edit_full_text_ollama(const params::CommandLineParameters &params, c
         print_prompt_if_verbose(prompt);
     }
 
-    const query_llm::LLMResponse results = run_ollama_query_with_threading(prompt, params.model);
-    report_query_info(results);
+    query_llm::LLMResponse results;
 
+    if (params.use_local_llm) {
+        results = run_ollama_query_with_threading(prompt, params.model);
+    } else {
+        results = run_openai_query_with_threading(prompt, params.model);
+    }
+
+    report_query_info(results);
     return results.output_text;
 }
 
@@ -205,18 +203,10 @@ void process_file(const params::CommandLineParameters &params)
 
     std::string output_text;
 
-    if (params.use_local_llm) {
-        if (text_manip::is_text_delimited(input_text)) {
-            output_text = edit_full_text_ollama(params, input_text);
-        } else {
-            output_text = edit_full_text_ollama(params, input_text);
-        }
+    if (text_manip::is_text_delimited(input_text)) {
+        output_text = edit_delimited_text(params, input_text);
     } else {
-        if (text_manip::is_text_delimited(input_text)) {
-            output_text = edit_delimited_text(params, input_text);
-        } else {
-            output_text = edit_full_text_openai(params, input_text);
-        }
+        output_text = edit_full_text(params, input_text);
     }
 
     if (params.output_file) {
