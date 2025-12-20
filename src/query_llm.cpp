@@ -52,8 +52,8 @@ StructuredOutput deserialize_structured_output(const std::string &output)
     }
 
     return {
-        json["description_of_changes"],
         json["code"],
+        json["description_of_changes"],
     };
 }
 
