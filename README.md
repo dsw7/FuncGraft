@@ -142,10 +142,4 @@ Run the program with the `-v` flag to enable verbosity:
 ```console
 edit foo.cpp -v
 ```
-This will print out the prompt being sent to OpenAI.
-
-### Specify a custom model
-Run the program with the `-m` or `--model` option:
-```console
-edit foo.cpp -m <your-model>
-```
+This will print out the prompt being sent to the LLM provider.
