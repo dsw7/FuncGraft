@@ -81,11 +81,15 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
+    const nlohmann::json response_format = {
+        { "format", { { "type", "text" } } },
+    };
     const nlohmann::json data = {
         { "input", prompt },
         { "model", model },
         { "store", false },
         { "temperature", 1.00 },
+        { "text", response_format },
     };
     const std::string request = data.dump();
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, request.c_str());
