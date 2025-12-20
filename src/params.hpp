@@ -13,7 +13,6 @@ struct CommandLineParameters {
     std::optional<std::filesystem::path> instructions_file;
     std::optional<std::filesystem::path> output_file;
     std::optional<std::string> instructions_from_cli;
-    std::string model = "gpt-4o";
 
     void validate_params();
 };

@@ -28,10 +28,6 @@ void CommandLineParameters::validate_params()
             throw std::invalid_argument("CLI instructions are empty. Cannot proceed");
         }
     }
-
-    if (this->model.empty()) {
-        throw std::invalid_argument("Model is empty. Cannot proceed");
-    }
 }
 
 } // namespace params
