@@ -27,30 +27,33 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, std::string *data)
     return size * nmemb;
 }
 
+inline nlohmann::json get_schema()
+{
+    // template seems to be consistent between Ollama and OpenAI
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "code", { { "type", "string" } } },
+                { "description_of_changes", { { "type", "string" } } },
+            },
+        },
+        { "required", { "code", "description_of_changes" } },
+        { "additionalProperties", false }, // not sure if ollama needs this
+    };
+}
+
 nlohmann::json post_data_openai(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json response_format = {
         {
             "format",
             {
+                { "name", "updated_code" },
+                { "schema", get_schema() },
                 { "strict", true },
                 { "type", "json_schema" },
-                { "name", "updated_code" },
-                {
-                    "schema",
-                    {
-                        { "type", "object" },
-                        { "required", { "code", "description_of_changes" } },
-                        {
-                            "properties",
-                            {
-                                { "code", { { "type", "string" } } },
-                                { "description_of_changes", { { "type", "string" } } },
-                            },
-                        },
-                        { "additionalProperties", false },
-                    },
-                },
             },
         }
     };
@@ -65,22 +68,11 @@ nlohmann::json post_data_openai(const std::string &prompt, const std::string &mo
 
 nlohmann::json post_data_ollama(const std::string &prompt, const std::string &model)
 {
-    const nlohmann::json response_format = {
-        { "type", "object" },
-        {
-            "properties",
-            {
-                { "code", { { "type", "string" } } },
-                { "description_of_changes", { { "type", "string" } } },
-            },
-        },
-        { "required", { "code", "description_of_changes" } }
-    };
     return {
-        { "prompt", prompt },
+        { "format", get_schema() },
         { "model", model },
+        { "prompt", prompt },
         { "stream", false },
-        { "format", response_format },
     };
 }
 
