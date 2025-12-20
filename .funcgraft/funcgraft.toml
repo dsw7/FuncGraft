@@ -1,0 +1,12 @@
+# --------------------------------------------------
+# FuncGraft
+# See https://github.com/dsw7/FuncGraft for more information
+# --------------------------------------------------
+
+[openai]
+# Specify a default OpenAI model to use such as "gpt-4o"
+model = "gpt-4o"
+
+[ollama]
+# Specify a default Ollama model to use such as "gemma3:latest"
+model = "gemma3:latest"
