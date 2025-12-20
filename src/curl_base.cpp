@@ -1,4 +1,5 @@
 #include "curl_base.hpp"
+#include "configs.hpp"
 
 #include <cstdlib>
 #include <json.hpp>
@@ -44,7 +45,7 @@ inline nlohmann::json get_schema()
     };
 }
 
-nlohmann::json post_data_openai(const std::string &prompt, const std::string &model)
+nlohmann::json post_data_openai(const std::string &prompt)
 {
     const nlohmann::json response_format = {
         {
@@ -59,18 +60,18 @@ nlohmann::json post_data_openai(const std::string &prompt, const std::string &mo
     };
     return {
         { "input", prompt },
-        { "model", model },
+        { "model", configs.model_openai },
         { "store", false },
         { "temperature", 1.00 },
         { "text", response_format },
     };
 }
 
-nlohmann::json post_data_ollama(const std::string &prompt, const std::string &model)
+nlohmann::json post_data_ollama(const std::string &prompt)
 {
     return {
         { "format", get_schema() },
-        { "model", model },
+        { "model", configs.model_ollama },
         { "prompt", prompt },
         { "stream", false },
     };
@@ -113,7 +114,7 @@ void Curl::reset_handle_and_headers_()
     this->headers_ = nullptr;
 }
 
-CurlResult Curl::create_openai_response(const std::string &prompt, const std::string &model)
+CurlResult Curl::create_openai_response(const std::string &prompt)
 {
     this->reset_handle_and_headers_();
 
@@ -130,7 +131,7 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_openai_responses.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
-    const nlohmann::json post_data = post_data_openai(prompt, model);
+    const nlohmann::json post_data = post_data_openai(prompt);
     const std::string post_data_str = post_data.dump();
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_data_str.c_str());
 
@@ -141,7 +142,7 @@ CurlResult Curl::create_openai_response(const std::string &prompt, const std::st
     return check_curl_code(this->handle_, code, response);
 }
 
-CurlResult Curl::create_ollama_response(const std::string &prompt, const std::string &model)
+CurlResult Curl::create_ollama_response(const std::string &prompt)
 {
     this->reset_handle_and_headers_();
 
@@ -155,7 +156,7 @@ CurlResult Curl::create_ollama_response(const std::string &prompt, const std::st
     curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
-    const nlohmann::json post_data = post_data_ollama(prompt, model);
+    const nlohmann::json post_data = post_data_ollama(prompt);
     const std::string post_data_str = post_data.dump();
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_data_str.c_str());
 
