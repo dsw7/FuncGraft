@@ -163,18 +163,16 @@ the configuration file.
 Place the following function in your `.vimrc` file:
 ```vim
 function! WrapCodeWithFuncGraftDelimiters()
-  let start_line = getpos("'<")[1]
-  let end_line = getpos("'>")[1]
+  let l:start_line = getpos("'<")[1]
+  let l:end_line = getpos("'>")[1]
 
-  execute end_line . 'put =\"\n\"'
-  execute start_line . ',' . end_line . 'move ' . (end_line + 1)
+  execute l:end_line . 'put =\"\n\"'
+  execute l:start_line . ',' . l:end_line . 'move ' . (l:end_line + 1)
 
-  execute start_line . 'put =\"@@@\"'
-  execute (end_line + 2) . 'put =\"@@@\"'
+  execute l:start_line . 'put =\"@@@\"'
+  execute (l:end_line + 2) . 'put =\"@@@\"'
 
-  " sequence of put operations will move block down by 1
-  " move the block back up
-  execute start_line . 'd'
+  execute l:start_line . 'd'
 endfunction
 ```
 And also place a mapping somewhere in the same file:
