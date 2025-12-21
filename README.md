@@ -18,6 +18,7 @@ work.
 - [Setup](#setup)
 - [Usage](#usage)
 - [Togging between LLM providers](#togging-between-llm-providers)
+- [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
 
 ## Prerequisites
 Ensure you possess a valid OpenAI API key. Set it as an environment variable:
@@ -155,3 +156,32 @@ The `--use-local` flag will deploy a job using the parameters specified under
 the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
 that that the Ollama server is up and running on the host and port specified in
 the configuration file.
+
+## Miscellaneous `vim` shortcuts
+
+### Shortcut for wrapping code with `@@@` delimiters
+Place the following function in your `.vimrc` file:
+```vim
+function! WrapCodeWithFuncGraftDelimiters()
+  let start_line = getpos("'<")[1]
+  let end_line = getpos("'>")[1]
+
+  execute end_line . 'put =\"\n\"'
+  execute start_line . ',' . end_line . 'move ' . (end_line + 1)
+
+  execute start_line . 'put =\"@@@\"'
+  execute (end_line + 2) . 'put =\"@@@\"'
+
+  " sequence of put operations will move block down by 1
+  " move the block back up
+  execute start_line . 'd'
+endfunction
+```
+And also place a mapping somewhere in the same file:
+```vim
+" Wrap a block of text with FuncGraft @@@ markers
+xnoremap ed :<C-u>call WrapCodeWithFuncGraftDelimiters()<CR>
+```
+Now, a block of code can be selected in visual mode, and executing `ed` will
+wrap the code in `@@@` delimiters to match the [targeted code manipulation
+example](#example---targeted-code-manipulation).
