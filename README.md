@@ -21,13 +21,8 @@ work.
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
 
 ## Prerequisites
-Ensure you possess a valid OpenAI API key. Set it as an environment variable:
-```bash
-export OPENAI_API_KEY="<your-api-key>"
-```
 This program requires [CMake](https://cmake.org/), [{fmt}](https://fmt.dev/latest/) and
 [libcurl](https://curl.se/libcurl/). These can be installed as follows:
-
 ### Ubuntu/Debian
 ```console
 apt install cmake libfmt-dev libcurl4-openssl-dev
@@ -40,6 +35,12 @@ brew install cmake fmt
 ### Other systems
 This program should work on other Unix-like systems (i.e. other Linux distributions) however I do not
 extensively test these.
+### API keys
+If using OpenAI as opposed to a locally hosted LLM, you will need a valid
+OpenAI API key and you will need to set this key as an environment variable:
+```bash
+export OPENAI_API_KEY="<your-api-key>"
+```
 
 ## Setup
 Compile the binary by executing the default `make` target:
