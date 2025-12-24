@@ -147,7 +147,7 @@ edit foo.cpp -v
 ```
 This will print out the prompt being sent to the LLM provider.
 
-## Togging between LLM providers
+## Toggling between LLM providers
 The program will default to querying OpenAI servers. To query a locally hosted
 LLM instead, run a command with the `--use-local` flag:
 ```console
