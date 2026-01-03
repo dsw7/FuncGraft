@@ -17,7 +17,7 @@ work.
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Togging between LLM providers](#togging-between-llm-providers)
+- [Toggling between LLM providers](#toggling-between-llm-providers)
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
 
 ## Prerequisites
