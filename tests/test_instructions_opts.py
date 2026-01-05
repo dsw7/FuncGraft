@@ -1,23 +1,25 @@
-from .utils import LOC_TEST_DATA, ExtendedTestCase
+from .utils import LOC_TEST_DATA, assert_command_failure
+
+DUMMY_FILE = str(LOC_TEST_DATA / "dummy_basic.py")
 
 
-class TestInstructionsOpts(ExtendedTestCase):
-    dummy_file = str(LOC_TEST_DATA / "dummy_basic.py")
+def test_empty_instructions_file_arg() -> None:
+    stderr = assert_command_failure(DUMMY_FILE, "--file=")
+    assert "Instructions filename was not provided. Cannot proceed" in stderr
 
-    def test_empty_instructions_file_arg(self) -> None:
-        stderr = self.assertFailure(self.dummy_file, "--file=")
-        self.assertIn("Instructions filename was not provided. Cannot proceed", stderr)
 
-    def test_missing_instructions_file(self) -> None:
-        stderr = self.assertFailure(self.dummy_file, "--file=foo.txt")
-        self.assertIn("File 'foo.txt' does not exist!", stderr)
+def test_missing_instructions_file() -> None:
+    stderr = assert_command_failure(DUMMY_FILE, "--file=foo.txt")
+    assert "File 'foo.txt' does not exist!" in stderr
 
-    def test_empty_instructions_file(self) -> None:
-        stderr = self.assertFailure(
-            self.dummy_file, f'--file={LOC_TEST_DATA / "edit_empty.txt"}'
-        )
-        self.assertIn("Instructions are empty!", stderr)
 
-    def test_empty_instructions(self) -> None:
-        stderr = self.assertFailure(self.dummy_file, "--instructions=")
-        self.assertIn("CLI instructions are empty. Cannot proceed", stderr)
+def test_empty_instructions_file() -> None:
+    stderr = assert_command_failure(
+        DUMMY_FILE, f'--file={LOC_TEST_DATA / "edit_empty.txt"}'
+    )
+    assert "Instructions are empty!" in stderr
+
+
+def test_empty_instructions() -> None:
+    stderr = assert_command_failure(DUMMY_FILE, "--instructions=")
+    assert "CLI instructions are empty. Cannot proceed" in stderr
