@@ -12,15 +12,21 @@ def tearDown() -> None:
         pass
 
 
+def run_temp_python_script() -> str:
+    # some tests will generate and edit OUTPUT_PATH python script with LLMs
+    # run this script to see if it works after modification by an LLM
+    process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
+    assert process.returncode == 0, process.stderr
+    return process.stdout
+
+
 def test_read_instructions_from_file() -> None:
     assert_command_success(
         str(LOC_TEST_DATA / "dummy_basic.py"),
         f'--file={LOC_TEST_DATA / "edit.txt"}',
         f"-o{OUTPUT_PATH}",
     )
-    process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
-    assert process.returncode == 0, process.stderr
-    assert "The sum is 14" in process.stdout
+    assert "The sum is 14" in run_temp_python_script()
 
 
 def test_read_instructions_from_cli() -> None:
@@ -31,10 +37,7 @@ def test_read_instructions_from_cli() -> None:
         f"-o{OUTPUT_PATH}",
     )
     assert "Prompt:" not in stdout  # Prompt should not print by default
-
-    process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
-    assert process.returncode == 0, process.stderr
-    assert "The sum is 9" in process.stdout
+    assert "The sum is 9" in run_temp_python_script()
 
 
 def test_print_prompt_with_verbose_flag() -> None:
@@ -46,10 +49,7 @@ def test_print_prompt_with_verbose_flag() -> None:
         "--verbose",
     )
     assert "Prompt:" in stdout
-
-    process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
-    assert process.returncode == 0, process.stderr
-    assert "The sum is 9" in process.stdout
+    assert "The sum is 9" in run_temp_python_script()
 
 
 def test_only_edit_between_delims() -> None:
@@ -59,9 +59,7 @@ def test_only_edit_between_delims() -> None:
         f"--instructions='{instructions}'",
         f"-o{OUTPUT_PATH}",
     )
-    process = run(["python3", OUTPUT_PATH], stdout=PIPE, stderr=PIPE, text=True)
-    assert process.returncode == 0, process.stderr
-    assert "The sum is 17" in process.stdout
+    assert "The sum is 17" in run_temp_python_script()
 
 
 def test_bad_delim_placement() -> None:
