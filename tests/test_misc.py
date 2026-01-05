@@ -1,23 +1,24 @@
 from datetime import datetime
-from .utils import ExtendedTestCase
+from pytest import mark
+from utils import assert_command_success, assert_command_failure
 
 
-class TestMisc(ExtendedTestCase):
+@mark.parametrize("option", ["-h", "--help"])
+def test_help(option: str) -> None:
+    assert_command_success(option)
 
-    def test_help(self) -> None:
-        for option in ["-h", "--help"]:
-            with self.subTest(option=option):
-                self.assertSuccess(option)
 
-    def test_no_opts_or_args(self) -> None:
-        self.assertSuccess()
+def test_no_opts_or_args() -> None:
+    assert_command_success()
 
-    def test_unknown_opt(self) -> None:
-        stderr = self.assertFailure("-X")
-        self.assertIn("Unknown option passed to command", stderr)
 
-    def test_copyright(self) -> None:
-        stdout = self.assertSuccess("--help")
-        self.assertIn(
-            f"-- FuncGraft | Copyright (C) {datetime.now().year} by David Weber", stdout
-        )
+def test_unknown_opt() -> None:
+    stderr = assert_command_failure("-X")
+    assert "Unknown option passed to command" in stderr
+
+
+def test_copyright() -> None:
+    stdout = assert_command_success("--help")
+    assert (
+        f"-- FuncGraft | Copyright (C) {datetime.now().year} by David Weber" in stdout
+    )
