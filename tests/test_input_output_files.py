@@ -1,33 +1,22 @@
-from subprocess import run, PIPE
-from unittest import TestCase
-from .utils import get_gpe_binary, LOC_TEST_DATA
+from .utils import LOC_TEST_DATA, ExtendedTestCase
 
 
-class TestInputFileOptions(TestCase):
+class TestInputFileOptions(ExtendedTestCase):
     def test_input_file_is_empty(self) -> None:
-        command = [get_gpe_binary(), ""]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("No filename was provided. Cannot proceed", process.stderr)
+        stderr = self.assertFailure("")
+        self.assertIn("No filename was provided. Cannot proceed", stderr)
 
     def test_input_file_is_not_a_file(self) -> None:
-        command = [get_gpe_binary(), "/tmp", "-iFoo"]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("Input '/tmp' is not a file!", process.stderr)
+        stderr = self.assertFailure("/tmp", "-iFoo")
+        self.assertIn("Input '/tmp' is not a file!", stderr)
 
     def test_input_file_is_missing(self) -> None:
-        command = [get_gpe_binary(), "abc.txt", "-iFoo"]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn("File 'abc.txt' does not exist!", process.stderr)
+        stderr = self.assertFailure("abc.txt", "-iFoo")
+        self.assertIn("File 'abc.txt' does not exist!", stderr)
 
 
-class TestOutputFileOptions(TestCase):
+class TestOutputFileOptions(ExtendedTestCase):
     def test_output_file_is_empty(self) -> None:
-        command = [get_gpe_binary(), LOC_TEST_DATA / "dummy_basic.py", "--output="]
-        process = run(command, stdout=PIPE, stderr=PIPE, text=True)
-        self.assertEqual(process.returncode, 1)
-        self.assertIn(
-            "Output filename was not provided. Cannot proceed", process.stderr
-        )
+        path_file = str(LOC_TEST_DATA / "dummy_basic.py")
+        stderr = self.assertFailure(path_file, "--output=")
+        self.assertIn("Output filename was not provided. Cannot proceed", stderr)
