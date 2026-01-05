@@ -17,8 +17,8 @@ def outputted_script() -> Generator[str, None, None]:
 
 
 def run_outputted_python_script(python_script: str) -> str:
-    # some tests will generate and edit a python script with LLMs
-    # run this script to see if it works after modification by an LLM
+    # some tests will edit a python script with LLMs and place the edited copy elsewhere
+    # run the edited copy to see if it works after modification by an LLM
     process = run(["python3", python_script], stdout=PIPE, stderr=PIPE, text=True)
     assert process.returncode == 0, process.stderr
     return process.stdout
