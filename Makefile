@@ -1,4 +1,4 @@
-.PHONY = format compile tidy clean lint test
+.PHONY = format compile tidy clean lint test py
 .DEFAULT_GOAL = compile
 
 format:
@@ -27,3 +27,8 @@ test: format
 	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
 	@echo "See coverage report at: build/test/coverageResults/index.html"
+
+py:
+	@black tests/*.py
+	@pylint --exit-zero tests/*.py
+	@mypy --strict tests/*.py
