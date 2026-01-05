@@ -2,7 +2,7 @@ from os import remove
 from subprocess import run, PIPE
 from typing import Generator
 from pytest import fixture
-from .utils import LOC_TEST_DATA, assert_command_success, assert_command_failure
+from utils import LOC_TEST_DATA, assert_command_success, assert_command_failure
 
 
 @fixture

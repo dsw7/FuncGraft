@@ -1,4 +1,4 @@
-from .utils import LOC_TEST_DATA, assert_command_failure
+from utils import LOC_TEST_DATA, assert_command_failure
 
 
 def test_input_file_is_empty() -> None:

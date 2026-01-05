@@ -1,6 +1,6 @@
 from datetime import datetime
 from pytest import mark
-from .utils import assert_command_success, assert_command_failure
+from utils import assert_command_success, assert_command_failure
 
 
 @mark.parametrize("option", ["-h", "--help"])

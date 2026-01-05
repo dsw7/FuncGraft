@@ -1,4 +1,4 @@
-from .utils import LOC_TEST_DATA, assert_command_failure
+from utils import LOC_TEST_DATA, assert_command_failure
 
 DUMMY_FILE = str(LOC_TEST_DATA / "dummy_basic.py")
 
