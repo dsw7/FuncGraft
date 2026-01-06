@@ -19,6 +19,7 @@ work.
 - [Usage](#usage)
 - [Toggling between LLM providers](#toggling-between-llm-providers)
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
+- [Testing](#testing)
 
 ## Prerequisites
 This program requires [CMake](https://cmake.org/), [{fmt}](https://fmt.dev/latest/) and
@@ -184,3 +185,19 @@ xnoremap ed :<C-u>call WrapCodeWithFuncGraftDelimiters()<CR>
 Now, a block of code can be selected in visual mode, and executing `ed` will
 wrap the code in `@@@` delimiters to match the [targeted code manipulation
 example](#example---targeted-code-manipulation).
+
+## Testing
+Testing is separated into OpenAI and Ollama streams as the program supports
+independently adapting to either Ollama or OpenAI servers.
+
+### OpenAI stream
+Run the following:
+```
+make test
+```
+### Ollama stream
+Run the following:
+```
+make test-ollama
+```
+All tests will fail if FuncGraft cannot connect to an Ollama server.
