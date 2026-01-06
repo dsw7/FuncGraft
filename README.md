@@ -15,17 +15,13 @@ work.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
-  - [Ubuntu/Debian](#ubuntudebian)
-  - [macOS](#macos)
-  - [Other systems](#other-systems)
-  - [API keys](#api-keys)
 - [Setup](#setup)
 - [Usage](#usage)
-  - [Example - read from stdin](#example---read-from-stdin)
+  - [Example - connect to OpenAI and read instructions from `stdin`](#example---connect-to-openai-and-read-instructions-from-stdin)
+  - [Example - connect to Ollama](#example---connect-to-ollama)
   - [Example - working with complex prompts](#example---working-with-complex-prompts)
   - [Example - targeted code manipulation](#example---targeted-code-manipulation)
   - [Debugging](#debugging)
-- [Toggling between LLM providers](#toggling-between-llm-providers)
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
   - [Shortcut for wrapping code with `@@@` delimiters](#shortcut-for-wrapping-code-with-@@@-delimiters)
 - [Testing](#testing)
@@ -73,7 +69,7 @@ And edit `~/.funcgraft/funcgraft.toml` to match your infrastructure.
 
 ## Usage
 
-### Example - read from stdin
+### Example - connect to OpenAI and read instructions from `stdin`
 Assume `foo.cpp` uses CamelCase formatting and needs to be converted to snake_case. Run:
 ```console
 edit foo.cpp
@@ -91,6 +87,17 @@ To save the updated code to a new file, such as `bar.cpp`, execute:
 ```console
 edit foo.cpp -o bar.cpp
 ```
+
+### Example - connect to Ollama
+The program will default to querying OpenAI servers. To query a locally hosted
+LLM instead, run a command with the `--use-local` flag:
+```console
+edit foo.cpp --use-local # or -l for short
+```
+The `--use-local` flag will deploy a job using the parameters specified under
+the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
+that that the Ollama server is up and running on the host and port specified in
+the configuration file.
 
 ### Example - working with complex prompts
 Complex multiline prompts can be written into a file and read into the program. For example:
@@ -158,17 +165,6 @@ Run the program with the `-v` flag to enable verbosity:
 edit foo.cpp -v
 ```
 This will print out the prompt being sent to the LLM provider.
-
-## Toggling between LLM providers
-The program will default to querying OpenAI servers. To query a locally hosted
-LLM instead, run a command with the `--use-local` flag:
-```console
-edit foo.cpp --use-local # or -l for short
-```
-The `--use-local` flag will deploy a job using the parameters specified under
-the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
-that that the Ollama server is up and running on the host and port specified in
-the configuration file.
 
 ## Miscellaneous `vim` shortcuts
 
