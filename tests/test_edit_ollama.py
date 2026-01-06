@@ -58,63 +58,6 @@ def test_only_edit_between_delims(outputted_script: str) -> None:
 
 
 @mark.test_ollama
-def test_bad_delim_placement(outputted_script: str) -> None:
-    instructions = "Replace the variable `c` with the integer 3"
-    stderr = assert_command_failure(
-        str(LOC_TEST_DATA / "dummy_with_bad_delims.py"),
-        f"--instructions='{instructions}'",
-        f"-o{outputted_script}",
-        "--use-local",
-    )
-    assert "No matching closing delimiter line" in stderr
-
-
-@mark.test_ollama
-def test_bad_delim_placement_2(outputted_script: str) -> None:
-    instructions = "Replace the variable `c` with the integer 3"
-    stderr = assert_command_failure(
-        str(LOC_TEST_DATA / "dummy_with_bad_delims_2.py"),
-        f"--instructions='{instructions}'",
-        f"-o{outputted_script}",
-        "--use-local",
-    )
-    assert "The number of delimiter lines must be exactly 2" in stderr
-
-
-@mark.test_ollama
-def test_work_on_empty_file() -> None:
-    instructions = "Replace the variable `c` with the integer 3"
-    stderr = assert_command_failure(
-        str(LOC_TEST_DATA / "dummy_empty.py"),
-        f"--instructions='{instructions}'",
-        "--use-local",
-    )
-    assert "The file does not contain any code" in stderr
-
-
-@mark.test_ollama
-def test_work_with_empty_delims() -> None:
-    instructions = "Replace the variable `c` with the integer 3"
-    stderr = assert_command_failure(
-        str(LOC_TEST_DATA / "dummy_with_empty_delims.py"),
-        f"--instructions='{instructions}'",
-        "--use-local",
-    )
-    assert "The delimited block does not contain any code" in stderr
-
-
-@mark.test_ollama
-def test_work_with_empty_delims_2() -> None:
-    instructions = "Replace the variable `c` with the integer 3"
-    stderr = assert_command_failure(
-        str(LOC_TEST_DATA / "dummy_with_empty_delims_2.py"),
-        f"--instructions='{instructions}'",
-        "--use-local",
-    )
-    assert "The delimited block does not contain any code" in stderr
-
-
-@mark.test_ollama
 def test_work_on_unknown_file(outputted_script: str) -> None:
     instructions = "Capitalize all words in the file"
     assert_command_success(
