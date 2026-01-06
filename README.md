@@ -188,7 +188,8 @@ example](#example---targeted-code-manipulation).
 
 ## Testing
 Testing is separated into OpenAI and Ollama streams as the program supports
-independently adapting to either Ollama or OpenAI servers.
+independently adapting to either Ollama or OpenAI servers. The program uses
+[pytest](https://docs.pytest.org/en/stable/) for running unit tests.
 
 ### OpenAI stream
 Run the following:
