@@ -16,11 +16,11 @@ work.
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
-- [Usage](#usage)
-  - [Example - connect to OpenAI and read instructions from `stdin`](#example---connect-to-openai-and-read-instructions-from-stdin)
-  - [Example - connect to Ollama](#example---connect-to-ollama)
-  - [Example - working with complex prompts](#example---working-with-complex-prompts)
-  - [Example - targeted code manipulation](#example---targeted-code-manipulation)
+- [Examples](#examples)
+  - [Connect to OpenAI and read instructions from `stdin`](#connect-to-openai-and-read-instructions-from-stdin)
+  - [Connect to Ollama](#connect-to-ollama)
+  - [Working with complex prompts](#working-with-complex-prompts)
+  - [Targeted code manipulation](#targeted-code-manipulation)
   - [Debugging](#debugging)
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
   - [Shortcut for wrapping code with `@@@` delimiters](#shortcut-for-wrapping-code-with-@@@-delimiters)
@@ -29,8 +29,9 @@ work.
   - [Ollama stream](#ollama-stream)
 
 ## Prerequisites
-This program requires [CMake](https://cmake.org/), [{fmt}](https://fmt.dev/latest/) and
-[libcurl](https://curl.se/libcurl/). These can be installed as follows:
+This program requires [CMake](https://cmake.org/),
+[{fmt}](https://fmt.dev/latest/) and [libcurl](https://curl.se/libcurl/). These
+can be installed as follows:
 ### Ubuntu/Debian
 ```console
 apt install cmake libfmt-dev libcurl4-openssl-dev
@@ -41,8 +42,8 @@ brew install cmake fmt
 # libcurl usually comes bundled with macOS
 ```
 ### Other systems
-This program should work on other Unix-like systems (i.e. other Linux distributions) however I do not
-extensively test these.
+This program should work on other Unix-like systems (i.e. other Linux
+distributions) however I do not extensively test these.
 ### API keys
 If using OpenAI as opposed to a locally hosted LLM, you will need a valid
 OpenAI API key and you will need to set this key as an environment variable:
@@ -56,8 +57,8 @@ Compile the binary by executing the default `make` target:
 make
 ```
 The binary will be installed into the directory specified by CMake's [install()
-function](https://cmake.org/cmake/help/latest/command/install.html#command:install). To clean up generated
-artifacts:
+function](https://cmake.org/cmake/help/latest/command/install.html#command:install).
+To clean up generated artifacts:
 ```console
 make clean
 ```
@@ -67,19 +68,21 @@ cp -rv .funcgraft/ ~
 ```
 And edit `~/.funcgraft/funcgraft.toml` to match your infrastructure.
 
-## Usage
+## Examples
 
-### Example - connect to OpenAI and read instructions from `stdin`
-Assume `foo.cpp` uses CamelCase formatting and needs to be converted to snake_case. Run:
+### Connect to OpenAI and read instructions from `stdin`
+Assume `foo.cpp` uses CamelCase formatting and needs to be converted to
+snake_case. Run:
 ```console
 edit foo.cpp
 ```
-Which will begin a basic interactive session. Outline the required changes when prompted:
+Which will begin a basic interactive session. Outline the required changes when
+prompted:
 ```plaintext
 Input: Convert all code from CamelCase to snake_case.
 ```
-This will print the updated code to `stdout` and prompt whether to overwrite `foo.cpp`. To automatically
-overwrite `foo.cpp`, simply run:
+This will print the updated code to `stdout` and prompt whether to overwrite
+`foo.cpp`. To automatically overwrite `foo.cpp`, simply run:
 ```console
 edit foo.cpp -o foo.cpp
 ```
@@ -88,7 +91,7 @@ To save the updated code to a new file, such as `bar.cpp`, execute:
 edit foo.cpp -o bar.cpp
 ```
 
-### Example - connect to Ollama
+### Connect to Ollama
 The program will default to querying OpenAI servers. To query a locally hosted
 LLM instead, run a command with the `--use-local` flag:
 ```console
@@ -99,8 +102,9 @@ the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
 that that the Ollama server is up and running on the host and port specified in
 the configuration file.
 
-### Example - working with complex prompts
-Complex multiline prompts can be written into a file and read into the program. For example:
+### Working with complex prompts
+Complex multiline prompts can be written into a file and read into the program.
+For example:
 ```bash
 echo "Convert all code from CamelCase to snake_case." > edit.txt && \
 edit /tmp/test.py -o /tmp/test.py -f edit.txt
@@ -109,7 +113,7 @@ edit /tmp/test.py -o /tmp/test.py -f edit.txt
 > The instructions in `edit.txt` do not require prompt engineering. When processed, these instructions
 > are combined with additional context and output format specifications to create a complete prompt.
 
-### Example - targeted code manipulation
+### Targeted code manipulation
 Suppose we have the file `example.c`:
 ```c
 #include <stdio.h>
@@ -135,8 +139,9 @@ int main()
     return 0;
 }
 ```
-This code will not compile. The case between the two functions that print an integer address are mixed. To
-both resolve this and minimize token usage, the offending code can be isolated with `@@@` delimiters:
+This code will not compile. The case between the two functions that print an
+integer address are mixed. To both resolve this and minimize token usage, the
+offending code can be isolated with `@@@` delimiters:
 ```c
 #include <stdio.h>
 
@@ -157,7 +162,8 @@ We can then run:
 ```console
 edit example.c
 ```
-And request a CamelCase to snake_case conversion, thus resolving the missing function definition.
+And request a CamelCase to snake_case conversion, thus resolving the missing
+function definition.
 
 ### Debugging
 Run the program with the `-v` flag to enable verbosity:
@@ -191,7 +197,7 @@ xnoremap ed :<C-u>call WrapCodeWithFuncGraftDelimiters()<CR>
 ```
 Now, a block of code can be selected in visual mode, and executing `ed` will
 wrap the code in `@@@` delimiters to match the [targeted code manipulation
-example](#example---targeted-code-manipulation).
+example](#targeted-code-manipulation).
 
 ## Testing
 Testing is separated into OpenAI and Ollama streams as the program supports
