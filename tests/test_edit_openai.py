@@ -10,7 +10,7 @@ from utils import (
 @mark.test_openai
 def test_read_instructions_from_file(outputted_script: str) -> None:
     assert_command_success(
-        str(LOC_TEST_DATA / "dummy_basic.py"),
+        f"{LOC_TEST_DATA}/dummy_basic.py",
         f'--file={LOC_TEST_DATA / "edit.txt"}',
         f"-o{outputted_script}",
     )
@@ -21,7 +21,7 @@ def test_read_instructions_from_file(outputted_script: str) -> None:
 def test_read_instructions_from_cli(outputted_script: str) -> None:
     instructions = "Replace the variable `c` with the integer 5"
     stdout = assert_command_success(
-        str(LOC_TEST_DATA / "dummy_basic.py"),
+        f"{LOC_TEST_DATA}/dummy_basic.py",
         f"--instructions='{instructions}'",
         f"-o{outputted_script}",
     )
@@ -33,7 +33,7 @@ def test_read_instructions_from_cli(outputted_script: str) -> None:
 def test_print_prompt_with_verbose_flag(outputted_script: str) -> None:
     instructions = "Replace the variable `c` with the integer 5"
     stdout = assert_command_success(
-        str(LOC_TEST_DATA / "dummy_basic.py"),
+        f"{LOC_TEST_DATA}/dummy_basic.py",
         f"--instructions='{instructions}'",
         f"-o{outputted_script}",
         "--verbose",
@@ -46,7 +46,7 @@ def test_print_prompt_with_verbose_flag(outputted_script: str) -> None:
 def test_only_edit_between_delims(outputted_script: str) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     assert_command_success(
-        str(LOC_TEST_DATA / "dummy_with_delims.py"),
+        f"{LOC_TEST_DATA}/dummy_with_delims.py",
         f"--instructions='{instructions}'",
         f"-o{outputted_script}",
     )
@@ -57,7 +57,7 @@ def test_only_edit_between_delims(outputted_script: str) -> None:
 def test_work_on_unknown_file(outputted_script: str) -> None:
     instructions = "Capitalize all words in the file"
     assert_command_success(
-        str(LOC_TEST_DATA / "unknown_file_type.abc"),
+        f"{LOC_TEST_DATA}/unknown_file_type.abc",
         f"--instructions='{instructions}'",
         f"-o{outputted_script}",  # Will write to a .py file but it's okay
     )
