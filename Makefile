@@ -22,7 +22,9 @@ test: export PATH_BIN = $(CURDIR)/build/test/edit
 test: format
 	@cmake -S src -B build/test -DENABLE_TESTING=ON -DENABLE_COVERAGE=ON
 	@make --jobs=12 --directory=build/test
-	@python3 -m pytest -vs tests/
+	@python3 -m pytest -vs -m test_ollama tests/
+	@python3 -m pytest -vs -m test_misc tests/
+	@python3 -m pytest -vs -m test_openai tests/
 	@lcov --capture --directory=build/test --output-file build/test/coverage.info
 	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
