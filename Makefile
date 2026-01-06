@@ -1,4 +1,4 @@
-.PHONY = format compile tidy clean lint test py
+.PHONY = format compile tidy clean lint compile-test test test-ollama py
 .DEFAULT_GOAL = compile
 
 format:
@@ -18,11 +18,21 @@ clean:
 lint:
 	@cppcheck src --enable=all
 
-test: export PATH_BIN = $(CURDIR)/build/test/edit
-test: format
+compile-test:
 	@cmake -S src -B build/test -DENABLE_TESTING=ON -DENABLE_COVERAGE=ON
 	@make --jobs=12 --directory=build/test
-	@python3 -m pytest -vs tests/
+
+test: export PATH_BIN = $(CURDIR)/build/test/edit
+test: format compile-test
+	@python3 -m pytest -vs -m "test_misc or test_openai" tests/
+	@lcov --capture --directory=build/test --output-file build/test/coverage.info
+	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
+	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
+	@echo "See coverage report at: build/test/coverageResults/index.html"
+
+test-ollama: export PATH_BIN = $(CURDIR)/build/test/edit
+test-ollama: format compile-test
+	@python3 -m pytest -vs -m "test_misc or test_ollama" tests/
 	@lcov --capture --directory=build/test --output-file build/test/coverage.info
 	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
