@@ -15,11 +15,22 @@ work.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
+  - [Ubuntu/Debian](#ubuntudebian)
+  - [macOS](#macos)
+  - [Other systems](#other-systems)
+  - [API keys](#api-keys)
 - [Setup](#setup)
 - [Usage](#usage)
+  - [Example - read from stdin](#example---read-from-stdin)
+  - [Example - working with complex prompts](#example---working-with-complex-prompts)
+  - [Example - targeted code manipulation](#example---targeted-code-manipulation)
+  - [Debugging](#debugging)
 - [Toggling between LLM providers](#toggling-between-llm-providers)
 - [Miscellaneous `vim` shortcuts](#miscellaneous-vim-shortcuts)
+  - [Shortcut for wrapping code with `@@@` delimiters](#shortcut-for-wrapping-code-with-@@@-delimiters)
 - [Testing](#testing)
+  - [OpenAI stream](#openai-stream)
+  - [Ollama stream](#ollama-stream)
 
 ## Prerequisites
 This program requires [CMake](https://cmake.org/), [{fmt}](https://fmt.dev/latest/) and
