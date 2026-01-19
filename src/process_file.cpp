@@ -132,7 +132,13 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
     print_code_being_targeted_(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
+    std::string prompt;
+
+    if (params.use_local_llm) {
+        prompt = prompt::build_ollama_prompt(instructions, text_parts.original_text, params.input_file.extension());
+    } else {
+        prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
+    }
 
     if (params.verbose) {
         print_prompt_if_verbose_(prompt);
@@ -155,7 +161,13 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
 std::string edit_full_text_(const params::CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = instructions::load_instructions(params);
-    const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
+    std::string prompt;
+
+    if (params.use_local_llm) {
+        prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
+    } else {
+        prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
+    }
 
     if (params.verbose) {
         print_prompt_if_verbose_(prompt);
