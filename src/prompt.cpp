@@ -109,19 +109,23 @@ Return the code edits in a JSON format with keys "code" and "description." For e
 
 std::string build_ollama_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
 {
-    std::string prompt = "I am editing some code. Apply the following instructions:\n";
-
-    prompt += get_code_block_(instructions, "plaintext");
-    prompt += "To the following code:\n";
+    std::string code_block_to_edit;
 
     if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
-        prompt += get_code_block_(input_text, *label);
+        code_block_to_edit = get_code_block_(input_text, *label);
     } else {
-        prompt += get_code_block_(input_text);
+        code_block_to_edit = get_code_block_(input_text);
     }
 
-    prompt += "Respond using JSON.\n";
-    return prompt;
+    return fmt::format(R"(
+I am editing some code. Apply the following instructions:
+{}
+To the following code:
+{}
+Respond using JSON.
+)",
+        get_code_block_(instructions, "plaintext"),
+        code_block_to_edit);
 }
 
 } // namespace prompt
