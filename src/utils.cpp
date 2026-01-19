@@ -2,7 +2,6 @@
 
 #include <fmt/core.h>
 #include <fstream>
-#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <sys/ioctl.h>
@@ -61,45 +60,6 @@ void write_to_file(const std::string &filename, const std::string &text)
 
     file << text;
     file.close();
-}
-
-std::optional<std::string> resolve_label_from_extension(const std::string &extension)
-{
-    static std::map<std::string, std::string> ext_to_label {
-        { ".bash", "bash" },
-        { ".sh", "sh" },
-        { ".c", "c" },
-        { ".cpp", "cpp" },
-        { ".c++", "cpp" },
-        { ".cs", "csharp" },
-        { ".csharp", "csharp" },
-        { ".css", "css" },
-        { ".html", "html" },
-        { ".javascript", "javascript" },
-        { ".js", "javascript" },
-        { ".json", "json" },
-        { ".java", "java" },
-        { ".kotlin", "kotlin" },
-        { ".perl", "perl" },
-        { ".php", "php" },
-        { ".python", "python" },
-        { ".py", "python" },
-        { ".ruby", "ruby" },
-        { ".rust", "rust" },
-        { ".sql", "sql" },
-        { ".swift", "swift" },
-        { ".typescript", "typescript" },
-        { ".ts", "typescript" },
-        { ".xml", "xml" },
-        { ".yaml", "yaml" },
-        { ".yml", "yaml" },
-    };
-
-    if (ext_to_label.contains(extension)) {
-        return ext_to_label[extension];
-    }
-
-    return std::nullopt;
 }
 
 nlohmann::json parse_json(const std::string &response)

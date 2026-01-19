@@ -4,9 +4,50 @@
 
 #include <fmt/core.h>
 #include <json.hpp>
+#include <map>
+#include <optional>
 #include <stdexcept>
 
 namespace {
+
+std::optional<std::string> resolve_label_from_extension_(const std::string &extension)
+{
+    static std::map<std::string, std::string> ext_to_label {
+        { ".bash", "bash" },
+        { ".sh", "sh" },
+        { ".c", "c" },
+        { ".cpp", "cpp" },
+        { ".c++", "cpp" },
+        { ".cs", "csharp" },
+        { ".csharp", "csharp" },
+        { ".css", "css" },
+        { ".html", "html" },
+        { ".javascript", "javascript" },
+        { ".js", "javascript" },
+        { ".json", "json" },
+        { ".java", "java" },
+        { ".kotlin", "kotlin" },
+        { ".perl", "perl" },
+        { ".php", "php" },
+        { ".python", "python" },
+        { ".py", "python" },
+        { ".ruby", "ruby" },
+        { ".rust", "rust" },
+        { ".sql", "sql" },
+        { ".swift", "swift" },
+        { ".typescript", "typescript" },
+        { ".ts", "typescript" },
+        { ".xml", "xml" },
+        { ".yaml", "yaml" },
+        { ".yml", "yaml" },
+    };
+
+    if (ext_to_label.contains(extension)) {
+        return ext_to_label[extension];
+    }
+
+    return std::nullopt;
+}
 
 std::string get_code_block_(const std::string &body)
 {
@@ -33,6 +74,7 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 
     return fmt::format("```{}\n{}\n```\n", label, body);
 }
+
 } // namespace
 
 namespace prompt {
@@ -44,10 +86,8 @@ std::string build_openai_prompt(const std::string &instructions, const std::stri
     prompt += get_code_block_(instructions, "plaintext");
     prompt += "To the following code:\n";
 
-    const auto label = utils::resolve_label_from_extension(extension);
-
-    if (label) {
-        prompt += get_code_block_(input_text, label.value());
+    if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
+        prompt += get_code_block_(input_text, *label);
     } else {
         prompt += get_code_block_(input_text);
     }
@@ -70,10 +110,8 @@ std::string build_ollama_prompt(const std::string &instructions, const std::stri
     prompt += get_code_block_(instructions, "plaintext");
     prompt += "To the following code:\n";
 
-    const auto label = utils::resolve_label_from_extension(extension);
-
-    if (label) {
-        prompt += get_code_block_(input_text, label.value());
+    if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
+        prompt += get_code_block_(input_text, *label);
     } else {
         prompt += get_code_block_(input_text);
     }
