@@ -24,18 +24,19 @@ void deserialize_openai_response_and_throw_error_(const std::string &response)
     throw std::runtime_error(json["error"]["message"]);
 }
 
-query_llm::LLMResponse deserialize_openai_response_(const std::string &response)
+void is_valid_openai_response_object_(const nlohmann::json &json)
 {
-    const nlohmann::json json = utils::parse_json(response);
-
-    if (json.contains("object")) {
-        if (json["object"] != "response") {
-            throw std::runtime_error("The response from OpenAI is not an OpenAI Response");
-        }
-    } else {
+    if (not json.contains("object")) {
         throw std::runtime_error("The response from OpenAI does not contain an 'object' key");
     }
 
+    if (json["object"] != "response") {
+        throw std::runtime_error("The response from OpenAI is not an OpenAI Response");
+    }
+}
+
+std::string extract_output_from_response_(const nlohmann::json &json)
+{
     nlohmann::json content;
     bool job_complete = false;
 
@@ -55,16 +56,24 @@ query_llm::LLMResponse deserialize_openai_response_(const std::string &response)
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    std::string output;
-
     if (content["type"] == "output_text") {
-        output = content["text"];
-    } else if (content["type"] == "refusal") {
-        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", content["refusal"]));
-    } else {
-        throw std::runtime_error("Some unknown object type was returned from OpenAI");
+        return content["text"];
     }
 
+    if (content["type"] == "refusal") {
+        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", content["refusal"]));
+    }
+
+    throw std::runtime_error("Some unknown object type was returned from OpenAI");
+}
+
+query_llm::LLMResponse deserialize_openai_response_(const std::string &response)
+{
+    const nlohmann::json json = utils::parse_json(response);
+
+    is_valid_openai_response_object_(json);
+
+    const std::string output = extract_output_from_response_(json);
     const auto &[code, description] = query_llm::deserialize_structured_output(output);
 
     query_llm::LLMResponse results;
