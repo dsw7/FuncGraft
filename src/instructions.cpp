@@ -10,7 +10,7 @@
 
 namespace {
 
-std::string load_instructions_from_file(const std::filesystem::path &filename)
+std::string load_instructions_from_file_(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
@@ -20,7 +20,7 @@ std::string load_instructions_from_file(const std::filesystem::path &filename)
     return utils::read_from_file(filename);
 }
 
-std::string load_instructions_from_stdin()
+std::string load_instructions_from_stdin_()
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Input: ");
@@ -41,9 +41,9 @@ std::string load_instructions(const params::CommandLineParameters &params)
     if (params.instructions_from_cli) {
         instructions = params.instructions_from_cli.value();
     } else if (params.instructions_file) {
-        instructions = load_instructions_from_file(params.instructions_file.value());
+        instructions = load_instructions_from_file_(params.instructions_file.value());
     } else {
-        instructions = load_instructions_from_stdin();
+        instructions = load_instructions_from_stdin_();
     }
 
     if (instructions.empty()) {
