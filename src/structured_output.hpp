@@ -11,7 +11,10 @@ struct LLMResponse {
     std::string output_text;
 };
 
-LLMResponse run_openai_query(const std::string &prompt);
-LLMResponse run_ollama_query(const std::string &prompt);
+struct StructuredOutput {
+    std::string code;
+    std::string description_of_changes;
+};
 
+StructuredOutput deserialize_structured_output(const std::string &output);
 } // namespace query_llm

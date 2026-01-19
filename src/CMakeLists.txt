@@ -18,7 +18,9 @@ set(SRC_FILES
   params.cpp
   process_file.cpp
   prompt.cpp
-  query_llm.cpp
+  query_ollama.cpp
+  query_openai.cpp
+  structured_output.cpp
   text_manip.cpp
   utils.cpp
 )

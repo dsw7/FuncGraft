@@ -3,7 +3,8 @@
 #include "file_io.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
-#include "query_llm.hpp"
+#include "query_ollama.hpp"
+#include "query_openai.hpp"
 #include "text_manip.hpp"
 #include "utils.hpp"
 
