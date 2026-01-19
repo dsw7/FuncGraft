@@ -102,32 +102,6 @@ std::optional<std::string> resolve_label_from_extension(const std::string &exten
     return std::nullopt;
 }
 
-std::string get_code_block(const std::string &body)
-{
-    if (body.empty()) {
-        throw std::runtime_error("Body is empty. Cannot extract code block");
-    }
-
-    if (body.back() == '\n') {
-        return fmt::format("```\n{}```\n", body);
-    }
-
-    return fmt::format("```\n{}\n```\n", body);
-}
-
-std::string get_code_block(const std::string &body, const std::string &label)
-{
-    if (body.empty()) {
-        throw std::runtime_error("Body is empty. Cannot extract code block");
-    }
-
-    if (body.back() == '\n') {
-        return fmt::format("```{}\n{}```\n", label, body);
-    }
-
-    return fmt::format("```{}\n{}\n```\n", label, body);
-}
-
 nlohmann::json parse_json(const std::string &response)
 {
     nlohmann::json json;
