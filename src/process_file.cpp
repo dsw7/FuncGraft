@@ -179,7 +179,7 @@ namespace process_file {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = file_io::import_file(params.input_file);
+    const std::string input_text = file_io::import_file_to_edit(params.input_file);
 
     if (text_manip::is_text_empty(input_text)) {
         throw std::runtime_error("The file does not contain any code");
@@ -195,13 +195,13 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        file_io::export_file(output_text, params.output_file.value());
+        file_io::export_edited_file(output_text, params.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    file_io::export_file_with_prompt(output_text, params.input_file);
+    file_io::export_edited_file_with_prompt(output_text, params.input_file);
     utils::print_separator();
 #endif
 }

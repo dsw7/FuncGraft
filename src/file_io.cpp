@@ -8,7 +8,7 @@
 
 namespace file_io {
 
-std::string import_file(const fs::path &filename)
+std::string import_file_to_edit(const fs::path &filename)
 {
     if (not fs::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
@@ -21,12 +21,12 @@ std::string import_file(const fs::path &filename)
     return utils::read_from_file(filename);
 }
 
-void export_file(const std::string &code, const fs::path &filename)
+void export_edited_file(const std::string &code, const fs::path &filename)
 {
     utils::write_to_file(filename, code);
 }
 
-void export_file_with_prompt(const std::string &code, const fs::path &filename)
+void export_edited_file_with_prompt(const std::string &code, const fs::path &filename)
 {
     char choice = 'n';
 
@@ -42,7 +42,7 @@ void export_file_with_prompt(const std::string &code, const fs::path &filename)
     }
 
     if (choice == 'y') {
-        export_file(code, filename);
+        export_edited_file(code, filename);
     }
 }
 
