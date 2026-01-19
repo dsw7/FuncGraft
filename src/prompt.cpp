@@ -81,26 +81,30 @@ namespace prompt {
 
 std::string build_openai_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
 {
-    std::string prompt = "I am editing some code. Apply the following instructions:\n";
-
-    prompt += get_code_block_(instructions, "plaintext");
-    prompt += "To the following code:\n";
+    std::string code_block_to_edit;
 
     if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
-        prompt += get_code_block_(input_text, *label);
+        code_block_to_edit = get_code_block_(input_text, *label);
     } else {
-        prompt += get_code_block_(input_text);
+        code_block_to_edit = get_code_block_(input_text);
     }
-
-    prompt += "Return the code edits in a JSON format with keys \"code\" and \"description.\" For example:\n";
 
     const nlohmann::json example = {
         { "code", "Your updated code here" },
         { "description", "A brief explanation of the changes" }
     };
 
-    prompt += example.dump(4) + '\n';
-    return prompt;
+    return fmt::format(
+        R"(I am editing some code. Apply the following instructions:
+{}
+To the following code:
+{}
+Return the code edits in a JSON format with keys "code" and "description." For example:
+{}
+)",
+        get_code_block_(instructions, "plaintext"),
+        code_block_to_edit,
+        example.dump(4));
 }
 
 std::string build_ollama_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
