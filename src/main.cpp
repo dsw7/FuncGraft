@@ -9,7 +9,7 @@
 #include <string.h>
 #include <string>
 
-void print_help()
+void print_help_messages()
 {
     fmt::print("-- FuncGraft | Copyright (C) {} by David Weber\n", CURRENT_YEAR);
 
@@ -46,7 +46,7 @@ Examples:
     fmt::print("{}", messages);
 }
 
-params::CommandLineParameters parse_opts(int argc, char **argv)
+params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
 {
     params::CommandLineParameters params;
 
@@ -62,16 +62,16 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
         };
 
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "ho:f:i:lv", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:lv", long_options, &option_index);
 
-        if (opt == -1) {
+        if (option == -1) {
             break;
         }
 
-        switch (opt) {
+        switch (option) {
             case 'h':
-                print_help();
-                exit(EXIT_SUCCESS);
+                print_help_messages();
+                std::exit(EXIT_SUCCESS);
             case 'o':
                 params.output_file = optarg;
                 break;
@@ -89,7 +89,7 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
-                exit(EXIT_FAILURE);
+                std::exit(EXIT_FAILURE);
         }
     }
 
@@ -106,11 +106,11 @@ params::CommandLineParameters parse_opts(int argc, char **argv)
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        print_help();
+        print_help_messages();
         return 0;
     }
 
-    params::CommandLineParameters params = parse_opts(argc, argv);
+    params::CommandLineParameters params = parse_opts_from_argv(argc, argv);
 
     try {
         params.validate_params();
