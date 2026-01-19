@@ -23,7 +23,7 @@ struct Positions {
     std::size_t pos_end_2 = 0;
 };
 
-Positions get_delimiter_positions(const std::string &text)
+Positions get_delimiter_positions_(const std::string &text)
 {
     std::vector<std::size_t> indices;
     std::size_t pos = text.find(DELIMITER_LINE_);
@@ -83,7 +83,7 @@ Parts unpack_text_into_parts(const std::string &input_text)
      *
      * So we can operate on the "core" only
      */
-    const Positions positions = get_delimiter_positions(input_text);
+    const Positions positions = get_delimiter_positions_(input_text);
 
     Parts parts;
     parts.head = input_text.substr(0, positions.pos_start_1);
