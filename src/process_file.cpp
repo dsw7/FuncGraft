@@ -26,7 +26,7 @@ fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
 std::atomic<bool> TIMER_ENABLED(false);
 
-void time_api_call()
+void time_api_call_()
 {
     const std::chrono::duration delay = std::chrono::milliseconds(100);
 
@@ -43,10 +43,10 @@ void time_api_call()
     std::cout << " \r" << std::flush;
 }
 
-query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt)
+query_llm::LLMResponse run_openai_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
-    std::thread timer(time_api_call);
+    std::thread timer(time_api_call_);
 
     query_llm::LLMResponse results;
     bool query_failed = false;
@@ -69,10 +69,10 @@ query_llm::LLMResponse run_openai_query_with_threading(const std::string &prompt
     return results;
 }
 
-query_llm::LLMResponse run_ollama_query_with_threading(const std::string &prompt)
+query_llm::LLMResponse run_ollama_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
-    std::thread timer(time_api_call);
+    std::thread timer(time_api_call_);
 
     query_llm::LLMResponse results;
     bool query_failed = false;
@@ -97,21 +97,21 @@ query_llm::LLMResponse run_ollama_query_with_threading(const std::string &prompt
 
 // ----------------------------------------------------------------------------------------------------------
 
-void print_code_being_targeted(const std::string &code)
+void print_code_being_targeted_(const std::string &code)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Delimited code:\n");
     fmt::print(fg(blue), "{}", code);
 }
 
-void print_prompt_if_verbose(const std::string &prompt)
+void print_prompt_if_verbose_(const std::string &prompt)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_query_info(const query_llm::LLMResponse &results)
+void report_query_info_(const query_llm::LLMResponse &results)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
@@ -121,7 +121,7 @@ void report_query_info(const query_llm::LLMResponse &results)
     fmt::print(fg(blue), "{}\n", results.description);
 }
 
-std::string edit_delimited_text(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_delimited_text_(const params::CommandLineParameters &params, const std::string &input_text)
 {
     text_manip::Parts text_parts = text_manip::unpack_text_into_parts(input_text);
 
@@ -129,47 +129,47 @@ std::string edit_delimited_text(const params::CommandLineParameters &params, con
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
-    print_code_being_targeted(text_parts.original_text);
+    print_code_being_targeted_(text_parts.original_text);
 
     const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
 
     if (params.verbose) {
-        print_prompt_if_verbose(prompt);
+        print_prompt_if_verbose_(prompt);
     }
 
     query_llm::LLMResponse results;
 
     if (params.use_local_llm) {
-        results = run_ollama_query_with_threading(prompt);
+        results = run_ollama_query_with_threading_(prompt);
     } else {
-        results = run_openai_query_with_threading(prompt);
+        results = run_openai_query_with_threading_(prompt);
     }
 
-    report_query_info(results);
+    report_query_info_(results);
 
     text_parts.modified_text = results.output_text;
     return text_manip::pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_full_text_(const params::CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = instructions::load_instructions(params);
     const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
 
     if (params.verbose) {
-        print_prompt_if_verbose(prompt);
+        print_prompt_if_verbose_(prompt);
     }
 
     query_llm::LLMResponse results;
 
     if (params.use_local_llm) {
-        results = run_ollama_query_with_threading(prompt);
+        results = run_ollama_query_with_threading_(prompt);
     } else {
-        results = run_openai_query_with_threading(prompt);
+        results = run_openai_query_with_threading_(prompt);
     }
 
-    report_query_info(results);
+    report_query_info_(results);
     return results.output_text;
 }
 
@@ -188,9 +188,9 @@ void process_file(const params::CommandLineParameters &params)
     std::string output_text;
 
     if (text_manip::is_text_delimited(input_text)) {
-        output_text = edit_delimited_text(params, input_text);
+        output_text = edit_delimited_text_(params, input_text);
     } else {
-        output_text = edit_full_text(params, input_text);
+        output_text = edit_full_text_(params, input_text);
     }
 
     if (params.output_file) {
