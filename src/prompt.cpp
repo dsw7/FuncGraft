@@ -56,10 +56,10 @@ std::string get_code_block_(const std::string &body)
     }
 
     if (body.back() == '\n') {
-        return fmt::format("```\n{}```\n", body);
+        return fmt::format("```\n{}```", body);
     }
 
-    return fmt::format("```\n{}\n```\n", body);
+    return fmt::format("```\n{}\n```", body);
 }
 
 std::string get_code_block_(const std::string &body, const std::string &label)
@@ -69,10 +69,10 @@ std::string get_code_block_(const std::string &body, const std::string &label)
     }
 
     if (body.back() == '\n') {
-        return fmt::format("```{}\n{}```\n", label, body);
+        return fmt::format("```{}\n{}```", label, body);
     }
 
-    return fmt::format("```{}\n{}\n```\n", label, body);
+    return fmt::format("```{}\n{}\n```", label, body);
 }
 
 } // namespace
@@ -94,8 +94,7 @@ std::string build_openai_prompt(const std::string &instructions, const std::stri
         { "description", "A brief explanation of the changes" }
     };
 
-    return fmt::format(
-        R"(I am editing some code. Apply the following instructions:
+    return fmt::format(R"(I am editing some code. Apply the following instructions:
 {}
 To the following code:
 {}
@@ -117,8 +116,7 @@ std::string build_ollama_prompt(const std::string &instructions, const std::stri
         code_block_to_edit = get_code_block_(input_text);
     }
 
-    return fmt::format(R"(
-I am editing some code. Apply the following instructions:
+    return fmt::format(R"(I am editing some code. Apply the following instructions:
 {}
 To the following code:
 {}
