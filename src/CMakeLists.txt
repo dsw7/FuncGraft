@@ -15,13 +15,13 @@ set(SRC_FILES
   completion/query_openai.cpp
   completion/structured_output.cpp
   configs.cpp
-  file_io.cpp
   main.cpp
   params.cpp
-  process_file.cpp
-  prompt/instructions.cpp
+  pipeline/file_io.cpp
+  pipeline/process_file.cpp
+  pipeline/text_manip.cpp
   prompt/generate_prompt.cpp
-  text_manip.cpp
+  prompt/instructions.cpp
   utils.cpp
 )
 
@@ -43,6 +43,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/completion
   ${CMAKE_SOURCE_DIR}/external
+  ${CMAKE_SOURCE_DIR}/pipeline
   ${CMAKE_SOURCE_DIR}/prompt
 )
 
