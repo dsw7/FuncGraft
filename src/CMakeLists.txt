@@ -10,17 +10,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 set(SRC_FILES
+  completion/curl_base.cpp
+  completion/query_ollama.cpp
+  completion/query_openai.cpp
+  completion/structured_output.cpp
   configs.cpp
-  curl_base.cpp
   file_io.cpp
-  instructions.cpp
   main.cpp
   params.cpp
   process_file.cpp
-  prompt.cpp
-  query_ollama.cpp
-  query_openai.cpp
-  structured_output.cpp
+  prompt/instructions.cpp
+  prompt/prompt.cpp
   text_manip.cpp
   utils.cpp
 )
@@ -39,7 +39,12 @@ if(ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
 
-include_directories(external)
+include_directories(
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/completion
+  ${CMAKE_SOURCE_DIR}/external
+  ${CMAKE_SOURCE_DIR}/prompt
+)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
