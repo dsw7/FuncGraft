@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace file_io {
+namespace pipeline {
 
 std::string import_file_to_edit(const fs::path &filename)
 {
@@ -46,4 +46,4 @@ void export_edited_file_with_prompt(const std::string &code, const fs::path &fil
     }
 }
 
-} // namespace file_io
+} // namespace pipeline

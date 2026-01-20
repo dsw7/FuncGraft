@@ -2,6 +2,6 @@
 
 #include "params.hpp"
 
-namespace process_file {
+namespace pipeline {
 void process_file(const params::CommandLineParameters &params);
 }

@@ -51,7 +51,7 @@ Positions get_delimiter_positions_(const std::string &text)
 
 } // namespace
 
-namespace text_manip {
+namespace pipeline {
 
 bool is_text_empty(const std::string &input_text)
 {
@@ -119,4 +119,4 @@ std::string pack_parts_into_text(const Parts &parts)
 #endif
 }
 
-} // namespace text_manip
+} // namespace pipeline

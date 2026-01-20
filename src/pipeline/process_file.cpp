@@ -126,9 +126,9 @@ void report_query_info_(const LLMResponse &results)
 
 std::string edit_delimited_text_(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    text_manip::Parts text_parts = text_manip::unpack_text_into_parts(input_text);
+    pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
-    if (text_manip::is_text_empty(text_parts.original_text)) {
+    if (pipeline::is_text_empty(text_parts.original_text)) {
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
@@ -158,7 +158,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
     report_query_info_(results);
 
     text_parts.modified_text = results.output_text;
-    return text_manip::pack_parts_into_text(text_parts);
+    return pack_parts_into_text(text_parts);
 }
 
 std::string edit_full_text_(const params::CommandLineParameters &params, const std::string &input_text)
@@ -190,19 +190,19 @@ std::string edit_full_text_(const params::CommandLineParameters &params, const s
 
 } // namespace
 
-namespace process_file {
+namespace pipeline {
 
 void process_file(const params::CommandLineParameters &params)
 {
-    const std::string input_text = file_io::import_file_to_edit(params.input_file);
+    const std::string input_text = import_file_to_edit(params.input_file);
 
-    if (text_manip::is_text_empty(input_text)) {
+    if (is_text_empty(input_text)) {
         throw std::runtime_error("The file does not contain any code");
     }
 
     std::string output_text;
 
-    if (text_manip::is_text_delimited(input_text)) {
+    if (is_text_delimited(input_text)) {
         output_text = edit_delimited_text_(params, input_text);
     } else {
         output_text = edit_full_text_(params, input_text);
@@ -210,15 +210,15 @@ void process_file(const params::CommandLineParameters &params)
 
     if (params.output_file) {
         fmt::print("Exported updated content to file '{}'\n", params.output_file.value().string());
-        file_io::export_edited_file(output_text, params.output_file.value());
+        export_edited_file(output_text, params.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    file_io::export_edited_file_with_prompt(output_text, params.input_file);
+    export_edited_file_with_prompt(output_text, params.input_file);
     utils::print_separator();
 #endif
 }
 
-} // namespace process_file
+} // namespace pipeline
