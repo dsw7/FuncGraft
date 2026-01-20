@@ -4,6 +4,6 @@
 
 #include <string>
 
-namespace instructions {
+namespace prompt {
 std::string load_instructions(const params::CommandLineParameters &params);
 }

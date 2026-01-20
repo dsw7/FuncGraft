@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace curl_base {
+namespace completion {
 
 struct Ok {
     long code = -1;
@@ -55,4 +55,4 @@ private:
     void reset_handle_and_headers_();
 };
 
-} // namespace curl_base
+} // namespace completion

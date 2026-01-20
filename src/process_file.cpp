@@ -1,8 +1,8 @@
 #include "process_file.hpp"
 
 #include "file_io.hpp"
+#include "generate_prompt.hpp"
 #include "instructions.hpp"
-#include "prompt.hpp"
 #include "query_ollama.hpp"
 #include "query_openai.hpp"
 #include "text_manip.hpp"
@@ -20,6 +20,8 @@
 #include <thread>
 
 namespace {
+
+using completion::LLMResponse;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
@@ -44,17 +46,17 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-query_llm::LLMResponse run_openai_query_with_threading_(const std::string &prompt)
+LLMResponse run_openai_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
 
-    query_llm::LLMResponse results;
+    LLMResponse results;
     bool query_failed = false;
     std::string errmsg;
 
     try {
-        results = query_llm::run_openai_query(prompt);
+        results = completion::run_openai_query(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -70,17 +72,17 @@ query_llm::LLMResponse run_openai_query_with_threading_(const std::string &promp
     return results;
 }
 
-query_llm::LLMResponse run_ollama_query_with_threading_(const std::string &prompt)
+LLMResponse run_ollama_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
 
-    query_llm::LLMResponse results;
+    LLMResponse results;
     bool query_failed = false;
     std::string errmsg;
 
     try {
-        results = query_llm::run_ollama_query(prompt);
+        results = completion::run_ollama_query(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -112,7 +114,7 @@ void print_prompt_if_verbose_(const std::string &prompt)
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_query_info_(const query_llm::LLMResponse &results)
+void report_query_info_(const LLMResponse &results)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
@@ -132,7 +134,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
 
     print_code_being_targeted_(text_parts.original_text);
 
-    const std::string instructions = instructions::load_instructions(params);
+    const std::string instructions = prompt::load_instructions(params);
     std::string prompt;
 
     if (params.use_local_llm) {
@@ -145,7 +147,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
         print_prompt_if_verbose_(prompt);
     }
 
-    query_llm::LLMResponse results;
+    LLMResponse results;
 
     if (params.use_local_llm) {
         results = run_ollama_query_with_threading_(prompt);
@@ -161,7 +163,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
 
 std::string edit_full_text_(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    const std::string instructions = instructions::load_instructions(params);
+    const std::string instructions = prompt::load_instructions(params);
     std::string prompt;
 
     if (params.use_local_llm) {
@@ -174,7 +176,7 @@ std::string edit_full_text_(const params::CommandLineParameters &params, const s
         print_prompt_if_verbose_(prompt);
     }
 
-    query_llm::LLMResponse results;
+    LLMResponse results;
 
     if (params.use_local_llm) {
         results = run_ollama_query_with_threading_(prompt);

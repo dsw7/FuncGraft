@@ -1,4 +1,4 @@
-#include "prompt.hpp"
+#include "generate_prompt.hpp"
 
 #include "utils.hpp"
 

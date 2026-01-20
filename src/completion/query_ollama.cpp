@@ -19,7 +19,7 @@ void deserialize_ollama_response_and_throw_error_(const std::string &response)
     throw std::runtime_error(json["error"]);
 }
 
-query_llm::LLMResponse deserialize_ollama_response_(const std::string &response)
+completion::LLMResponse deserialize_ollama_response_(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
 
@@ -32,9 +32,9 @@ query_llm::LLMResponse deserialize_ollama_response_(const std::string &response)
     }
 
     const std::string output = json["response"];
-    const auto &[code, description] = query_llm::deserialize_structured_output(output);
+    const auto &[code, description] = completion::deserialize_structured_output(output);
 
-    query_llm::LLMResponse results;
+    completion::LLMResponse results;
     results.description = description;
     results.input_tokens = json["prompt_eval_count"];
     results.output_text = code;
@@ -44,11 +44,11 @@ query_llm::LLMResponse deserialize_ollama_response_(const std::string &response)
 
 } // namespace
 
-namespace query_llm {
+namespace completion {
 
 LLMResponse run_ollama_query(const std::string &prompt)
 {
-    curl_base::Curl curl;
+    Curl curl;
     const auto result = curl.create_ollama_response(prompt);
 
     if (not result) {
@@ -58,4 +58,4 @@ LLMResponse run_ollama_query(const std::string &prompt)
     return deserialize_ollama_response_(result->response);
 }
 
-} // namespace query_llm
+} // namespace completion

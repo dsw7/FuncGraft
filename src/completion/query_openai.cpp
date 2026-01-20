@@ -67,16 +67,16 @@ std::string extract_output_from_response_(const nlohmann::json &json)
     throw std::runtime_error("Some unknown object type was returned from OpenAI");
 }
 
-query_llm::LLMResponse deserialize_openai_response_(const std::string &response)
+completion::LLMResponse deserialize_openai_response_(const std::string &response)
 {
     const nlohmann::json json = utils::parse_json(response);
 
     is_valid_openai_response_object_(json);
 
     const std::string output = extract_output_from_response_(json);
-    const auto &[code, description] = query_llm::deserialize_structured_output(output);
+    const auto &[code, description] = completion::deserialize_structured_output(output);
 
-    query_llm::LLMResponse results;
+    completion::LLMResponse results;
     results.description = description;
     results.input_tokens = json["usage"]["input_tokens"];
     results.output_text = code;
@@ -86,11 +86,11 @@ query_llm::LLMResponse deserialize_openai_response_(const std::string &response)
 
 } // namespace
 
-namespace query_llm {
+namespace completion {
 
 LLMResponse run_openai_query(const std::string &prompt)
 {
-    curl_base::Curl curl;
+    Curl curl;
     const auto result = curl.create_openai_response(prompt);
 
     if (not result) {
@@ -100,4 +100,4 @@ LLMResponse run_openai_query(const std::string &prompt)
     return deserialize_openai_response_(result->response);
 }
 
-} // namespace query_llm
+} // namespace completion

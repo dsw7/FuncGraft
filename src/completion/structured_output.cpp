@@ -5,7 +5,7 @@
 #include <json.hpp>
 #include <stdexcept>
 
-namespace query_llm {
+namespace completion {
 
 StructuredOutput deserialize_structured_output(const std::string &output)
 {
@@ -24,4 +24,5 @@ StructuredOutput deserialize_structured_output(const std::string &output)
         json["description_of_changes"],
     };
 }
-} // namespace query_llm
+
+} // namespace completion

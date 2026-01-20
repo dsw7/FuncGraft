@@ -20,7 +20,7 @@ set(SRC_FILES
   params.cpp
   process_file.cpp
   prompt/instructions.cpp
-  prompt/prompt.cpp
+  prompt/generate_prompt.cpp
   text_manip.cpp
   utils.cpp
 )

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace query_llm {
+namespace completion {
 
 struct LLMResponse {
     int output_tokens = 0;
@@ -17,4 +17,4 @@ struct StructuredOutput {
 };
 
 StructuredOutput deserialize_structured_output(const std::string &output);
-} // namespace query_llm
+} // namespace completion

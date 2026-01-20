@@ -79,7 +79,7 @@ nlohmann::json post_data_ollama(const std::string &prompt)
 
 } // namespace
 
-namespace curl_base {
+namespace completion {
 
 Curl::Curl()
 {
@@ -167,4 +167,4 @@ CurlResult Curl::create_ollama_response(const std::string &prompt)
     return check_curl_code(this->handle_, code, response);
 }
 
-} // namespace curl_base
+} // namespace completion

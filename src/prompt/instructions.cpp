@@ -32,7 +32,7 @@ std::string load_instructions_from_stdin_()
 
 } // namespace
 
-namespace instructions {
+namespace prompt {
 
 std::string load_instructions(const params::CommandLineParameters &params)
 {
@@ -53,4 +53,4 @@ std::string load_instructions(const params::CommandLineParameters &params)
     return instructions;
 }
 
-} // namespace instructions
+} // namespace prompt

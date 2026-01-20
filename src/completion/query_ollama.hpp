@@ -4,6 +4,6 @@
 
 #include <string>
 
-namespace query_llm {
+namespace completion {
 LLMResponse run_ollama_query(const std::string &prompt);
-} // namespace query_llm
+} // namespace completion
