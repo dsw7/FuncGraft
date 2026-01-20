@@ -2,7 +2,10 @@
 .DEFAULT_GOAL = compile
 
 format:
-	@clang-format -i --verbose --style=file src/*.cpp src/*.hpp
+	@clang-format -i --verbose --style=file \
+		src/*.cpp src/*.hpp \
+		src/prompt/*.cpp src/prompt/*.hpp \
+		src/completion/*.cpp src/completion/*.hpp
 
 compile: format
 	@cmake -S src -B build/prod
