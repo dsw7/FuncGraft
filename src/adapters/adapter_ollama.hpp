@@ -26,11 +26,13 @@ struct OllamaError {
 
 class Ollama: public CurlBase {
 public:
-    Ollama(const std::string &model);
+    Ollama(const std::string &model, const std::string &host_ollama, const int port_ollama);
     std::expected<OllamaResponse, OllamaError> query_generate_api(const std::string &prompt);
 
 private:
     std::string model_;
+    std::string host_ollama_;
+    int port_ollama_ = 11434;
 };
 
 } // namespace adapters

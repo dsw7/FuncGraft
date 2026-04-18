@@ -1,7 +1,5 @@
 #include "adapter_ollama.hpp"
 
-#include "configs.hpp"
-
 #include <fmt/core.h>
 #include <json.hpp>
 #include <stdexcept>
@@ -91,12 +89,12 @@ OllamaError::OllamaError(const std::string &response, const int status_code) :
     this->errmsg = json["error"];
 }
 
-Ollama::Ollama(const std::string &model) :
-    model_(model) {}
+Ollama::Ollama(const std::string &model, const std::string &host_ollama, const int port_ollama) :
+    model_(model), host_ollama_(host_ollama), port_ollama_(port_ollama) {}
 
 std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std::string &prompt)
 {
-    static std::string url = fmt::format("http://{}:{}/api/generate", configs.host_ollama, configs.port_ollama);
+    const std::string url = fmt::format("http://{}:{}/api/generate", this->host_ollama_, this->port_ollama_);
     curl_easy_setopt(this->handle_, CURLOPT_URL, url.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
