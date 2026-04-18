@@ -63,7 +63,7 @@ OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = adapters::OpenAI().query_messages_api(prompt);
+        results = adapters::OpenAI(configs.model_openai).query_messages_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;

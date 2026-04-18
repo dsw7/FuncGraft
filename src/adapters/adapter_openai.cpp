@@ -1,7 +1,5 @@
 #include "adapter_openai.hpp"
 
-#include "configs.hpp"
-
 #include <fmt/core.h>
 #include <stdexcept>
 
@@ -40,7 +38,7 @@ nlohmann::json get_structured_output_schema_()
     };
 }
 
-std::string get_post_fields_(const std::string &prompt)
+std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json response_format = {
         {
@@ -56,7 +54,7 @@ std::string get_post_fields_(const std::string &prompt)
 
     const nlohmann::json fields = {
         { "input", prompt },
-        { "model", configs.model_openai },
+        { "model", model },
         { "store", false },
         { "temperature", 1.00 },
         { "text", response_format },
@@ -154,6 +152,9 @@ OpenAIError::OpenAIError(const std::string &response, const int status_code) :
     this->errmsg = json["error"]["message"];
 }
 
+OpenAI::OpenAI(const std::string &model) :
+    model_(model) {}
+
 std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std::string &prompt)
 {
     curl_easy_setopt(this->handle_, CURLOPT_URL, "https://api.openai.com/v1/responses");
@@ -164,7 +165,7 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
     headers = curl_slist_append(headers, ("Authorization: Bearer " + get_openai_user_api_key_()).c_str());
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = get_post_fields_(prompt);
+    const std::string post_fields = get_post_fields_(prompt, this->model_);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;

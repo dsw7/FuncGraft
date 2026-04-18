@@ -32,7 +32,11 @@ struct OpenAIError {
 
 class OpenAI: public CurlBase {
 public:
+    OpenAI(const std::string &model);
     std::expected<OpenAIResponse, OpenAIError> query_messages_api(const std::string &prompt);
+
+private:
+    std::string model_;
 };
 
 } // namespace adapters
