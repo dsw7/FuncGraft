@@ -30,7 +30,6 @@ public:
     Curl(const Curl &) = delete;
     Curl &operator=(const Curl &) = delete;
     CurlResult create_openai_response(const std::string &prompt);
-    CurlResult create_ollama_response(const std::string &prompt);
 
 private:
     CURL *handle_ = nullptr;

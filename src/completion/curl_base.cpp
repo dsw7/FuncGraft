@@ -67,16 +67,6 @@ nlohmann::json post_data_openai(const std::string &prompt)
     };
 }
 
-nlohmann::json post_data_ollama(const std::string &prompt)
-{
-    return {
-        { "format", get_schema() },
-        { "model", configs.model_ollama },
-        { "prompt", prompt },
-        { "stream", false },
-    };
-}
-
 } // namespace
 
 namespace completion {
@@ -142,43 +132,6 @@ CurlResult Curl::create_openai_response(const std::string &prompt)
 
     if (code != CURLE_OK) {
         // rare but catch truly exceptional cases
-        throw std::runtime_error(curl_easy_strerror(code));
-    }
-
-    long http_status_code = -1;
-    curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
-
-    if (http_status_code != 200) {
-        return std::unexpected(Error { http_status_code, response });
-    }
-
-    return Ok { http_status_code, response };
-}
-
-CurlResult Curl::create_ollama_response(const std::string &prompt)
-{
-    this->reset_handle_and_headers_();
-
-    const std::string header_content_type = "Content-Type: application/json";
-    this->headers_ = curl_slist_append(this->headers_, header_content_type.c_str());
-
-    curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, this->headers_);
-
-    static std::string url_ollama_generate = fmt::format("http://{}:{}/api/generate", configs.host_ollama, configs.port_ollama);
-    curl_easy_setopt(this->handle_, CURLOPT_URL, url_ollama_generate.c_str());
-    curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
-
-    const nlohmann::json post_data = post_data_ollama(prompt);
-    const std::string post_data_str = post_data.dump();
-    curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_data_str.c_str());
-
-    std::string response;
-    curl_easy_setopt(this->handle_, CURLOPT_WRITEDATA, &response);
-
-    const CURLcode code = curl_easy_perform(this->handle_);
-
-    if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
 
