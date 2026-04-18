@@ -1,5 +1,6 @@
 #pragma once
 
+#include "configs.hpp"
 #include "curl_base.hpp"
 
 #include <expected>
@@ -32,7 +33,7 @@ struct OpenAIError {
 
 class OpenAI: public CurlBase {
 public:
-    OpenAI(const std::string &model);
+    OpenAI(const Configurations &configs);
     std::expected<OpenAIResponse, OpenAIError> query_messages_api(const std::string &prompt);
 
 private:
