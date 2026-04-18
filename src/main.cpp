@@ -1,12 +1,15 @@
 #include "configs.hpp"
 #include "process_file.hpp"
+#include "utils.hpp"
 
+#include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <stdexcept>
 #include <string.h>
 #include <string>
+#include <toml.hpp>
 
 void print_help_messages()
 {
@@ -97,6 +100,29 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
     return configs;
 }
 
+void load_additional_configs_from_file(Configurations &configs)
+{
+    const std::filesystem::path proj_config = utils::get_project_data_dir() / "funcgraft.toml";
+
+    if (not std::filesystem::exists(proj_config)) {
+        throw std::runtime_error("Could not locate FuncGraft configuration file!");
+    }
+
+    toml::table table;
+
+    try {
+        table = toml::parse_file(proj_config.string());
+    } catch (const toml::parse_error &e) {
+        throw std::runtime_error(e);
+    }
+
+    configs.provider = table["general"]["provider"].value_or("openai");
+    configs.host_ollama = table["ollama"]["host"].value_or("localhost");
+    configs.model_ollama = table["ollama"]["model"].value_or("gemma3:latest");
+    configs.model_openai = table["openai"]["model"].value_or("gpt-4o");
+    configs.port_ollama = table["ollama"]["port"].value_or(11434);
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 2) {
@@ -114,7 +140,8 @@ int main(int argc, char **argv)
     }
 
     try {
-        configs.load_additional_configs_from_file();
+        load_additional_configs_from_file(configs);
+        configs.validate_configs_from_file();
         pipeline::process_file(configs);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
