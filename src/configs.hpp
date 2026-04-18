@@ -6,6 +6,7 @@ struct Configs {
     void load_configs_from_config_file();
 
     int port_ollama = -1;
+    std::string provider;
     std::string host_ollama;
     std::string model_ollama;
     std::string model_openai;
