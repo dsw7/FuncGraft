@@ -192,4 +192,28 @@ CurlResult Curl::create_ollama_response(const std::string &prompt)
     return Ok { http_status_code, response };
 }
 
+CurlBase::CurlBase()
+{
+    if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0) {
+        throw std::runtime_error("Something went wrong when initializing libcurl");
+    }
+
+    this->handle_ = curl_easy_init();
+
+    if (this->handle_ == nullptr) {
+        throw std::runtime_error("Something went wrong when starting libcurl easy session");
+    }
+
+    curl_easy_setopt(this->handle_, CURLOPT_WRITEFUNCTION, write_callback);
+}
+
+CurlBase::~CurlBase()
+{
+    if (this->handle_) {
+        curl_easy_cleanup(this->handle_);
+    }
+
+    curl_global_cleanup();
+}
+
 } // namespace completion
