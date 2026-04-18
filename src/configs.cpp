@@ -30,7 +30,7 @@ fs::path get_proj_data_dir()
 
 } // namespace
 
-void CommandLineParameters::validate_params()
+void Configurations::validate_params()
 {
     if (this->input_file.empty()) {
         throw std::invalid_argument("No filename was provided. Cannot proceed");
@@ -55,7 +55,7 @@ void CommandLineParameters::validate_params()
     }
 }
 
-void CommandLineParameters::load_configs_from_config_file()
+void Configurations::load_configs_from_config_file()
 {
     static fs::path proj_config = get_proj_data_dir() / "funcgraft.toml";
 

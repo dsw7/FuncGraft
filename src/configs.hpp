@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 
-struct CommandLineParameters {
+struct Configurations {
     void load_configs_from_config_file();
     void validate_params();
 
