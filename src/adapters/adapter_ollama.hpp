@@ -1,5 +1,6 @@
 #pragma once
 
+#include "configs.hpp"
 #include "curl_base.hpp"
 
 #include <expected>
@@ -26,7 +27,7 @@ struct OllamaError {
 
 class Ollama: public CurlBase {
 public:
-    Ollama(const std::string &model, const std::string &host_ollama, const int port_ollama);
+    Ollama(const Configurations &configs);
     std::expected<OllamaResponse, OllamaError> query_generate_api(const std::string &prompt);
 
 private:
