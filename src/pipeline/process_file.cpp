@@ -53,7 +53,7 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
+OpenAIResults run_openai_query_with_threading_(const params::CommandLineParameters &params, const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
@@ -63,7 +63,7 @@ OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = adapters::OpenAI(configs.model_openai).query_messages_api(prompt);
+        results = adapters::OpenAI(params.model_openai).query_messages_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -79,7 +79,7 @@ OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
     return results.value();
 }
 
-OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
+OllamaResults run_ollama_query_with_threading_(const params::CommandLineParameters &params, const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
@@ -89,7 +89,7 @@ OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = adapters::Ollama(configs.model_ollama, configs.host_ollama, configs.port_ollama).query_generate_api(prompt);
+        results = adapters::Ollama(params.model_ollama, params.host_ollama, params.port_ollama).query_generate_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -158,7 +158,7 @@ std::string edit_delimited_text_openai_(const params::CommandLineParameters &par
         print_prompt_if_verbose_(prompt);
     }
 
-    const OpenAIResults results = run_openai_query_with_threading_(prompt);
+    const OpenAIResults results = run_openai_query_with_threading_(params, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
@@ -186,7 +186,7 @@ std::string edit_delimited_text_ollama_(const params::CommandLineParameters &par
         print_prompt_if_verbose_(prompt);
     }
 
-    const OllamaResults results = run_ollama_query_with_threading_(prompt);
+    const OllamaResults results = run_ollama_query_with_threading_(params, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
@@ -206,7 +206,7 @@ std::string edit_full_text_openai_(const params::CommandLineParameters &params, 
         print_prompt_if_verbose_(prompt);
     }
 
-    const OpenAIResults results = run_openai_query_with_threading_(prompt);
+    const OpenAIResults results = run_openai_query_with_threading_(params, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
@@ -225,7 +225,7 @@ std::string edit_full_text_ollama_(const params::CommandLineParameters &params, 
         print_prompt_if_verbose_(prompt);
     }
 
-    const OllamaResults results = run_ollama_query_with_threading_(prompt);
+    const OllamaResults results = run_ollama_query_with_threading_(params, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
@@ -250,11 +250,11 @@ void process_file(const params::CommandLineParameters &params)
     bool text_delimited = is_text_delimited(input_text);
     std::string output_text;
 
-    if (text_delimited and configs.provider == "openai") {
+    if (text_delimited and params.provider == "openai") {
         output_text = edit_delimited_text_openai_(params, input_text);
-    } else if (text_delimited and configs.provider == "ollama") {
+    } else if (text_delimited and params.provider == "ollama") {
         output_text = edit_delimited_text_ollama_(params, input_text);
-    } else if (not text_delimited and configs.provider == "openai") {
+    } else if (not text_delimited and params.provider == "openai") {
         output_text = edit_full_text_openai_(params, input_text);
     } else {
         output_text = edit_full_text_ollama_(params, input_text);

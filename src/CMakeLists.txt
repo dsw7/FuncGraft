@@ -15,7 +15,6 @@ set(SRC_FILES
   adapters/curl_base.cpp
   configs.cpp
   main.cpp
-  params.cpp
   pipeline/file_io.cpp
   pipeline/process_file.cpp
   pipeline/text_manip.cpp

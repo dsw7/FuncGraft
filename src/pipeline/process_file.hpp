@@ -1,6 +1,6 @@
 #pragma once
 
-#include "params.hpp"
+#include "configs.hpp"
 
 namespace pipeline {
 void process_file(const params::CommandLineParameters &params);

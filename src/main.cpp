@@ -1,5 +1,4 @@
 #include "configs.hpp"
-#include "params.hpp"
 #include "process_file.hpp"
 
 #include <fmt/color.h>
@@ -115,7 +114,7 @@ int main(int argc, char **argv)
     }
 
     try {
-        configs.load_configs_from_config_file();
+        params.load_configs_from_config_file();
         pipeline::process_file(params);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
