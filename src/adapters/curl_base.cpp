@@ -1,9 +1,6 @@
 #include "curl_base.hpp"
 
-#include "configs.hpp"
-
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
 #include <string>
 
