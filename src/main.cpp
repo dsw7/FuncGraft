@@ -44,9 +44,9 @@ Examples:
     fmt::print("{}", messages);
 }
 
-Configurations parse_opts_from_argv(const int argc, char **argv)
+Configurations parse_configs_from_argv(const int argc, char **argv)
 {
-    Configurations params;
+    Configurations configs;
 
     while (true) {
         static struct option long_options[] = {
@@ -70,16 +70,16 @@ Configurations parse_opts_from_argv(const int argc, char **argv)
                 print_help_messages();
                 std::exit(EXIT_SUCCESS);
             case 'o':
-                params.output_file = optarg;
+                configs.output_file = optarg;
                 break;
             case 'f':
-                params.instructions_file = optarg;
+                configs.instructions_file = optarg;
                 break;
             case 'i':
-                params.instructions_from_cli = optarg;
+                configs.instructions_from_cli = optarg;
                 break;
             case 'v':
-                params.verbose = true;
+                configs.verbose = true;
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
@@ -89,12 +89,12 @@ Configurations parse_opts_from_argv(const int argc, char **argv)
 
     for (int i = optind; i < argc; i++) {
         if (strcmp("edit", argv[i]) != 0) {
-            params.input_file = argv[i];
+            configs.input_file = argv[i];
             break;
         }
     }
 
-    return params;
+    return configs;
 }
 
 int main(int argc, char **argv)
@@ -104,18 +104,18 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    Configurations params = parse_opts_from_argv(argc, argv);
+    Configurations configs = parse_configs_from_argv(argc, argv);
 
     try {
-        params.validate_params();
+        configs.validate_configs_from_cli();
     } catch (const std::invalid_argument &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;
     }
 
     try {
-        params.load_configs_from_config_file();
-        pipeline::process_file(params);
+        configs.load_additional_configs_from_file();
+        pipeline::process_file(configs);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;

@@ -5,8 +5,8 @@
 #include <string>
 
 struct Configurations {
-    void load_configs_from_config_file();
-    void validate_params();
+    void validate_configs_from_cli();
+    void load_additional_configs_from_file();
 
     bool verbose = false;
 
