@@ -1,5 +1,6 @@
 #include "process_file.hpp"
 
+#include "configs.hpp"
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
 #include "instructions.hpp"
@@ -137,7 +138,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
     const std::string instructions = prompt::load_instructions(params);
     std::string prompt;
 
-    if (params.use_local_llm) {
+    if (configs.provider == "ollama") {
         prompt = prompt::build_ollama_prompt(instructions, text_parts.original_text, params.input_file.extension());
     } else {
         prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
@@ -149,7 +150,7 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
 
     LLMResponse results;
 
-    if (params.use_local_llm) {
+    if (configs.provider == "ollama") {
         results = run_ollama_query_with_threading_(prompt);
     } else {
         results = run_openai_query_with_threading_(prompt);
@@ -166,7 +167,7 @@ std::string edit_full_text_(const params::CommandLineParameters &params, const s
     const std::string instructions = prompt::load_instructions(params);
     std::string prompt;
 
-    if (params.use_local_llm) {
+    if (configs.provider == "ollama") {
         prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
     } else {
         prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
@@ -178,7 +179,7 @@ std::string edit_full_text_(const params::CommandLineParameters &params, const s
 
     LLMResponse results;
 
-    if (params.use_local_llm) {
+    if (configs.provider == "ollama") {
         results = run_ollama_query_with_threading_(prompt);
     } else {
         results = run_openai_query_with_threading_(prompt);
