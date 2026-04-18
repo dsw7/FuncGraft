@@ -13,8 +13,6 @@ set(SRC_FILES
   completion/adapter_ollama.cpp
   completion/adapter_openai.cpp
   completion/curl_base.cpp
-  completion/query_openai.cpp
-  completion/structured_output.cpp
   configs.cpp
   main.cpp
   params.cpp

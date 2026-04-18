@@ -6,7 +6,6 @@
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
 #include "instructions.hpp"
-#include "query_openai.hpp"
 #include "text_manip.hpp"
 #include "utils.hpp"
 
