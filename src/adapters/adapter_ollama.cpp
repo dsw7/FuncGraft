@@ -23,11 +23,11 @@ nlohmann::json get_structured_output_schema_()
     };
 }
 
-std::string get_post_fields_(const std::string &prompt)
+std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json fields = {
         { "format", get_structured_output_schema_() },
-        { "model", configs.model_ollama },
+        { "model", model },
         { "prompt", prompt },
         { "stream", false },
     };
@@ -91,6 +91,9 @@ OllamaError::OllamaError(const std::string &response, const int status_code) :
     this->errmsg = json["error"];
 }
 
+Ollama::Ollama(const std::string &model) :
+    model_(model) {}
+
 std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std::string &prompt)
 {
     static std::string url = fmt::format("http://{}:{}/api/generate", configs.host_ollama, configs.port_ollama);
@@ -101,7 +104,7 @@ std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std:
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = get_post_fields_(prompt);
+    const std::string post_fields = get_post_fields_(prompt, this->model_);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;

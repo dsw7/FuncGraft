@@ -89,7 +89,7 @@ OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = adapters::Ollama().query_generate_api(prompt);
+        results = adapters::Ollama(configs.model_ollama).query_generate_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
