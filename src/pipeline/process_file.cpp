@@ -1,6 +1,7 @@
 #include "process_file.hpp"
 
 #include "adapter_ollama.hpp"
+#include "adapter_openai.hpp"
 #include "configs.hpp"
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
@@ -24,10 +25,11 @@
 
 namespace {
 
-using completion::LLMResponse;
-using completion::Ollama;
 using completion::OllamaResponse;
 using OllamaResults = std::expected<OllamaResponse, completion::OllamaError>;
+
+using completion::OpenAIResponse;
+using OpenAIResults = std::expected<OpenAIResponse, completion::OpenAIError>;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
@@ -52,17 +54,17 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-LLMResponse run_openai_query_with_threading_(const std::string &prompt)
+OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
 
-    LLMResponse results;
+    std::optional<OpenAIResults> results;
     bool query_failed = false;
     std::string errmsg;
 
     try {
-        results = completion::run_openai_query(prompt);
+        results = completion::OpenAI().query_messages_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -75,7 +77,7 @@ LLMResponse run_openai_query_with_threading_(const std::string &prompt)
         throw std::runtime_error(errmsg);
     }
 
-    return results;
+    return results.value();
 }
 
 OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
@@ -88,7 +90,7 @@ OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = Ollama().query_generate_api(prompt);
+        results = completion::Ollama().query_generate_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -120,14 +122,14 @@ void print_prompt_if_verbose_(const std::string &prompt)
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_query_info_(const LLMResponse &results)
+void report_query_info_(const OpenAIResponse &response)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Input tokens: {}\n", results.input_tokens);
-    fmt::print("Output tokens: {}\n", results.output_tokens);
+    fmt::print("Input tokens: {}\n", response.input_tokens);
+    fmt::print("Output tokens: {}\n", response.output_tokens);
     fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", results.description);
+    fmt::print(fg(blue), "{}\n", response.description);
 }
 
 void report_query_info_(const OllamaResponse &response)
@@ -157,10 +159,14 @@ std::string edit_delimited_text_openai_(const params::CommandLineParameters &par
         print_prompt_if_verbose_(prompt);
     }
 
-    const auto results = run_openai_query_with_threading_(prompt);
-    report_query_info_(results);
+    const OpenAIResults results = run_openai_query_with_threading_(prompt);
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
+    }
 
-    text_parts.modified_text = results.output_text;
+    report_query_info_(*results);
+
+    text_parts.modified_text = results->output_text;
     return pack_parts_into_text(text_parts);
 }
 
@@ -201,10 +207,14 @@ std::string edit_full_text_openai_(const params::CommandLineParameters &params, 
         print_prompt_if_verbose_(prompt);
     }
 
-    const auto results = run_openai_query_with_threading_(prompt);
-    report_query_info_(results);
+    const OpenAIResults results = run_openai_query_with_threading_(prompt);
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
+    }
 
-    return results.output_text;
+    report_query_info_(*results);
+
+    return results->output_text;
 }
 
 std::string edit_full_text_ollama_(const params::CommandLineParameters &params, const std::string &input_text)

@@ -96,8 +96,8 @@ OpenAIResponse::OpenAIResponse(const std::string &response)
     this->description = structured_output_json["description_of_changes"];
     this->output_text = structured_output_json["code"];
 
-    this->input_tokens = this->response_["prompt_eval_count"];
-    this->output_tokens = this->response_["eval_count"];
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
 }
 
 std::string OpenAIResponse::extract_output_from_response_()
