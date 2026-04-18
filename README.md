@@ -1,9 +1,9 @@
 # FuncGraft
 Ultra lightweight CLI code editor.
 
-This program is used to selectively edit files using either a locally hosted
-LLM (via [Ollama](https://ollama.com/)) or via models exposed by the OpenAI
-API.
+This program can selectively edit files using the following providers:
+- [OpenAI](https://openai.com/)
+- [Ollama](https://ollama.com/)
 
 I tried [codex](https://github.com/openai/codex) but it felt too bloated, led
 to code sprawl, and did not feel targeted enough for me. So I built my own
@@ -16,9 +16,9 @@ work.
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
+  - [Specify a provider](#specify-a-provider)
 - [Examples](#examples)
-  - [Connect to OpenAI and read instructions from `stdin`](#connect-to-openai-and-read-instructions-from-stdin)
-  - [Connect to Ollama](#connect-to-ollama)
+  - [Read instructions from `stdin`](#read-instructions-from-stdin)
   - [Working with complex prompts](#working-with-complex-prompts)
   - [Targeted code manipulation](#targeted-code-manipulation)
   - [Debugging](#debugging)
@@ -68,9 +68,18 @@ cp -rv .funcgraft/ ~
 ```
 And edit `~/.funcgraft/funcgraft.toml` to match your infrastructure.
 
+### Specify a provider
+Locate the `provider` in `funcgraft.toml` and specify the provider:
+```toml
+[general]
+# Specify which provider to connect to
+# Options are "openai" and "ollama"
+provider = "openai"
+```
+
 ## Examples
 
-### Connect to OpenAI and read instructions from `stdin`
+### Read instructions from `stdin`
 Assume `foo.cpp` uses CamelCase formatting and needs to be converted to
 snake_case. Run:
 ```console
@@ -90,17 +99,6 @@ To save the updated code to a new file, such as `bar.cpp`, execute:
 ```console
 edit foo.cpp -o bar.cpp
 ```
-
-### Connect to Ollama
-The program will default to querying OpenAI servers. To query a locally hosted
-LLM instead, run a command with the `--use-local` flag:
-```console
-edit foo.cpp --use-local # or -l for short
-```
-The `--use-local` flag will deploy a job using the parameters specified under
-the `[ollama]` section in [funcgraft.toml](./.funcgraft/funcgraft.toml). Ensure
-that that the Ollama server is up and running on the host and port specified in
-the configuration file.
 
 ### Working with complex prompts
 Complex multiline prompts can be written into a file and read into the program.

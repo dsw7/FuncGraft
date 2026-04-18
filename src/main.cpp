@@ -28,7 +28,6 @@ Options:
   -o, --output=FILE                Place output into FILE
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
-  -l, --use-local                  Connect to local LLM
   -v, --verbose                    Be more verbose with output
 
 Examples:
@@ -56,13 +55,12 @@ params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
             { "output", required_argument, 0, 'o' },
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
-            { "use-local", no_argument, 0, 'l' },
             { "verbose", no_argument, 0, 'v' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        const int option = getopt_long(argc, argv, "ho:f:i:lv", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:v", long_options, &option_index);
 
         if (option == -1) {
             break;
@@ -80,9 +78,6 @@ params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
                 break;
             case 'i':
                 params.instructions_from_cli = optarg;
-                break;
-            case 'l':
-                params.use_local_llm = true;
                 break;
             case 'v':
                 params.verbose = true;

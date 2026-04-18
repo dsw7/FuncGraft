@@ -3,6 +3,11 @@
 # See https://github.com/dsw7/FuncGraft for more information
 # --------------------------------------------------
 
+[general]
+# Specify which provider to connect to
+# Options are "openai" and "ollama"
+provider = "openai"
+
 [openai]
 # Specify a default OpenAI model to use such as "gpt-4o"
 model = "gpt-4o"
