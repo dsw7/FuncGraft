@@ -53,7 +53,7 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-OpenAIResults run_openai_query_with_threading_(const params::CommandLineParameters &params, const std::string &prompt)
+OpenAIResults run_openai_query_with_threading_(const CommandLineParameters &params, const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
@@ -79,7 +79,7 @@ OpenAIResults run_openai_query_with_threading_(const params::CommandLineParamete
     return results.value();
 }
 
-OllamaResults run_ollama_query_with_threading_(const params::CommandLineParameters &params, const std::string &prompt)
+OllamaResults run_ollama_query_with_threading_(const CommandLineParameters &params, const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
@@ -141,7 +141,7 @@ void report_query_info_(const OllamaResponse &response)
     fmt::print(fg(blue), "{}\n", response.description);
 }
 
-std::string edit_delimited_text_openai_(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_delimited_text_openai_(const CommandLineParameters &params, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -169,7 +169,7 @@ std::string edit_delimited_text_openai_(const params::CommandLineParameters &par
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_delimited_text_ollama_(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_delimited_text_ollama_(const CommandLineParameters &params, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -197,7 +197,7 @@ std::string edit_delimited_text_ollama_(const params::CommandLineParameters &par
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text_openai_(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_full_text_openai_(const CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(params);
     const std::string prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
@@ -216,7 +216,7 @@ std::string edit_full_text_openai_(const params::CommandLineParameters &params, 
     return results->output_text;
 }
 
-std::string edit_full_text_ollama_(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_full_text_ollama_(const CommandLineParameters &params, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(params);
     const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
@@ -239,7 +239,7 @@ std::string edit_full_text_ollama_(const params::CommandLineParameters &params, 
 
 namespace pipeline {
 
-void process_file(const params::CommandLineParameters &params)
+void process_file(const CommandLineParameters &params)
 {
     const std::string input_text = import_file_to_edit(params.input_file);
 

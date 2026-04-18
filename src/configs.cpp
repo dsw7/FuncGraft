@@ -30,8 +30,6 @@ fs::path get_proj_data_dir()
 
 } // namespace
 
-namespace params {
-
 void CommandLineParameters::validate_params()
 {
     if (this->input_file.empty()) {
@@ -83,5 +81,3 @@ void CommandLineParameters::load_configs_from_config_file()
         throw std::runtime_error("Provider must be one of \"openai\" or \"ollama\"");
     }
 }
-
-} // namespace params

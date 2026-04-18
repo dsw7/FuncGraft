@@ -34,7 +34,7 @@ std::string load_instructions_from_stdin_()
 
 namespace prompt {
 
-std::string load_instructions(const params::CommandLineParameters &params)
+std::string load_instructions(const CommandLineParameters &params)
 {
     std::string instructions;
 

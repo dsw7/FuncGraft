@@ -4,8 +4,6 @@
 #include <optional>
 #include <string>
 
-namespace params {
-
 struct CommandLineParameters {
     void load_configs_from_config_file();
     void validate_params();
@@ -23,5 +21,3 @@ struct CommandLineParameters {
     std::string model_ollama;
     std::string model_openai;
 };
-
-} // namespace params

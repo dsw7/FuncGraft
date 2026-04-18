@@ -5,5 +5,5 @@
 #include <string>
 
 namespace prompt {
-std::string load_instructions(const params::CommandLineParameters &params);
+std::string load_instructions(const CommandLineParameters &params);
 }

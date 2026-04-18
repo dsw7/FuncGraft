@@ -44,9 +44,9 @@ Examples:
     fmt::print("{}", messages);
 }
 
-params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
+CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
 {
-    params::CommandLineParameters params;
+    CommandLineParameters params;
 
     while (true) {
         static struct option long_options[] = {
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    params::CommandLineParameters params = parse_opts_from_argv(argc, argv);
+    CommandLineParameters params = parse_opts_from_argv(argc, argv);
 
     try {
         params.validate_params();
