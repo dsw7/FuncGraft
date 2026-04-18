@@ -1,13 +1,15 @@
 #include "configs.hpp"
-#include "params.hpp"
 #include "process_file.hpp"
+#include "utils.hpp"
 
+#include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <stdexcept>
 #include <string.h>
 #include <string>
+#include <toml.hpp>
 
 void print_help_messages()
 {
@@ -45,9 +47,9 @@ Examples:
     fmt::print("{}", messages);
 }
 
-params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
+Configurations parse_configs_from_argv(const int argc, char **argv)
 {
-    params::CommandLineParameters params;
+    Configurations configs;
 
     while (true) {
         static struct option long_options[] = {
@@ -71,16 +73,16 @@ params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
                 print_help_messages();
                 std::exit(EXIT_SUCCESS);
             case 'o':
-                params.output_file = optarg;
+                configs.output_file = optarg;
                 break;
             case 'f':
-                params.instructions_file = optarg;
+                configs.instructions_file = optarg;
                 break;
             case 'i':
-                params.instructions_from_cli = optarg;
+                configs.instructions_from_cli = optarg;
                 break;
             case 'v':
-                params.verbose = true;
+                configs.verbose = true;
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
@@ -90,12 +92,35 @@ params::CommandLineParameters parse_opts_from_argv(const int argc, char **argv)
 
     for (int i = optind; i < argc; i++) {
         if (strcmp("edit", argv[i]) != 0) {
-            params.input_file = argv[i];
+            configs.input_file = argv[i];
             break;
         }
     }
 
-    return params;
+    return configs;
+}
+
+void load_additional_configs_from_file(Configurations &configs)
+{
+    const std::filesystem::path proj_config = utils::get_project_data_dir() / "funcgraft.toml";
+
+    if (not std::filesystem::exists(proj_config)) {
+        throw std::runtime_error("Could not locate FuncGraft configuration file!");
+    }
+
+    toml::table table;
+
+    try {
+        table = toml::parse_file(proj_config.string());
+    } catch (const toml::parse_error &e) {
+        throw std::runtime_error(e);
+    }
+
+    configs.provider = table["general"]["provider"].value_or("openai");
+    configs.host_ollama = table["ollama"]["host"].value_or("localhost");
+    configs.model_ollama = table["ollama"]["model"].value_or("gemma3:latest");
+    configs.model_openai = table["openai"]["model"].value_or("gpt-4o");
+    configs.port_ollama = table["ollama"]["port"].value_or(11434);
 }
 
 int main(int argc, char **argv)
@@ -105,18 +130,19 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    params::CommandLineParameters params = parse_opts_from_argv(argc, argv);
+    Configurations configs = parse_configs_from_argv(argc, argv);
 
     try {
-        params.validate_params();
+        configs.validate_configs_from_cli();
     } catch (const std::invalid_argument &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;
     }
 
     try {
-        configs.load_configs_from_config_file();
-        pipeline::process_file(params);
+        load_additional_configs_from_file(configs);
+        configs.validate_configs_from_file();
+        pipeline::process_file(configs);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;

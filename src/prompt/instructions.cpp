@@ -34,14 +34,14 @@ std::string load_instructions_from_stdin_()
 
 namespace prompt {
 
-std::string load_instructions(const params::CommandLineParameters &params)
+std::string load_instructions(const Configurations &configs)
 {
     std::string instructions;
 
-    if (params.instructions_from_cli) {
-        instructions = params.instructions_from_cli.value();
-    } else if (params.instructions_file) {
-        instructions = load_instructions_from_file_(params.instructions_file.value());
+    if (configs.instructions_from_cli) {
+        instructions = configs.instructions_from_cli.value();
+    } else if (configs.instructions_file) {
+        instructions = load_instructions_from_file_(configs.instructions_file.value());
     } else {
         instructions = load_instructions_from_stdin_();
     }

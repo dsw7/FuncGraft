@@ -152,8 +152,10 @@ OpenAIError::OpenAIError(const std::string &response, const int status_code) :
     this->errmsg = json["error"]["message"];
 }
 
-OpenAI::OpenAI(const std::string &model) :
-    model_(model) {}
+OpenAI::OpenAI(const Configurations &configs)
+{
+    this->model_ = configs.model_openai;
+}
 
 std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std::string &prompt)
 {

@@ -89,8 +89,12 @@ OllamaError::OllamaError(const std::string &response, const int status_code) :
     this->errmsg = json["error"];
 }
 
-Ollama::Ollama(const std::string &model, const std::string &host_ollama, const int port_ollama) :
-    model_(model), host_ollama_(host_ollama), port_ollama_(port_ollama) {}
+Ollama::Ollama(const Configurations &configs)
+{
+    this->model_ = configs.model_ollama;
+    this->host_ollama_ = configs.host_ollama;
+    this->port_ollama_ = configs.port_ollama;
+}
 
 std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std::string &prompt)
 {
