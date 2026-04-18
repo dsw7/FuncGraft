@@ -62,17 +62,4 @@ void write_to_file(const std::string &filename, const std::string &text)
     file.close();
 }
 
-nlohmann::json parse_json(const std::string &response)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    return json;
-}
-
 } // namespace utils
