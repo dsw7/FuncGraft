@@ -26,8 +26,8 @@ namespace {
 
 using completion::LLMResponse;
 using completion::Ollama;
-using completion::OllamaError;
 using completion::OllamaResponse;
+using OllamaResults = std::expected<OllamaResponse, completion::OllamaError>;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
@@ -78,12 +78,12 @@ LLMResponse run_openai_query_with_threading_(const std::string &prompt)
     return results;
 }
 
-std::expected<OllamaResponse, OllamaError> run_ollama_query_with_threading_(const std::string &prompt)
+OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
 
-    std::optional<std::expected<OllamaResponse, OllamaError>> results;
+    std::optional<OllamaResults> results;
     bool query_failed = false;
     std::string errmsg;
 
@@ -181,7 +181,7 @@ std::string edit_delimited_text_ollama_(const params::CommandLineParameters &par
         print_prompt_if_verbose_(prompt);
     }
 
-    const auto results = run_ollama_query_with_threading_(prompt);
+    const OllamaResults results = run_ollama_query_with_threading_(prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
@@ -216,7 +216,7 @@ std::string edit_full_text_ollama_(const params::CommandLineParameters &params, 
         print_prompt_if_verbose_(prompt);
     }
 
-    const auto results = run_ollama_query_with_threading_(prompt);
+    const OllamaResults results = run_ollama_query_with_threading_(prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
     }
