@@ -24,11 +24,11 @@
 
 namespace {
 
-using completion::OllamaResponse;
-using OllamaResults = std::expected<OllamaResponse, completion::OllamaError>;
+using adapters::OllamaResponse;
+using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
 
-using completion::OpenAIResponse;
-using OpenAIResults = std::expected<OpenAIResponse, completion::OpenAIError>;
+using adapters::OpenAIResponse;
+using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
@@ -63,7 +63,7 @@ OpenAIResults run_openai_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = completion::OpenAI().query_messages_api(prompt);
+        results = adapters::OpenAI().query_messages_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -89,7 +89,7 @@ OllamaResults run_ollama_query_with_threading_(const std::string &prompt)
     std::string errmsg;
 
     try {
-        results = completion::Ollama().query_generate_api(prompt);
+        results = adapters::Ollama().query_generate_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;

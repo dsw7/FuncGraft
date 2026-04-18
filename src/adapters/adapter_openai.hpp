@@ -6,7 +6,7 @@
 #include <json.hpp>
 #include <string>
 
-namespace completion {
+namespace adapters {
 
 class OpenAIResponse {
 public:
@@ -35,4 +35,4 @@ public:
     std::expected<OpenAIResponse, OpenAIError> query_messages_api(const std::string &prompt);
 };
 
-} // namespace completion
+} // namespace adapters

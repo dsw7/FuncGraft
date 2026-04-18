@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 set(SRC_FILES
-  completion/adapter_ollama.cpp
-  completion/adapter_openai.cpp
-  completion/curl_base.cpp
+  adapters/adapter_ollama.cpp
+  adapters/adapter_openai.cpp
+  adapters/curl_base.cpp
   configs.cpp
   main.cpp
   params.cpp
@@ -40,7 +40,7 @@ endif()
 
 include_directories(
   ${CMAKE_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/completion
+  ${CMAKE_SOURCE_DIR}/adapters
   ${CMAKE_SOURCE_DIR}/external
   ${CMAKE_SOURCE_DIR}/pipeline
   ${CMAKE_SOURCE_DIR}/prompt

@@ -2,7 +2,7 @@
 
 #include <curl/curl.h>
 
-namespace completion {
+namespace adapters {
 
 class CurlBase {
 public:
@@ -16,4 +16,4 @@ protected:
     CURL *handle_ = nullptr;
 };
 
-} // namespace completion
+} // namespace adapters

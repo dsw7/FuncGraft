@@ -5,7 +5,7 @@
 #include <expected>
 #include <string>
 
-namespace completion {
+namespace adapters {
 
 struct OllamaResponse {
     OllamaResponse(const std::string &response);
@@ -29,4 +29,4 @@ public:
     std::expected<OllamaResponse, OllamaError> query_generate_api(const std::string &prompt);
 };
 
-} // namespace completion
+} // namespace adapters

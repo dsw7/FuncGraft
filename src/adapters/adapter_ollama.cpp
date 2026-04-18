@@ -37,7 +37,7 @@ std::string get_post_fields_(const std::string &prompt)
 
 } // namespace
 
-namespace completion {
+namespace adapters {
 
 OllamaResponse::OllamaResponse(const std::string &response)
 {
@@ -125,4 +125,4 @@ std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std:
     return OllamaResponse(response);
 }
 
-} // namespace completion
+} // namespace adapters

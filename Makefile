@@ -4,9 +4,9 @@
 format:
 	@clang-format -i --verbose --style=file \
 		src/*.cpp src/*.hpp \
-		src/prompt/*.cpp src/prompt/*.hpp \
-		src/completion/*.cpp src/completion/*.hpp \
-		src/pipeline/*.cpp src/pipeline/*.hpp
+		src/adapters/*.cpp src/adapters/*.hpp \
+		src/pipeline/*.cpp src/pipeline/*.hpp \
+		src/prompt/*.cpp src/prompt/*.hpp
 
 compile: format
 	@cmake -S src -B build/prod

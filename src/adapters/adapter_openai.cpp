@@ -66,7 +66,7 @@ std::string get_post_fields_(const std::string &prompt)
 
 } // namespace
 
-namespace completion {
+namespace adapters {
 
 OpenAIResponse::OpenAIResponse(const std::string &response)
 {
@@ -188,4 +188,4 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
     return OpenAIResponse(response);
 }
 
-} // namespace completion
+} // namespace adapters

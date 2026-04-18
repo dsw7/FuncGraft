@@ -17,7 +17,7 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, std::string *data)
 
 } // namespace
 
-namespace completion {
+namespace adapters {
 
 CurlBase::CurlBase()
 {
@@ -43,4 +43,4 @@ CurlBase::~CurlBase()
     curl_global_cleanup();
 }
 
-} // namespace completion
+} // namespace adapters
