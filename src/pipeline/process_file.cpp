@@ -1,5 +1,6 @@
 #include "process_file.hpp"
 
+#include "adapter_ollama.hpp"
 #include "configs.hpp"
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
@@ -13,16 +14,21 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <expected>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <thread>
 
 namespace {
 
 using completion::LLMResponse;
+using completion::Ollama;
+using completion::OllamaError;
+using completion::OllamaResponse;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
 
@@ -73,17 +79,17 @@ LLMResponse run_openai_query_with_threading_(const std::string &prompt)
     return results;
 }
 
-LLMResponse run_ollama_query_with_threading_(const std::string &prompt)
+std::expected<OllamaResponse, OllamaError> run_ollama_query_with_threading_(const std::string &prompt)
 {
     TIMER_ENABLED.store(true);
     std::thread timer(time_api_call_);
 
-    LLMResponse results;
+    std::optional<std::expected<OllamaResponse, OllamaError>> results;
     bool query_failed = false;
     std::string errmsg;
 
     try {
-        results = completion::run_ollama_query(prompt);
+        results = Ollama().query_generate_api(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -96,7 +102,7 @@ LLMResponse run_ollama_query_with_threading_(const std::string &prompt)
         throw std::runtime_error(errmsg);
     }
 
-    return results;
+    return results.value();
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -125,7 +131,17 @@ void report_query_info_(const LLMResponse &results)
     fmt::print(fg(blue), "{}\n", results.description);
 }
 
-std::string edit_delimited_text_(const params::CommandLineParameters &params, const std::string &input_text)
+void report_query_info_(const OllamaResponse &response)
+{
+    utils::print_separator();
+    fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Input tokens: {}\n", response.input_tokens);
+    fmt::print("Output tokens: {}\n", response.output_tokens);
+    fmt::print("Description of changes: ");
+    fmt::print(fg(blue), "{}\n", response.description);
+}
+
+std::string edit_delimited_text_openai_(const params::CommandLineParameters &params, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -136,57 +152,79 @@ std::string edit_delimited_text_(const params::CommandLineParameters &params, co
     print_code_being_targeted_(text_parts.original_text);
 
     const std::string instructions = prompt::load_instructions(params);
-    std::string prompt;
-
-    if (configs.provider == "ollama") {
-        prompt = prompt::build_ollama_prompt(instructions, text_parts.original_text, params.input_file.extension());
-    } else {
-        prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
-    }
+    const std::string prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, params.input_file.extension());
 
     if (params.verbose) {
         print_prompt_if_verbose_(prompt);
     }
 
-    LLMResponse results;
-
-    if (configs.provider == "ollama") {
-        results = run_ollama_query_with_threading_(prompt);
-    } else {
-        results = run_openai_query_with_threading_(prompt);
-    }
-
+    const auto results = run_openai_query_with_threading_(prompt);
     report_query_info_(results);
 
     text_parts.modified_text = results.output_text;
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text_(const params::CommandLineParameters &params, const std::string &input_text)
+std::string edit_delimited_text_ollama_(const params::CommandLineParameters &params, const std::string &input_text)
 {
-    const std::string instructions = prompt::load_instructions(params);
-    std::string prompt;
+    pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
-    if (configs.provider == "ollama") {
-        prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
-    } else {
-        prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
+    if (pipeline::is_text_empty(text_parts.original_text)) {
+        throw std::runtime_error("The delimited block does not contain any code");
     }
+
+    print_code_being_targeted_(text_parts.original_text);
+
+    const std::string instructions = prompt::load_instructions(params);
+    const std::string prompt = prompt::build_ollama_prompt(instructions, text_parts.original_text, params.input_file.extension());
 
     if (params.verbose) {
         print_prompt_if_verbose_(prompt);
     }
 
-    LLMResponse results;
-
-    if (configs.provider == "ollama") {
-        results = run_ollama_query_with_threading_(prompt);
-    } else {
-        results = run_openai_query_with_threading_(prompt);
+    const auto results = run_ollama_query_with_threading_(prompt);
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
     }
 
+    report_query_info_(*results);
+
+    text_parts.modified_text = results->output_text;
+    return pack_parts_into_text(text_parts);
+}
+
+std::string edit_full_text_openai_(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    const std::string instructions = prompt::load_instructions(params);
+    const std::string prompt = prompt::build_openai_prompt(instructions, input_text, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose_(prompt);
+    }
+
+    const auto results = run_openai_query_with_threading_(prompt);
     report_query_info_(results);
+
     return results.output_text;
+}
+
+std::string edit_full_text_ollama_(const params::CommandLineParameters &params, const std::string &input_text)
+{
+    const std::string instructions = prompt::load_instructions(params);
+    const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, params.input_file.extension());
+
+    if (params.verbose) {
+        print_prompt_if_verbose_(prompt);
+    }
+
+    const auto results = run_ollama_query_with_threading_(prompt);
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
+    }
+
+    report_query_info_(*results);
+
+    return results->output_text;
 }
 
 } // namespace
@@ -201,12 +239,17 @@ void process_file(const params::CommandLineParameters &params)
         throw std::runtime_error("The file does not contain any code");
     }
 
+    bool text_delimited = is_text_delimited(input_text);
     std::string output_text;
 
-    if (is_text_delimited(input_text)) {
-        output_text = edit_delimited_text_(params, input_text);
+    if (text_delimited and configs.provider == "openai") {
+        output_text = edit_delimited_text_openai_(params, input_text);
+    } else if (text_delimited and configs.provider == "ollama") {
+        output_text = edit_delimited_text_ollama_(params, input_text);
+    } else if (not text_delimited and configs.provider == "openai") {
+        output_text = edit_full_text_openai_(params, input_text);
     } else {
-        output_text = edit_full_text_(params, input_text);
+        output_text = edit_full_text_ollama_(params, input_text);
     }
 
     if (params.output_file) {
