@@ -52,7 +52,7 @@ void Configs::load_configs_from_config_file()
     this->model_openai = table["openai"]["model"].value_or("gpt-4o");
     this->port_ollama = table["ollama"]["port"].value_or(11434);
 
-    if (this->provider != "ollama" or this->provider != "openai") {
+    if (this->provider != "ollama" and this->provider != "openai") {
         throw std::runtime_error("Provider must be one of \"openai\" or \"ollama\"");
     }
 }
