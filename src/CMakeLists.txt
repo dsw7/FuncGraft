@@ -12,7 +12,6 @@ set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 set(SRC_FILES
   completion/adapter_ollama.cpp
   completion/curl_base.cpp
-  completion/query_ollama.cpp
   completion/query_openai.cpp
   completion/structured_output.cpp
   configs.cpp
