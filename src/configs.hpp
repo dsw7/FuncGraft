@@ -23,5 +23,6 @@ public:
     std::optional<std::string> provider;
 
 private:
+    void validate_input_file_();
     void validate_provider_();
 };
