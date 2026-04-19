@@ -31,6 +31,7 @@ Options:
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
   -v, --verbose                    Be more verbose with output
+  -p, --provider=PROVIDER          Specify LLM provider. Valid options are [openai, ollama]
 
 Examples:
   > Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
@@ -58,11 +59,12 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
             { "verbose", no_argument, 0, 'v' },
+            { "provider", required_argument, 0, 'p' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        const int option = getopt_long(argc, argv, "ho:f:i:v", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:vp:", long_options, &option_index);
 
         if (option == -1) {
             break;
@@ -83,6 +85,9 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
                 break;
             case 'v':
                 configs.verbose = true;
+                break;
+            case 'p':
+                configs.provider = optarg;
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
@@ -116,11 +121,15 @@ void load_additional_configs_from_file(Configurations &configs)
         throw std::runtime_error(e);
     }
 
-    configs.provider = table["general"]["provider"].value_or("openai");
     configs.host_ollama = table["ollama"]["host"].value_or("localhost");
     configs.model_ollama = table["ollama"]["model"].value_or("gemma3:latest");
     configs.model_openai = table["openai"]["model"].value_or("gpt-4o");
     configs.port_ollama = table["ollama"]["port"].value_or(11434);
+
+    if (not configs.provider) {
+        // i.e. provider was not set via command line
+        configs.provider = table["general"]["provider"].value_or("openai");
+    }
 }
 
 int main(int argc, char **argv)
@@ -133,15 +142,8 @@ int main(int argc, char **argv)
     Configurations configs = parse_configs_from_argv(argc, argv);
 
     try {
-        configs.validate_configs_from_cli();
-    } catch (const std::invalid_argument &e) {
-        fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
-        return 1;
-    }
-
-    try {
         load_additional_configs_from_file(configs);
-        configs.validate_configs_from_file();
+        configs.validate_configurations();
         pipeline::process_file(configs);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());

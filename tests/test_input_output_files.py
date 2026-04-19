@@ -46,6 +46,7 @@ def test_bad_delim_placement(
 ) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     stderr = assert_command_failure(
+        "--provider=openai",
         f"{LOC_TEST_DATA}/{dummy_file}",
         f"--instructions='{instructions}'",
         f"-o{outputted_script}",
@@ -57,6 +58,7 @@ def test_bad_delim_placement(
 def test_work_on_empty_file() -> None:
     instructions = "Replace the variable `c` with the integer 3"
     stderr = assert_command_failure(
+        "--provider=openai",
         str(LOC_TEST_DATA / "dummy_empty.py"),
         f"--instructions='{instructions}'",
     )
@@ -70,6 +72,8 @@ def test_work_on_empty_file() -> None:
 def test_work_with_empty_delims(dummy_file: str) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     stderr = assert_command_failure(
-        f"{LOC_TEST_DATA}/{dummy_file}", f"--instructions='{instructions}'"
+        "--provider=openai",
+        f"{LOC_TEST_DATA}/{dummy_file}",
+        f"--instructions='{instructions}'",
     )
     assert "The delimited block does not contain any code" in stderr
