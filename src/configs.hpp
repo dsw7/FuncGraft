@@ -16,8 +16,9 @@ struct Configurations {
     void validate_configs_from_file();
 
     int port_ollama = 11434;
-    std::string provider;
     std::string host_ollama;
     std::string model_ollama;
     std::string model_openai;
+
+    std::optional<std::string> provider;
 };
