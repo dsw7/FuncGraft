@@ -28,6 +28,12 @@ def test_copyright() -> None:
     )
 
 
+@mark.test_misc
+def test_invalid_provider() -> None:
+    stderr = assert_command_failure("--provider=foobar", "foobar.py")
+    assert "Invalid LLM provider" in stderr
+
+
 # misc. prompting tests
 DUMMY_FILE = str(LOC_TEST_DATA / "dummy_basic.py")
 
