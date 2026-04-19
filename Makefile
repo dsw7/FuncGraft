@@ -29,17 +29,17 @@ compile-test:
 test: export PATH_BIN = $(CURDIR)/build/test/edit
 test: format compile-test
 	@python3 -m pytest -vs -m "test_misc or test_openai" tests/
-	@lcov --capture --directory=build/test --output-file build/test/coverage.info
-	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
-	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
+	@lcov --quiet --capture --directory=build/test --output-file build/test/coverage.info
+	@lcov --quiet --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
+	@genhtml --quiet build/test/coverage.info --output-directory build/test/coverageResults
 	@echo "See coverage report at: build/test/coverageResults/index.html"
 
 test-ollama: export PATH_BIN = $(CURDIR)/build/test/edit
 test-ollama: format compile-test
 	@python3 -m pytest -vs -m "test_misc or test_ollama" tests/
-	@lcov --capture --directory=build/test --output-file build/test/coverage.info
-	@lcov --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
-	@genhtml build/test/coverage.info --output-directory build/test/coverageResults
+	@lcov --quiet --capture --directory=build/test --output-file build/test/coverage.info
+	@lcov --quiet --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
+	@genhtml --quiet build/test/coverage.info --output-directory build/test/coverageResults
 	@echo "See coverage report at: build/test/coverageResults/index.html"
 
 py:
