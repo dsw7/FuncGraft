@@ -26,5 +26,6 @@ private:
     void validate_input_file_();
     void validate_instructions_file_();
     void validate_output_file_();
+    void validate_cli_instructions_();
     void validate_provider_();
 };
