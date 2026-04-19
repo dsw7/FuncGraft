@@ -1,5 +1,6 @@
 #include "configs.hpp"
 
+#include <array>
 #include <stdexcept>
 
 void Configurations::validate_configs_from_cli()
@@ -27,9 +28,24 @@ void Configurations::validate_configs_from_cli()
     }
 }
 
-void Configurations::validate_configs_from_file()
+void Configurations::validate_provider_()
 {
-    if (this->provider != "ollama" and this->provider != "openai") {
-        throw std::runtime_error("Provider must be one of \"openai\" or \"ollama\"");
+    if (not this->provider) {
+        throw std::runtime_error("LLM provider is unset");
     }
+
+    const std::array<std::string, 2> providers = { "ollama", "openai" };
+
+    for (const auto &it: providers) {
+        if (it == this->provider) {
+            return;
+        }
+    }
+
+    throw std::runtime_error("Invalid LLM provider");
+}
+
+void Configurations::validate_configurations()
+{
+    this->validate_provider_();
 }

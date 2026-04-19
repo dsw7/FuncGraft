@@ -4,7 +4,9 @@
 #include <optional>
 #include <string>
 
-struct Configurations {
+class Configurations {
+public:
+    void validate_configurations();
     void validate_configs_from_cli();
 
     bool verbose = false;
@@ -13,12 +15,13 @@ struct Configurations {
     std::optional<std::filesystem::path> output_file;
     std::optional<std::string> instructions_from_cli;
 
-    void validate_configs_from_file();
-
     int port_ollama = 11434;
     std::string host_ollama;
     std::string model_ollama;
     std::string model_openai;
 
     std::optional<std::string> provider;
+
+private:
+    void validate_provider_();
 };
