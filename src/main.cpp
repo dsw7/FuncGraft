@@ -142,13 +142,6 @@ int main(int argc, char **argv)
     Configurations configs = parse_configs_from_argv(argc, argv);
 
     try {
-        configs.validate_configs_from_cli();
-    } catch (const std::invalid_argument &e) {
-        fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
-        return 1;
-    }
-
-    try {
         load_additional_configs_from_file(configs);
         configs.validate_configurations();
         pipeline::process_file(configs);
