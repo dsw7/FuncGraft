@@ -31,7 +31,7 @@ Options:
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
   -v, --verbose                    Be more verbose with output
-  -p, --provider=PROVIDER          Specify LLM provider. Valid options are [OpenAI, Ollama]
+  -p, --provider=PROVIDER          Specify LLM provider. Valid options are [openai, ollama]
 
 Examples:
   > Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
