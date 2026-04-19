@@ -24,5 +24,6 @@ public:
 
 private:
     void validate_input_file_();
+    void validate_instructions_file_();
     void validate_provider_();
 };
