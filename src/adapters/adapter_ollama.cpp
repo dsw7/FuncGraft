@@ -23,7 +23,16 @@ nlohmann::json get_structured_output_schema_()
 
 nlohmann::json build_conversation_(const std::string &prompt)
 {
-    return nlohmann::json::array({ { { "role", "user" }, { "content", prompt } } });
+    return nlohmann::json::array({
+        { { "role", "system" }, { "content", R"(
+You are a helpful assistant that specializes in programming.
+The user will provide some code and instructions on what to do with the the code.
+
+Set `code` to your updated code.
+Set `description_of_changes` to a summary of the changes you applied.
+)" } },
+        { { "role", "user" }, { "content", prompt } },
+    });
 }
 
 std::string get_post_fields_(const std::string &prompt, const std::string &model)
@@ -81,6 +90,8 @@ OllamaResponse::OllamaResponse(const std::string &response)
     }
 
     const StructuredOutput_ structured_output(json["message"]["content"]);
+    fmt::print("{}\n", structured_output.code);
+    fmt::print("{}\n", structured_output.description);
 
     this->description = structured_output.description;
     this->output_text = structured_output.code;

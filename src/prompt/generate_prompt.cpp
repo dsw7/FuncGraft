@@ -116,11 +116,10 @@ std::string build_ollama_prompt(const std::string &instructions, const std::stri
         code_block_to_edit = get_code_block_(input_text);
     }
 
-    return fmt::format(R"(I am editing some code. Apply the following instructions:
+    return fmt::format(R"(Apply the following instructions:
 {}
 To the following code:
 {}
-Respond using JSON.
 )",
         get_code_block_(instructions, "plaintext"),
         code_block_to_edit);
