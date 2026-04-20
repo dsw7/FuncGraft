@@ -21,12 +21,17 @@ nlohmann::json get_structured_output_schema_()
     };
 }
 
+nlohmann::json build_conversation_(const std::string &prompt)
+{
+    return nlohmann::json::array({ { { "role", "user" }, { "content", prompt } } });
+}
+
 std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json fields = {
         { "format", get_structured_output_schema_() },
+        { "messages", build_conversation_(prompt) },
         { "model", model },
-        { "prompt", prompt },
         { "stream", false },
     };
 
@@ -98,7 +103,7 @@ Ollama::Ollama(const Configurations &configs)
 
 std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std::string &prompt)
 {
-    const std::string url = fmt::format("http://{}:{}/api/generate", this->host_ollama_, this->port_ollama_);
+    const std::string url = fmt::format("http://{}:{}/api/chat", this->host_ollama_, this->port_ollama_);
     curl_easy_setopt(this->handle_, CURLOPT_URL, url.c_str());
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
 
