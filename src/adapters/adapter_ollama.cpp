@@ -38,6 +38,26 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
     return fields.dump();
 }
 
+struct StructuredOutput_ {
+    StructuredOutput_(const std::string &message);
+    std::string code;
+    std::string description;
+};
+
+StructuredOutput_::StructuredOutput_(const std::string &content)
+{
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->code = json["code"];
+    this->description = json["description_of_changes"];
+}
+
 } // namespace
 
 namespace adapters {
@@ -60,18 +80,10 @@ OllamaResponse::OllamaResponse(const std::string &response)
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const std::string structured_output_s = json["response"];
-    nlohmann::json structured_output_json;
+    const StructuredOutput_ structured_output(json["message"]["content"]);
 
-    try {
-        structured_output_json = nlohmann::json::parse(structured_output_s);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->description = structured_output_json["description_of_changes"];
-    this->output_text = structured_output_json["code"];
-
+    this->description = structured_output.description;
+    this->output_text = structured_output.code;
     this->input_tokens = json["prompt_eval_count"];
     this->output_tokens = json["eval_count"];
 }
