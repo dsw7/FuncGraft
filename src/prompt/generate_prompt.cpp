@@ -89,21 +89,13 @@ std::string build_openai_prompt(const std::string &instructions, const std::stri
         code_block_to_edit = get_code_block_(input_text);
     }
 
-    const nlohmann::json example = {
-        { "code", "Your updated code here" },
-        { "description", "A brief explanation of the changes" }
-    };
-
-    return fmt::format(R"(I am editing some code. Apply the following instructions:
+    return fmt::format(R"(Apply the following instructions:
 {}
 To the following code:
 {}
-Return the code edits in a JSON format with keys "code" and "description." For example:
-{}
 )",
         get_code_block_(instructions, "plaintext"),
-        code_block_to_edit,
-        example.dump(4));
+        code_block_to_edit);
 }
 
 std::string build_ollama_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)

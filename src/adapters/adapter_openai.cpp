@@ -22,6 +22,17 @@ std::string get_openai_user_api_key_()
     return api_key;
 }
 
+std::string get_system_prompt_()
+{
+    return R"(
+You are a helpful assistant that specializes in programming.
+The user will provide some code and instructions on what to do with the the code.
+
+Set `code` to your updated code.
+Set `description_of_changes` to a summary of the changes you applied.
+)";
+}
+
 nlohmann::json get_structured_output_schema_()
 {
     return {
@@ -54,6 +65,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
     const nlohmann::json fields = {
         { "input", prompt },
+        { "instructions", get_system_prompt_() },
         { "model", model },
         { "store", false },
         { "temperature", 1.00 },
