@@ -152,7 +152,7 @@ std::string edit_delimited_text_openai_(const Configurations &configs, const std
     print_code_being_targeted_(text_parts.original_text);
 
     const std::string instructions = prompt::load_instructions(configs);
-    const std::string prompt = prompt::build_openai_prompt(instructions, text_parts.original_text, configs.input_file.extension());
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
         print_prompt_if_verbose_(prompt);
@@ -180,7 +180,7 @@ std::string edit_delimited_text_ollama_(const Configurations &configs, const std
     print_code_being_targeted_(text_parts.original_text);
 
     const std::string instructions = prompt::load_instructions(configs);
-    const std::string prompt = prompt::build_ollama_prompt(instructions, text_parts.original_text, configs.input_file.extension());
+    const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
         print_prompt_if_verbose_(prompt);
@@ -200,7 +200,7 @@ std::string edit_delimited_text_ollama_(const Configurations &configs, const std
 std::string edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(configs);
-    const std::string prompt = prompt::build_openai_prompt(instructions, input_text, configs.input_file.extension());
+    const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
         print_prompt_if_verbose_(prompt);
@@ -219,7 +219,7 @@ std::string edit_full_text_openai_(const Configurations &configs, const std::str
 std::string edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(configs);
-    const std::string prompt = prompt::build_ollama_prompt(instructions, input_text, configs.input_file.extension());
+    const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
         print_prompt_if_verbose_(prompt);

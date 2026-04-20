@@ -79,26 +79,7 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 
 namespace prompt {
 
-std::string build_openai_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
-{
-    std::string code_block_to_edit;
-
-    if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
-        code_block_to_edit = get_code_block_(input_text, *label);
-    } else {
-        code_block_to_edit = get_code_block_(input_text);
-    }
-
-    return fmt::format(R"(Apply the following instructions:
-{}
-To the following code:
-{}
-)",
-        get_code_block_(instructions, "plaintext"),
-        code_block_to_edit);
-}
-
-std::string build_ollama_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
+std::string build_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
 {
     std::string code_block_to_edit;
 
