@@ -90,11 +90,9 @@ OllamaResponse::OllamaResponse(const std::string &response)
     }
 
     const StructuredOutput_ structured_output(json["message"]["content"]);
-    fmt::print("{}\n", structured_output.code);
-    fmt::print("{}\n", structured_output.description);
-
     this->description = structured_output.description;
     this->output_text = structured_output.code;
+
     this->input_tokens = json["prompt_eval_count"];
     this->output_tokens = json["eval_count"];
 }
