@@ -1,5 +1,7 @@
 from datetime import datetime
-from pytest import mark
+from pathlib import Path
+from typing import Generator
+from pytest import mark, fixture
 from utils import assert_command_success, assert_command_failure, LOC_TEST_DATA
 
 
@@ -33,6 +35,12 @@ def test_invalid_provider() -> None:
 DUMMY_FILE = str(LOC_TEST_DATA / "dummy_basic.py")
 
 
+@fixture
+def empty_instructions_file(text_file: Path) -> Generator[Path, None, None]:
+    text_file.write_text("", encoding="utf-8")
+    yield text_file
+
+
 def test_empty_instructions_file_arg() -> None:
     stderr = assert_command_failure(DUMMY_FILE, "--file=")
     assert "Instructions filename was not provided. Cannot proceed" in stderr
@@ -43,10 +51,8 @@ def test_missing_instructions_file() -> None:
     assert "File 'foo.txt' does not exist!" in stderr
 
 
-def test_empty_instructions_file() -> None:
-    stderr = assert_command_failure(
-        DUMMY_FILE, f'--file={LOC_TEST_DATA / "edit_empty.txt"}'
-    )
+def test_empty_instructions_file(empty_instructions_file: Path) -> None:
+    stderr = assert_command_failure(DUMMY_FILE, f"--file={empty_instructions_file}")
     assert "Instructions are empty!" in stderr
 
 

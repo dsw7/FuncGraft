@@ -1,11 +1,7 @@
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import (
-    assert_command_success,
-    assert_python_script_runs,
-    remove_file_when_done,
-)
+from utils import assert_command_success, assert_python_script_runs
 
 
 @fixture
@@ -47,23 +43,23 @@ if __name__ == '__main__':
 
 
 @fixture
-def instructions_file() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/instructions.txt")
-    path_to_file.write_text(
+def instructions_file(text_file: Path) -> Generator[Path, None, None]:
+    text_file.write_text(
         "Replace the variable `c` with the integer 10", encoding="utf-8"
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield text_file
 
 
 @fixture
 def unknown_file() -> Generator[Path, None, None]:
     path_to_file = Path("/tmp/foobar.abc")
     path_to_file.write_text("foobar", encoding="utf-8")
-
     yield path_to_file
-    remove_file_when_done(path_to_file)
+
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
