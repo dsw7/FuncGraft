@@ -1,18 +1,33 @@
-from os import remove
+from pathlib import Path
 from typing import Generator
 from pytest import fixture
 
 
 @fixture
-def outputted_script() -> Generator[str, None, None]:
-    # some tests process an input file and emit an output file:
-    # i.e. edit <input-file> -o <output-file>
-    # this fixture cleans up <output-file>
-
-    path_to_outputted_script = "/tmp/dummy_basic.py"
-    yield path_to_outputted_script
+def python_file() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/funcgraft_test_file.py")
+    yield path_to_file
 
     try:
-        remove(path_to_outputted_script)
+        path_to_file.unlink()
     except FileNotFoundError:
         pass
+
+
+@fixture
+def text_file() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/funcgraft_test_file.txt")
+    yield path_to_file
+
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
+
+
+@fixture
+def dummy_python_file(python_file: Path) -> Generator[str, None, None]:
+    # Useful for cases where we just need to satisfy the input file
+    # requirement but we're otherwise doing nothing with the file
+    python_file.write_text("print('Lorem ipsum...')", encoding="utf-8")
+    yield str(python_file)
