@@ -4,6 +4,13 @@ from pytest import mark, fixture
 from utils import assert_command_success, assert_python_script_runs
 
 
+def remove_file_when_done(path_to_file: Path) -> None:
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
+
+
 @fixture
 def file_to_edit() -> Generator[Path, None, None]:
     path_to_file = Path("/tmp/file_to_edit.py")
@@ -18,12 +25,9 @@ if __name__ == "__main__":
 """,
         encoding="utf-8",
     )
-    yield path_to_file
 
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
+    yield path_to_file
+    remove_file_when_done(path_to_file)
 
 
 @fixture
@@ -46,12 +50,9 @@ if __name__ == '__main__':
 """,
         encoding="utf-8",
     )
-    yield path_to_file
 
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
+    yield path_to_file
+    remove_file_when_done(path_to_file)
 
 
 @fixture
@@ -62,11 +63,7 @@ def instructions_file() -> Generator[Path, None, None]:
     )
 
     yield path_to_file
-
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
+    remove_file_when_done(path_to_file)
 
 
 @fixture
@@ -75,11 +72,7 @@ def unknown_file() -> Generator[Path, None, None]:
     path_to_file.write_text("foobar", encoding="utf-8")
 
     yield path_to_file
-
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
+    remove_file_when_done(path_to_file)
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
