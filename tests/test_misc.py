@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import assert_command_success, assert_command_failure, LOC_TEST_DATA
+from utils import assert_command_success, assert_command_failure
 
 
 @mark.parametrize("option", ["-h", "--help"])
@@ -31,31 +31,33 @@ def test_invalid_provider() -> None:
     assert "Invalid LLM provider" in stderr
 
 
-# misc. prompting tests
-DUMMY_FILE = str(LOC_TEST_DATA / "dummy_basic.py")
+@fixture
+def dummy_file(python_file: Path) -> Generator[str, None, None]:
+    python_file.write_text("nums = [1, c, 3]", encoding="utf-8")
+    yield str(python_file)
 
 
 @fixture
-def empty_instructions_file(text_file: Path) -> Generator[Path, None, None]:
+def empty_instructions_file(text_file: Path) -> Generator[str, None, None]:
     text_file.write_text("", encoding="utf-8")
-    yield text_file
+    yield str(text_file)
 
 
-def test_empty_instructions_file_arg() -> None:
-    stderr = assert_command_failure(DUMMY_FILE, "--file=")
+def test_empty_instructions_file_arg(dummy_file: str) -> None:
+    stderr = assert_command_failure(dummy_file, "--file=")
     assert "Instructions filename was not provided. Cannot proceed" in stderr
 
 
-def test_missing_instructions_file() -> None:
-    stderr = assert_command_failure(DUMMY_FILE, "--file=foo.txt")
+def test_missing_instructions_file(dummy_file: str) -> None:
+    stderr = assert_command_failure(dummy_file, "--file=foo.txt")
     assert "File 'foo.txt' does not exist!" in stderr
 
 
-def test_empty_instructions_file(empty_instructions_file: Path) -> None:
-    stderr = assert_command_failure(DUMMY_FILE, f"--file={empty_instructions_file}")
+def test_empty_instructions_file(dummy_file: str, empty_instructions_file: str) -> None:
+    stderr = assert_command_failure(dummy_file, f"--file={empty_instructions_file}")
     assert "Instructions are empty!" in stderr
 
 
-def test_empty_instructions() -> None:
-    stderr = assert_command_failure(DUMMY_FILE, "--instructions=")
+def test_empty_instructions(dummy_file: str) -> None:
+    stderr = assert_command_failure(dummy_file, "--instructions=")
     assert "CLI instructions are empty. Cannot proceed" in stderr
