@@ -27,6 +27,34 @@ if __name__ == "__main__":
 
 
 @fixture
+def file_to_edit_with_delims() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/file_to_edit.py")
+    path_to_file.write_text(
+        """
+@@@
+def get_sum() -> int:
+    return 10 + c
+@@@
+
+def main() -> None:
+    c = 1
+    nums = [c, get_sum(), 3]
+    print(f'The sum is {sum(nums)}')
+
+if __name__ == '__main__':
+    main()
+""",
+        encoding="utf-8",
+    )
+    yield path_to_file
+
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
+
+
+@fixture
 def instructions_file() -> Generator[Path, None, None]:
     path_to_file = Path("/tmp/instructions.txt")
     path_to_file.write_text(
@@ -67,7 +95,6 @@ def test_read_instructions_from_cli(provider: str, file_to_edit: Path) -> None:
     assert "The sum is 9" in assert_python_script_runs(file_to_edit)
 
 
-@mark.test_ollama
 @mark.parametrize("provider", ["ollama", "openai"])
 def test_print_prompt_with_verbose_flag(provider: str, file_to_edit: Path) -> None:
     instructions = "Replace the variable `c` with the integer 5"
@@ -82,16 +109,18 @@ def test_print_prompt_with_verbose_flag(provider: str, file_to_edit: Path) -> No
     assert "The sum is 9" in assert_python_script_runs(file_to_edit)
 
 
-@mark.test_ollama
-def test_only_edit_between_delims(outputted_script: str) -> None:
+@mark.parametrize("provider", ["ollama", "openai"])
+def test_only_edit_between_delims(
+    provider: str, file_to_edit_with_delims: Path
+) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     assert_command_success(
-        "--provider=ollama",
-        f"{LOC_TEST_DATA}/dummy_with_delims.py",
+        f"{file_to_edit}",
+        f"--provider={provider}",
         f"--instructions='{instructions}'",
-        f"-o{outputted_script}",
+        f"--output={file_to_edit}",
     )
-    assert "The sum is 17" in assert_python_script_runs(outputted_script)
+    assert "The sum is 17" in assert_python_script_runs(file_to_edit_with_delims)
 
 
 @mark.test_ollama
