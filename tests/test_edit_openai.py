@@ -3,17 +3,6 @@ from utils import LOC_TEST_DATA, assert_command_success, assert_python_script_ru
 
 
 @mark.test_openai
-def test_read_instructions_from_file(outputted_script: str) -> None:
-    assert_command_success(
-        "--provider=openai",
-        f"{LOC_TEST_DATA}/dummy_basic.py",
-        f'--file={LOC_TEST_DATA / "edit.txt"}',
-        f"-o{outputted_script}",
-    )
-    assert "The sum is 14" in assert_python_script_runs(outputted_script)
-
-
-@mark.test_openai
 def test_print_prompt_with_verbose_flag(outputted_script: str) -> None:
     instructions = "Replace the variable `c` with the integer 5"
     stdout = assert_command_success(

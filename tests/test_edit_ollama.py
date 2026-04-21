@@ -26,15 +26,15 @@ if __name__ == "__main__":
         pass
 
 
-@mark.test_ollama
-def test_read_instructions_from_file(outputted_script: str) -> None:
+@mark.parametrize("provider", ["ollama", "openai"])
+def test_read_instructions_from_file(provider: str, file_to_edit: Path) -> None:
     assert_command_success(
-        "--provider=ollama",
-        f"{LOC_TEST_DATA}/dummy_basic.py",
+        f"{file_to_edit}",
+        f"--provider={provider}",
         f'--file={LOC_TEST_DATA / "edit.txt"}',
-        f"-o{outputted_script}",
+        f"--output={file_to_edit}",
     )
-    assert "The sum is 14" in assert_python_script_runs(outputted_script)
+    assert "The sum is 14" in assert_python_script_runs(file_to_edit)
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
