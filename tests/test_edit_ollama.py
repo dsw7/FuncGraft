@@ -26,12 +26,29 @@ if __name__ == "__main__":
         pass
 
 
+@fixture
+def instructions_file() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/instructions.txt")
+    path_to_file.write_text(
+        "Replace the variable `c` with the integer 10", encoding="utf-8"
+    )
+
+    yield path_to_file
+
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
+
+
 @mark.parametrize("provider", ["ollama", "openai"])
-def test_read_instructions_from_file(provider: str, file_to_edit: Path) -> None:
+def test_read_instructions_from_file(
+    provider: str, file_to_edit: Path, instructions_file: Path
+) -> None:
     assert_command_success(
         f"{file_to_edit}",
         f"--provider={provider}",
-        f'--file={LOC_TEST_DATA / "edit.txt"}',
+        f"--file={instructions_file}",
         f"--output={file_to_edit}",
     )
     assert "The sum is 14" in assert_python_script_runs(file_to_edit)
