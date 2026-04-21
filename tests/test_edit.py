@@ -9,9 +9,8 @@ from utils import (
 
 
 @fixture
-def file_to_edit() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 def main() -> None:
     nums = [1, c, 3]
@@ -22,15 +21,12 @@ if __name__ == "__main__":
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 @fixture
-def file_to_edit_with_delims() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit_with_delims(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 @@@
 def get_sum() -> int:
@@ -47,9 +43,7 @@ if __name__ == '__main__':
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 @fixture

@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import LOC_TEST_DATA, assert_command_failure, remove_file_when_done
+from utils import LOC_TEST_DATA, assert_command_failure
 
 
 @fixture
-def file_to_edit_with_bad_delims() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit_with_bad_delims(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 def get_sum() -> int:
     return 10 + c
@@ -23,15 +22,12 @@ if __name__ == "__main__":
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 @fixture
-def file_to_edit_with_bad_delims_2() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit_with_bad_delims_2(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 def get_sum() -> int:
     return 10 + c
@@ -51,24 +47,18 @@ if __name__ == "__main__":
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 @fixture
-def file_to_edit_is_empty() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text("", encoding="utf-8")
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+def file_to_edit_is_empty(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text("", encoding="utf-8")
+    yield python_file
 
 
 @fixture
-def file_to_edit_with_empty_delims() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit_with_empty_delims(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 def get_sum() -> int:
     return 10 + c
@@ -85,15 +75,12 @@ def main() -> None:
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 @fixture
-def file_to_edit_with_empty_delims_2() -> Generator[Path, None, None]:
-    path_to_file = Path("/tmp/file_to_edit.py")
-    path_to_file.write_text(
+def file_to_edit_with_empty_delims_2(python_file: Path) -> Generator[Path, None, None]:
+    python_file.write_text(
         """
 def get_sum() -> int:
     return 10 + c
@@ -111,9 +98,7 @@ def main() -> None:
 """,
         encoding="utf-8",
     )
-
-    yield path_to_file
-    remove_file_when_done(path_to_file)
+    yield python_file
 
 
 def test_input_file_is_empty() -> None:
