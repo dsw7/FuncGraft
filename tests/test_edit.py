@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import LOC_TEST_DATA, assert_command_success, assert_python_script_runs
+from utils import assert_command_success, assert_python_script_runs
 
 
 @fixture
@@ -69,6 +69,19 @@ def instructions_file() -> Generator[Path, None, None]:
         pass
 
 
+@fixture
+def unknown_file() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/foobar.abc")
+    path_to_file.write_text("foobar", encoding="utf-8")
+
+    yield path_to_file
+
+    try:
+        path_to_file.unlink()
+    except FileNotFoundError:
+        pass
+
+
 @mark.parametrize("provider", ["ollama", "openai"])
 def test_read_instructions_from_file(
     provider: str, file_to_edit: Path, instructions_file: Path
@@ -115,23 +128,21 @@ def test_only_edit_between_delims(
 ) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     assert_command_success(
-        f"{file_to_edit}",
+        f"{file_to_edit_with_delims}",
         f"--provider={provider}",
         f"--instructions='{instructions}'",
-        f"--output={file_to_edit}",
+        f"--output={file_to_edit_with_delims}",
     )
     assert "The sum is 17" in assert_python_script_runs(file_to_edit_with_delims)
 
 
-@mark.test_ollama
-def test_work_on_unknown_file(outputted_script: str) -> None:
+@mark.parametrize("provider", ["ollama", "openai"])
+def test_work_on_unknown_file(provider: str, unknown_file: Path) -> None:
     instructions = "Capitalize all words in the file"
     assert_command_success(
-        "--provider=ollama",
-        f"{LOC_TEST_DATA}/unknown_file_type.abc",
+        f"{unknown_file}",
+        f"--provider={provider}",
         f"--instructions='{instructions}'",
-        f"-o{outputted_script}",  # Will write to a .py file but it's okay
+        f"--output={unknown_file}",
     )
-
-    with open(outputted_script, encoding="utf-8") as f:
-        assert "Foobar" in f.read()
+    assert "Foobar" in unknown_file.read_text(encoding="utf-8")
