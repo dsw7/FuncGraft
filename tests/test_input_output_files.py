@@ -56,6 +56,15 @@ if __name__ == "__main__":
     remove_file_when_done(path_to_file)
 
 
+@fixture
+def file_to_edit_is_empty() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/file_to_edit.py")
+    path_to_file.write_text("", encoding="utf-8")
+
+    yield path_to_file
+    remove_file_when_done(path_to_file)
+
+
 def test_input_file_is_empty() -> None:
     stderr = assert_command_failure("")
     assert "No filename was provided. Cannot proceed" in stderr
@@ -101,12 +110,10 @@ def test_bad_delim_placement_2(provider: str, dummy_with_bad_delims_2: Path) -> 
     assert "The number of delimiter lines must be exactly 2" in stderr
 
 
-def test_work_on_empty_file() -> None:
+def test_work_on_empty_file(file_to_edit_is_empty: Path) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     stderr = assert_command_failure(
-        "--provider=openai",
-        str(LOC_TEST_DATA / "dummy_empty.py"),
-        f"--instructions='{instructions}'",
+        f"{file_to_edit_is_empty}", f"--instructions='{instructions}'"
     )
     assert "The file does not contain any code" in stderr
 
