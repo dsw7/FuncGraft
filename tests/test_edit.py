@@ -1,14 +1,11 @@
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import assert_command_success, assert_python_script_runs
-
-
-def remove_file_when_done(path_to_file: Path) -> None:
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
+from utils import (
+    assert_command_success,
+    assert_python_script_runs,
+    remove_file_when_done,
+)
 
 
 @fixture

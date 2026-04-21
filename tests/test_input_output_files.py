@@ -1,5 +1,59 @@
-from pytest import mark
-from utils import LOC_TEST_DATA, assert_command_failure
+from pathlib import Path
+from typing import Generator
+from pytest import mark, fixture
+from utils import LOC_TEST_DATA, assert_command_failure, remove_file_when_done
+
+
+@fixture
+def file_to_edit_with_bad_delims() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/file_to_edit.py")
+    path_to_file.write_text(
+        """
+def get_sum() -> int:
+    return 10 + c
+@@@
+
+def main() -> None:
+    c = 1
+    nums = [c, get_sum(), 3]
+    print(f"The sum is {sum(nums)}")
+
+if __name__ == "__main__":
+    main()
+""",
+        encoding="utf-8",
+    )
+
+    yield path_to_file
+    remove_file_when_done(path_to_file)
+
+
+@fixture
+def file_to_edit_with_bad_delims_2() -> Generator[Path, None, None]:
+    path_to_file = Path("/tmp/file_to_edit.py")
+    path_to_file.write_text(
+        """
+def get_sum() -> int:
+    return 10 + c
+@@@
+
+@@@
+
+@@@
+
+def main() -> None:
+    c = 1
+    nums = [c, get_sum(), 3]
+    print(f"The sum is {sum(nums)}")
+
+if __name__ == "__main__":
+    main()
+""",
+        encoding="utf-8",
+    )
+
+    yield path_to_file
+    remove_file_when_done(path_to_file)
 
 
 def test_input_file_is_empty() -> None:
@@ -23,30 +77,28 @@ def test_output_file_is_empty() -> None:
     assert "Output filename was not provided. Cannot proceed" in stderr
 
 
-# delimiter tests
-
-
-@mark.parametrize(
-    "dummy_file, errmsg",
-    [
-        ("dummy_with_bad_delims.py", "No matching closing delimiter line"),
-        (
-            "dummy_with_bad_delims_2.py",
-            "The number of delimiter lines must be exactly 2",
-        ),
-    ],
-)
-def test_bad_delim_placement(
-    dummy_file: str, errmsg: str, outputted_script: str
-) -> None:
+@mark.parametrize("provider", ["ollama", "openai"])
+def test_bad_delim_placement(provider: str, dummy_with_bad_delims: Path) -> None:
     instructions = "Replace the variable `c` with the integer 3"
     stderr = assert_command_failure(
-        "--provider=openai",
-        f"{LOC_TEST_DATA}/{dummy_file}",
+        f"{dummy_with_bad_delims}",
+        f"--provider={provider}",
         f"--instructions='{instructions}'",
-        f"-o{outputted_script}",
+        f"-o{dummy_with_bad_delims}",
     )
-    assert errmsg in stderr
+    assert "No matching closing delimiter line" in stderr
+
+
+@mark.parametrize("provider", ["ollama", "openai"])
+def test_bad_delim_placement_2(provider: str, dummy_with_bad_delims_2: Path) -> None:
+    instructions = "Replace the variable `c` with the integer 3"
+    stderr = assert_command_failure(
+        f"{dummy_with_bad_delims_2}",
+        f"--provider={provider}",
+        f"--instructions='{instructions}'",
+        f"-o{dummy_with_bad_delims_2}",
+    )
+    assert "The number of delimiter lines must be exactly 2" in stderr
 
 
 def test_work_on_empty_file() -> None:
