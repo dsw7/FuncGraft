@@ -23,3 +23,11 @@ def text_file() -> Generator[Path, None, None]:
         path_to_file.unlink()
     except FileNotFoundError:
         pass
+
+
+@fixture
+def dummy_python_file(python_file: Path) -> Generator[str, None, None]:
+    # Useful for cases where we just need to satisfy the input file
+    # requirement but we're otherwise doing nothing with the file
+    python_file.write_text("print('Lorem ipsum...')", encoding="utf-8")
+    yield str(python_file)

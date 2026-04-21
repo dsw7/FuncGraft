@@ -2,15 +2,6 @@ from os import environ
 from pathlib import Path
 from subprocess import run, PIPE
 
-LOC_TEST_DATA = Path("tests/test_files")
-
-
-def remove_file_when_done(path_to_file: Path) -> None:
-    try:
-        path_to_file.unlink()
-    except FileNotFoundError:
-        pass
-
 
 def assert_command_success(*args: str) -> str:
     command = [environ["PATH_BIN"]]

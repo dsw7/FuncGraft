@@ -32,32 +32,30 @@ def test_invalid_provider() -> None:
 
 
 @fixture
-def dummy_file(python_file: Path) -> Generator[str, None, None]:
-    python_file.write_text("nums = [1, c, 3]", encoding="utf-8")
-    yield str(python_file)
-
-
-@fixture
 def empty_instructions_file(text_file: Path) -> Generator[str, None, None]:
     text_file.write_text("", encoding="utf-8")
     yield str(text_file)
 
 
-def test_empty_instructions_file_arg(dummy_file: str) -> None:
-    stderr = assert_command_failure(dummy_file, "--file=")
+def test_empty_instructions_file_arg(dummy_python_file: Path) -> None:
+    stderr = assert_command_failure(f"{dummy_python_file}", "--file=")
     assert "Instructions filename was not provided. Cannot proceed" in stderr
 
 
-def test_missing_instructions_file(dummy_file: str) -> None:
-    stderr = assert_command_failure(dummy_file, "--file=foo.txt")
+def test_missing_instructions_file(dummy_python_file: Path) -> None:
+    stderr = assert_command_failure(f"{dummy_python_file}", "--file=foo.txt")
     assert "File 'foo.txt' does not exist!" in stderr
 
 
-def test_empty_instructions_file(dummy_file: str, empty_instructions_file: str) -> None:
-    stderr = assert_command_failure(dummy_file, f"--file={empty_instructions_file}")
+def test_empty_instructions_file(
+    dummy_python_file: Path, empty_instructions_file: str
+) -> None:
+    stderr = assert_command_failure(
+        f"{dummy_python_file}", f"--file={empty_instructions_file}"
+    )
     assert "Instructions are empty!" in stderr
 
 
-def test_empty_instructions(dummy_file: str) -> None:
-    stderr = assert_command_failure(dummy_file, "--instructions=")
+def test_empty_instructions(dummy_python_file: Path) -> None:
+    stderr = assert_command_failure(f"{dummy_python_file}", "--instructions=")
     assert "CLI instructions are empty. Cannot proceed" in stderr

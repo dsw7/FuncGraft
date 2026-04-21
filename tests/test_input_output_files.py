@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Generator
 from pytest import mark, fixture
-from utils import LOC_TEST_DATA, assert_command_failure
+from utils import assert_command_failure
 
 
 @fixture
@@ -116,9 +116,8 @@ def test_input_file_is_missing() -> None:
     assert "File 'abc.txt' does not exist!" in stderr
 
 
-def test_output_file_is_empty() -> None:
-    path_file = str(LOC_TEST_DATA / "dummy_basic.py")
-    stderr = assert_command_failure(path_file, "--output=")
+def test_output_file_is_empty(dummy_python_file: Path) -> None:
+    stderr = assert_command_failure(f"{dummy_python_file}", "--output=")
     assert "Output filename was not provided. Cannot proceed" in stderr
 
 
