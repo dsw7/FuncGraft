@@ -13,8 +13,10 @@ nlohmann::json get_structured_output_schema_()
         {
             "properties",
             {
+                { "was_refused", { { "type", "boolean" } } },
                 { "code", { { "type", "string" } } },
                 { "description_of_changes", { { "type", "string" } } },
+                { "reason_for_refusal", { { "type", "string" } } },
             },
         },
         { "required", { "code", "description_of_changes" } },
@@ -28,8 +30,16 @@ nlohmann::json build_conversation_(const std::string &prompt)
 You are a helpful assistant that specializes in programming.
 The user will provide some code and instructions on what to do with the the code.
 
-Set `code` to your updated code.
-Set `description_of_changes` to a summary of the changes you applied.
+If the query makes sense and is related to programming, then:
+  Set `was_refused` to false.
+  Set `code` to your updated code.
+  Set `description_of_changes` to a summary of the changes you applied.
+  Set `reason_for_refusal` to an empty string.
+Otherwise:
+  Set `was_refused` to true.
+  Set `code` to an empty string.
+  Set `description_of_changes` to an empty string.
+  Set `reason_for_refusal` to an explanation for why you rejected the query.
 )" } },
         { { "role", "user" }, { "content", prompt } },
     });
@@ -49,8 +59,11 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 struct StructuredOutput_ {
     StructuredOutput_(const std::string &message);
+    bool was_refused = false;
+
     std::string code;
     std::string description;
+    std::string reason_for_refusal;
 };
 
 StructuredOutput_::StructuredOutput_(const std::string &content)
@@ -63,8 +76,10 @@ StructuredOutput_::StructuredOutput_(const std::string &content)
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
+    this->was_refused = json.at("was_refused").get<bool>();
     this->code = json["code"];
     this->description = json["description_of_changes"];
+    this->reason_for_refusal = json["reason_for_refusal"];
 }
 
 } // namespace
