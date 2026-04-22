@@ -31,6 +31,7 @@ using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
+fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -135,10 +136,16 @@ void report_query_info_(const OllamaResponse &response)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Was query refused: {}\n", response.was_refused);
     fmt::print("Input tokens: {}\n", response.input_tokens);
     fmt::print("Output tokens: {}\n", response.output_tokens);
+
     fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", response.description);
+    if (response.was_refused) {
+        fmt::print(fg(yellow), "{}\n", response.description);
+    } else {
+        fmt::print(fg(blue), "{}\n", response.description);
+    }
 }
 
 std::string edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
