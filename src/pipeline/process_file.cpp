@@ -176,7 +176,7 @@ std::string edit_delimited_text_openai_(const Configurations &configs, const std
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -199,6 +199,10 @@ std::string edit_delimited_text_ollama_(const Configurations &configs, const std
     }
 
     report_query_info_(*results);
+
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
 
     text_parts.modified_text = results->output_text;
     return pack_parts_into_text(text_parts);
@@ -223,7 +227,7 @@ std::string edit_full_text_openai_(const Configurations &configs, const std::str
     return results->output_text;
 }
 
-std::string edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
@@ -239,6 +243,9 @@ std::string edit_full_text_ollama_(const Configurations &configs, const std::str
 
     report_query_info_(*results);
 
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
     return results->output_text;
 }
 
@@ -255,16 +262,22 @@ void process_file(const Configurations &configs)
     }
 
     bool text_delimited = is_text_delimited(input_text);
+    std::expected<std::string, std::string> updated_code_or_error;
     std::string output_text;
 
     if (text_delimited and configs.provider == "openai") {
         output_text = edit_delimited_text_openai_(configs, input_text);
     } else if (text_delimited and configs.provider == "ollama") {
-        output_text = edit_delimited_text_ollama_(configs, input_text);
+        updated_code_or_error = edit_delimited_text_ollama_(configs, input_text);
     } else if (not text_delimited and configs.provider == "openai") {
         output_text = edit_full_text_openai_(configs, input_text);
     } else {
-        output_text = edit_full_text_ollama_(configs, input_text);
+        updated_code_or_error = edit_full_text_ollama_(configs, input_text);
+    }
+
+    if (not updated_code_or_error) {
+        fmt::print(stderr, "Query was rejected\n");
+        return;
     }
 
     if (configs.output_file) {
