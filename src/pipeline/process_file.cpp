@@ -276,7 +276,7 @@ void process_file(const Configurations &configs)
     }
 
     if (not updated_code_or_error) {
-        fmt::print(stderr, "Query was rejected\n");
+        fmt::print("Query was rejected\n");
         return;
     } else {
         // XXX temporary
