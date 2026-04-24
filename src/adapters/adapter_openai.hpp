@@ -13,6 +13,7 @@ class OpenAIResponse {
 public:
     OpenAIResponse(const std::string &response);
 
+    bool was_refused = false;
     std::string description;
     std::string output_text;
 
