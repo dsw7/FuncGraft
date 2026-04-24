@@ -122,17 +122,8 @@ void print_prompt_if_verbose_(const std::string &prompt)
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_query_info_(const OpenAIResponse &response)
-{
-    utils::print_separator();
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Input tokens: {}\n", response.input_tokens);
-    fmt::print("Output tokens: {}\n", response.output_tokens);
-    fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", response.description);
-}
-
-void report_query_info_(const OllamaResponse &response)
+template<typename T>
+void report_query_info_(const T &response)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
