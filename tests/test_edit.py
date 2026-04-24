@@ -128,7 +128,7 @@ def test_work_on_unknown_file(provider: str, unknown_file: Path) -> None:
     assert "Foobar" in unknown_file.read_text(encoding="utf-8")
 
 
-@mark.parametrize("provider", ["ollama"])
+@mark.parametrize("provider", ["ollama", "openai"])
 def test_reject_unrelated_instructions(provider: str, file_to_edit: Path) -> None:
     instructions = "What is the weather in Omaha, Nebraska?"
     stdout = assert_command_success(
