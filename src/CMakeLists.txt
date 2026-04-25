@@ -12,6 +12,7 @@ set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 set(SRC_FILES
   adapters/adapter_ollama.cpp
   adapters/adapter_openai.cpp
+  adapters/components.cpp
   adapters/curl_base.cpp
   configs.cpp
   main.cpp
