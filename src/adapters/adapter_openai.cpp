@@ -24,23 +24,6 @@ std::string get_openai_user_api_key_()
     return api_key;
 }
 
-nlohmann::json get_structured_output_schema_()
-{
-    return {
-        { "type", "object" },
-        {
-            "properties",
-            {
-                { "was_refused", { { "type", "boolean" } } },
-                { "code", { { "type", "string" } } },
-                { "description_of_changes", { { "type", "string" } } },
-            },
-        },
-        { "required", { "was_refused", "code", "description_of_changes" } },
-        { "additionalProperties", false },
-    };
-}
-
 std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json response_format = {
@@ -48,7 +31,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
             "format",
             {
                 { "name", "updated_code" },
-                { "schema", get_structured_output_schema_() },
+                { "schema", components::get_structured_output_schema() },
                 { "strict", true },
                 { "type", "json_schema" },
             },

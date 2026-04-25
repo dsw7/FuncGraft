@@ -19,4 +19,21 @@ Otherwise:
 )";
 }
 
+nlohmann::json get_structured_output_schema()
+{
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "was_refused", { { "type", "boolean" } } },
+                { "code", { { "type", "string" } } },
+                { "description_of_changes", { { "type", "string" } } },
+            },
+        },
+        { "required", { "was_refused", "code", "description_of_changes" } },
+        { "additionalProperties", false },
+    };
+}
+
 } // namespace components

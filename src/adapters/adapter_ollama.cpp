@@ -8,22 +8,6 @@
 
 namespace {
 
-nlohmann::json get_structured_output_schema_()
-{
-    return {
-        { "type", "object" },
-        {
-            "properties",
-            {
-                { "was_refused", { { "type", "boolean" } } },
-                { "code", { { "type", "string" } } },
-                { "description_of_changes", { { "type", "string" } } },
-            },
-        },
-        { "required", { "was_refused", "code", "description_of_changes" } },
-    };
-}
-
 nlohmann::json build_conversation_(const std::string &prompt)
 {
     return nlohmann::json::array({
@@ -35,7 +19,7 @@ nlohmann::json build_conversation_(const std::string &prompt)
 std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const nlohmann::json fields = {
-        { "format", get_structured_output_schema_() },
+        { "format", components::get_structured_output_schema() },
         { "messages", build_conversation_(prompt) },
         { "model", model },
         { "stream", false },
