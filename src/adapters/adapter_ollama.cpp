@@ -28,29 +28,6 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
     return fields.dump();
 }
 
-struct StructuredOutput_ {
-    StructuredOutput_(const std::string &message);
-
-    bool was_refused = false;
-    std::string code;
-    std::string description;
-};
-
-StructuredOutput_::StructuredOutput_(const std::string &content)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(content);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->was_refused = json.at("was_refused").get<bool>();
-    this->code = json["code"];
-    this->description = json["description_of_changes"];
-}
-
 } // namespace
 
 namespace adapters {
@@ -73,10 +50,10 @@ OllamaResponse::OllamaResponse(const std::string &response)
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const StructuredOutput_ structured_output(json["message"]["content"]);
-    this->description = structured_output.description;
-    this->output_text = structured_output.code;
-    this->was_refused = structured_output.was_refused;
+    const components::StructuredOutput so(json["message"]["content"]);
+    this->description = so.description;
+    this->output_text = so.code;
+    this->was_refused = so.was_refused;
 
     this->input_tokens = json["prompt_eval_count"];
     this->output_tokens = json["eval_count"];
