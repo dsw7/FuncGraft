@@ -13,11 +13,12 @@ nlohmann::json get_structured_output_schema_()
         {
             "properties",
             {
+                { "was_refused", { { "type", "boolean" } } },
                 { "code", { { "type", "string" } } },
                 { "description_of_changes", { { "type", "string" } } },
             },
         },
-        { "required", { "code", "description_of_changes" } },
+        { "required", { "was_refused", "code", "description_of_changes" } },
     };
 }
 
@@ -28,8 +29,14 @@ nlohmann::json build_conversation_(const std::string &prompt)
 You are a helpful assistant that specializes in programming.
 The user will provide some code and instructions on what to do with the the code.
 
-Set `code` to your updated code.
-Set `description_of_changes` to a summary of the changes you applied.
+If the query makes sense and is related to programming, then:
+  Set `was_refused` to false.
+  Set `code` to your updated code.
+  Set `description_of_changes` to a summary of the changes you applied.
+Otherwise:
+  Set `was_refused` to true.
+  Set `code` to an empty string.
+  Set `description_of_changes` to a summary of why you refused to process the query.
 )" } },
         { { "role", "user" }, { "content", prompt } },
     });
@@ -49,6 +56,8 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 struct StructuredOutput_ {
     StructuredOutput_(const std::string &message);
+
+    bool was_refused = false;
     std::string code;
     std::string description;
 };
@@ -63,6 +72,7 @@ StructuredOutput_::StructuredOutput_(const std::string &content)
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
+    this->was_refused = json.at("was_refused").get<bool>();
     this->code = json["code"];
     this->description = json["description_of_changes"];
 }
@@ -92,6 +102,7 @@ OllamaResponse::OllamaResponse(const std::string &response)
     const StructuredOutput_ structured_output(json["message"]["content"]);
     this->description = structured_output.description;
     this->output_text = structured_output.code;
+    this->was_refused = structured_output.was_refused;
 
     this->input_tokens = json["prompt_eval_count"];
     this->output_tokens = json["eval_count"];

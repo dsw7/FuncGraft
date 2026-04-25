@@ -31,6 +31,7 @@ using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
 fmt::terminal_color blue = fmt::terminal_color::bright_blue;
+fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -121,27 +122,24 @@ void print_prompt_if_verbose_(const std::string &prompt)
     fmt::print(fg(blue), "{}", prompt);
 }
 
-void report_query_info_(const OpenAIResponse &response)
+template<typename T>
+void report_query_info_(const T &response)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Information:\n");
+    fmt::print("Was query refused: {}\n", response.was_refused);
     fmt::print("Input tokens: {}\n", response.input_tokens);
     fmt::print("Output tokens: {}\n", response.output_tokens);
+
     fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", response.description);
+    if (response.was_refused) {
+        fmt::print(fg(yellow), "{}\n", response.description);
+    } else {
+        fmt::print(fg(blue), "{}\n", response.description);
+    }
 }
 
-void report_query_info_(const OllamaResponse &response)
-{
-    utils::print_separator();
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Input tokens: {}\n", response.input_tokens);
-    fmt::print("Output tokens: {}\n", response.output_tokens);
-    fmt::print("Description of changes: ");
-    fmt::print(fg(blue), "{}\n", response.description);
-}
-
-std::string edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -165,11 +163,15 @@ std::string edit_delimited_text_openai_(const Configurations &configs, const std
 
     report_query_info_(*results);
 
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
+
     text_parts.modified_text = results->output_text;
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
     pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
 
@@ -193,11 +195,15 @@ std::string edit_delimited_text_ollama_(const Configurations &configs, const std
 
     report_query_info_(*results);
 
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
+
     text_parts.modified_text = results->output_text;
     return pack_parts_into_text(text_parts);
 }
 
-std::string edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
@@ -212,11 +218,15 @@ std::string edit_full_text_openai_(const Configurations &configs, const std::str
     }
 
     report_query_info_(*results);
+
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
 
     return results->output_text;
 }
 
-std::string edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = prompt::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
@@ -232,6 +242,9 @@ std::string edit_full_text_ollama_(const Configurations &configs, const std::str
 
     report_query_info_(*results);
 
+    if (results->was_refused) {
+        return std::unexpected(results->description);
+    }
     return results->output_text;
 }
 
@@ -248,27 +261,34 @@ void process_file(const Configurations &configs)
     }
 
     bool text_delimited = is_text_delimited(input_text);
-    std::string output_text;
+    std::expected<std::string, std::string> updated_code_or_error;
 
     if (text_delimited and configs.provider == "openai") {
-        output_text = edit_delimited_text_openai_(configs, input_text);
+        updated_code_or_error = edit_delimited_text_openai_(configs, input_text);
     } else if (text_delimited and configs.provider == "ollama") {
-        output_text = edit_delimited_text_ollama_(configs, input_text);
+        updated_code_or_error = edit_delimited_text_ollama_(configs, input_text);
     } else if (not text_delimited and configs.provider == "openai") {
-        output_text = edit_full_text_openai_(configs, input_text);
+        updated_code_or_error = edit_full_text_openai_(configs, input_text);
     } else {
-        output_text = edit_full_text_ollama_(configs, input_text);
+        updated_code_or_error = edit_full_text_ollama_(configs, input_text);
     }
+
+    if (not updated_code_or_error) {
+        fmt::print("Query was rejected\n");
+        return;
+    }
+
+    const std::string edited_text = updated_code_or_error.value();
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
-        export_edited_file(output_text, configs.output_file.value());
+        export_edited_file(edited_text, configs.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    export_edited_file_with_prompt(output_text, configs.input_file);
+    export_edited_file_with_prompt(edited_text, configs.input_file);
     utils::print_separator();
 #endif
 }
