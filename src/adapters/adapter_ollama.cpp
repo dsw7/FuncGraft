@@ -8,19 +8,16 @@
 
 namespace {
 
-nlohmann::json build_conversation_(const std::string &prompt)
+std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
-    return nlohmann::json::array({
+    const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", components::get_system_prompt() } },
         { { "role", "user" }, { "content", prompt } },
     });
-}
 
-std::string get_post_fields_(const std::string &prompt, const std::string &model)
-{
     const nlohmann::json fields = {
         { "format", components::get_structured_output_schema() },
-        { "messages", build_conversation_(prompt) },
+        { "messages", messages },
         { "model", model },
         { "stream", false },
     };
