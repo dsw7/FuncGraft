@@ -1,4 +1,4 @@
-.PHONY = format compile tidy clean lint compile-test test test-ollama py
+.PHONY = format compile tidy clean lint compile-test test test-ollama test-slow py
 .DEFAULT_GOAL = compile
 
 format:
@@ -41,6 +41,10 @@ test-ollama: format compile-test
 	@lcov --quiet --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml --quiet build/test/coverage.info --output-directory build/test/coverageResults
 	@echo "See coverage report at: build/test/coverageResults/index.html"
+
+test-slow : export PATH_BIN = $(CURDIR)/build/test/edit
+test-slow : format compile-test
+	@python3 -m pytest -vs -m "slow" tests/
 
 py:
 	@black tests/*.py
