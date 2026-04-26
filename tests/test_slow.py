@@ -1,4 +1,5 @@
 from pathlib import Path
+from pytest import mark
 from utils import assert_command_success, assert_python_script_runs
 
 
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     assert f"The sum is {1 + 2 + n}" in assert_python_script_runs(python_file)
 
 
+@mark.slow
 def test_omit_code_fences() -> None:
     python_file = Path("/tmp/funcgraft_test_file_2.py")
     passed = 0

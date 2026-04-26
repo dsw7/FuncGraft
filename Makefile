@@ -28,7 +28,7 @@ compile-test:
 
 test: export PATH_BIN = $(CURDIR)/build/test/edit
 test: format compile-test
-	@python3 -m pytest -vs -k "not ollama" tests/
+	@python3 -m pytest -vs -k "not ollama" -m "not slow" tests/
 	@lcov --quiet --capture --directory=build/test --output-file build/test/coverage.info
 	@lcov --quiet --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml --quiet build/test/coverage.info --output-directory build/test/coverageResults
@@ -36,7 +36,7 @@ test: format compile-test
 
 test-ollama: export PATH_BIN = $(CURDIR)/build/test/edit
 test-ollama: format compile-test
-	@python3 -m pytest -vs -k "not openai" tests/
+	@python3 -m pytest -vs -k "not openai" -m "not slow" tests/
 	@lcov --quiet --capture --directory=build/test --output-file build/test/coverage.info
 	@lcov --quiet --remove build/test/coverage.info "/usr/*" "*/external/*" --output-file build/test/coverage.info
 	@genhtml --quiet build/test/coverage.info --output-directory build/test/coverageResults
