@@ -1,4 +1,5 @@
 from pathlib import Path
+from colorama import Fore
 from pytest import mark
 from utils import assert_command_success, assert_python_script_runs
 
@@ -27,25 +28,48 @@ if __name__ == "__main__":
     assert f"The sum is {1 + 2 + n}" in assert_python_script_runs(python_file)
 
 
+def print_errors(errors: list[str]) -> None:
+    if len(errors) == 0:
+        return
+
+    counts = {}
+
+    for error in errors:
+        if error not in counts:
+            counts[error] = 1
+        else:
+            counts[error] += 1
+
+    print("\n" + "-" * 50)
+    for error, count in counts.items():
+        print(f"{Fore.LIGHTBLUE_EX} + {error} + {Fore.RESET}")
+        print(f"Number of errors of this type: {count}\n")
+
+
 @mark.slow
 def test_omit_code_fences() -> None:
     python_file = Path("/tmp/funcgraft_test_file_2.py")
     passed = 0
     failed = 0
 
+    errors = []
+
     print("\n")
     for n in range(1, 11):
         try:
             edit_test_file(python_file, n)
-        except AssertionError:
+        except AssertionError as e:
             failed += 1
-            print(f"  Trial {n} ✘")
+            print(f"  Trial {n} {Fore.RED}✘{Fore.RESET}")
+            errors.append(str(e))
         else:
             passed += 1
-            print(f"  Trial {n} ✓")
+            print(f"  Trial {n} {Fore.GREEN}✓{Fore.RESET}")
         finally:
             if python_file.exists():
                 python_file.unlink()
+
+    print_errors(errors)
 
     success_rate = (100 * passed) / (passed + failed)
     print(f"\nSuccess rate: {success_rate}%")
