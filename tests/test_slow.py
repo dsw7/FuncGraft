@@ -28,7 +28,7 @@ if __name__ == "__main__":
     assert f"The sum is {1 + 2 + n}" in assert_python_script_runs(python_file)
 
 
-def print_errors(errors: list[str]) -> None:
+def enumerate_and_print_errors(errors: list[str]) -> None:
     if len(errors) == 0:
         return
 
@@ -40,9 +40,11 @@ def print_errors(errors: list[str]) -> None:
         else:
             counts[error] += 1
 
-    print("\n" + "-" * 50)
+    print("\nERRORS:\n")
+
     for error, count in counts.items():
-        print(f"{Fore.LIGHTBLUE_EX} + {error} + {Fore.RESET}")
+        print("-" * 50)
+        print(f"{Fore.LIGHTBLUE_EX}{error}{Fore.RESET}")
         print(f"Number of errors of this type: {count}\n")
 
 
@@ -69,7 +71,7 @@ def test_omit_code_fences() -> None:
             if python_file.exists():
                 python_file.unlink()
 
-    print_errors(errors)
-
     success_rate = (100 * passed) / (passed + failed)
     print(f"\nSuccess rate: {success_rate}%")
+
+    enumerate_and_print_errors(errors)
