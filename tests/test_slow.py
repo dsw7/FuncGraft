@@ -57,7 +57,7 @@ def test_omit_code_fences() -> None:
     errors = []
 
     print("\n")
-    for n in range(1, 11):
+    for n in range(1, 51):
         try:
             edit_test_file(python_file, n)
         except AssertionError as e:
