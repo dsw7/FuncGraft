@@ -41,12 +41,12 @@ void time_api_call_()
 {
     const std::chrono::duration delay = std::chrono::milliseconds(100);
 
-    static std::array spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
+    static std::array spinner = { "⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ " };
     const int num_frames = spinner.size();
 
     while (TIMER_ENABLED.load()) {
         for (int i = 0; i < num_frames; ++i) {
-            std::cout << "\r" << spinner[i] << std::flush;
+            std::cout << " \r" << spinner[i] << std::flush;
             std::this_thread::sleep_for(delay);
         }
     }
