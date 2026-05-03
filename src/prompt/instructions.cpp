@@ -26,16 +26,15 @@ std::string load_instructions_from_stdin_()
     std::string instructions;
 
     while (true) {
-        fmt::print(fmt::emphasis::bold, "Input: ");
+        fmt::print(fmt::emphasis::bold, "> ");
         std::getline(std::cin, instructions);
 
-        if (instructions.empty()) {
-            fmt::print(fg(fmt::color::red), "Instructions are empty. Try again!\n\n");
-        } else {
+        if (not instructions.empty()) {
             break;
         }
     }
 
+    utils::print_separator();
     return instructions;
 }
 

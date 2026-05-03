@@ -1,5 +1,6 @@
 #include "utils.hpp"
 
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
 #include <sstream>
@@ -31,7 +32,7 @@ void print_separator()
     static unsigned short columns = get_terminal_columns_();
     static std::string separator = std::string(columns, '-');
 
-    fmt::print("{}\n", separator);
+    fmt::print(fg(fmt::color::gray), "{}\n", separator);
 }
 
 std::string read_from_file(const std::string &filename)
