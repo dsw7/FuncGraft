@@ -19,8 +19,9 @@ void print_help_messages()
 
 Program for editing individual files using LLMs. This program
 can currently connect to LLMs served by:
-  - OpenAI
-  - Ollama
+
+  • OpenAI
+  • Ollama
 
 Usage:
   edit [OPTIONS] FILENAME
