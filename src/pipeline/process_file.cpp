@@ -30,9 +30,6 @@ using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
 using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
-fmt::terminal_color blue = fmt::terminal_color::bright_blue;
-fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
-
 // Threading ------------------------------------------------------------------------------------------------
 
 std::atomic<bool> TIMER_ENABLED(false);
@@ -112,34 +109,33 @@ void print_code_being_targeted_(const std::string &code)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Delimited code:\n");
-    fmt::print(fg(blue), "{}", code);
+    fmt::print(fg(fmt::terminal_color::bright_blue), "{}", code);
 }
 
 void print_prompt_if_verbose_(const std::string &prompt)
 {
     utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
-    fmt::print(fg(blue), "{}", prompt);
+    fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
 }
 
 template<typename T>
 void report_query_info_(const T &response)
 {
     if (response.was_refused) {
-        fmt::print(fg(fmt::color::white) | bg(fmt::color::tomato), " Refused ");
+        fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red),
+            " Refused | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
     } else {
-        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod), " Success ");
+        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
+            " Success | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
     }
 
     fmt::print("\n\n");
 
-    fmt::print(" Input tokens: {}\n", response.input_tokens);
-    fmt::print("Output tokens: {}\n", response.output_tokens);
-    fmt::print("  Description: ");
     if (response.was_refused) {
-        fmt::print(fg(yellow), "{}\n", response.description);
+        fmt::print(fg(fmt::terminal_color::bright_yellow), "{}\n", response.description);
     } else {
-        fmt::print(fg(blue), "{}\n", response.description);
+        fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
     }
 }
 
