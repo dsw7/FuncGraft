@@ -125,13 +125,17 @@ void print_prompt_if_verbose_(const std::string &prompt)
 template<typename T>
 void report_query_info_(const T &response)
 {
-    utils::print_separator();
-    fmt::print(fmt::emphasis::bold, "Information:\n");
-    fmt::print("Was query refused: {}\n", response.was_refused);
-    fmt::print("Input tokens: {}\n", response.input_tokens);
-    fmt::print("Output tokens: {}\n", response.output_tokens);
+    if (response.was_refused) {
+        fmt::print(fg(fmt::color::white) | bg(fmt::color::tomato), " Refused ");
+    } else {
+        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod), " Success ");
+    }
 
-    fmt::print("Description of changes: ");
+    fmt::print("\n\n");
+
+    fmt::print(" Input tokens: {}\n", response.input_tokens);
+    fmt::print("Output tokens: {}\n", response.output_tokens);
+    fmt::print("  Description: ");
     if (response.was_refused) {
         fmt::print(fg(yellow), "{}\n", response.description);
     } else {
