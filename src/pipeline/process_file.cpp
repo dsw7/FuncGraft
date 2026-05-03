@@ -108,15 +108,16 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 void print_code_being_targeted_(const std::string &code)
 {
     utils::print_separator();
-    fmt::print(fmt::emphasis::bold, "Delimited code:\n");
+    fmt::print(fg(fmt::color::dim_gray), "@@@\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", code);
+    fmt::print(fg(fmt::color::dim_gray), "@@@\n");
 }
 
 void print_prompt_if_verbose_(const std::string &prompt)
 {
-    utils::print_separator();
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
+    utils::print_separator();
 }
 
 template<typename T>
