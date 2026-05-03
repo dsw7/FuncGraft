@@ -23,10 +23,19 @@ std::string load_instructions_from_file_(const std::filesystem::path &filename)
 std::string load_instructions_from_stdin_()
 {
     utils::print_separator();
-    fmt::print(fmt::emphasis::bold, "Input: ");
-
     std::string instructions;
-    std::getline(std::cin, instructions);
+
+    while (true) {
+        fmt::print(fmt::emphasis::bold, "Input: ");
+        std::getline(std::cin, instructions);
+
+        if (instructions.empty()) {
+            fmt::print(fg(fmt::color::red), "Instructions are empty. Try again!\n\n");
+        } else {
+            break;
+        }
+    }
+
     return instructions;
 }
 
