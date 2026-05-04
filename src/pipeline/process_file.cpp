@@ -182,7 +182,7 @@ std::expected<std::string, std::string> edit_delimited_text_openai_(const Config
 
     print_code_being_targeted_(text_parts.original_text);
 
-    const std::string instructions = prompt::load_instructions(configs);
+    const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
@@ -214,7 +214,7 @@ std::expected<std::string, std::string> edit_delimited_text_ollama_(const Config
 
     print_code_being_targeted_(text_parts.original_text);
 
-    const std::string instructions = prompt::load_instructions(configs);
+    const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
@@ -238,7 +238,7 @@ std::expected<std::string, std::string> edit_delimited_text_ollama_(const Config
 
 std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string instructions = prompt::load_instructions(configs);
+    const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
@@ -261,7 +261,7 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
 
 std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string instructions = prompt::load_instructions(configs);
+    const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {

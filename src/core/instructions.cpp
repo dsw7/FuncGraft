@@ -41,7 +41,8 @@ std::string load_instructions_from_stdin_()
 
 } // namespace
 
-namespace prompt {
+namespace core {
+namespace instructions {
 
 std::string load_instructions(const Configurations &configs)
 {
@@ -62,4 +63,5 @@ std::string load_instructions(const Configurations &configs)
     return instructions;
 }
 
-} // namespace prompt
+} // namespace instructions
+} // namespace core

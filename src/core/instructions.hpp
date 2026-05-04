@@ -4,6 +4,8 @@
 
 #include <string>
 
-namespace prompt {
+namespace core {
+namespace instructions {
 std::string load_instructions(const Configurations &configs);
 }
+} // namespace core
