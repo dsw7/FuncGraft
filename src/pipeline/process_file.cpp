@@ -3,6 +3,7 @@
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
 #include "configs.hpp"
+#include "console.hpp"
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
 #include "instructions.hpp"
@@ -29,6 +30,35 @@ using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
 
 using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
+
+std::string total_time_to_hhmmss_(const double total_time_s)
+{
+    int h = static_cast<int>(total_time_s) / 3600;
+    int m = (static_cast<int>(total_time_s) % 3600) / 60;
+    int s = static_cast<int>(total_time_s) % 60;
+
+    std::string result;
+
+    if (h > 0) {
+        result += std::to_string(h) + "h";
+        if (m > 0 || s > 0) {
+            result += " ";
+        }
+    }
+
+    if (m > 0) {
+        result += std::to_string(m) + "m";
+        if (s > 0) {
+            result += " ";
+        }
+    }
+
+    if (s > 0 || result.empty()) {
+        result += std::to_string(s) + "s";
+    }
+
+    return fmt::format("Total time: {}", result);
+}
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -107,7 +137,7 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 void print_code_being_targeted_(const std::string &code)
 {
-    utils::print_separator();
+    console::print_separator();
     fmt::print(fg(fmt::color::dim_gray), "@@@\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", code);
     fmt::print(fg(fmt::color::dim_gray), "@@@\n");
@@ -117,7 +147,7 @@ void print_prompt_if_verbose_(const std::string &prompt)
 {
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-    utils::print_separator();
+    console::print_separator();
 }
 
 template<typename T>
@@ -138,6 +168,8 @@ void report_query_info_(const T &response)
     } else {
         fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
     }
+
+    console::print_right_align(total_time_to_hhmmss_(response.total_time));
 }
 
 std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
@@ -288,9 +320,9 @@ void process_file(const Configurations &configs)
     }
 
 #ifndef TESTING_ENABLED
-    utils::print_separator();
+    console::print_separator();
     export_edited_file_with_prompt(edited_text, configs.input_file);
-    utils::print_separator();
+    console::print_separator();
 #endif
 }
 

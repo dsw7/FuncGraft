@@ -13,6 +13,8 @@ public:
     CurlBase &operator=(const CurlBase &) = delete;
 
 protected:
+    double get_rtt_time_();
+
     CURL *handle_ = nullptr;
 };
 

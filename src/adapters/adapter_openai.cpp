@@ -53,7 +53,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 namespace adapters {
 
-OpenAIResponse::OpenAIResponse(const std::string &response)
+OpenAIResponse::OpenAIResponse(const std::string &response, const double total_time)
 {
     try {
         this->response_ = nlohmann::json::parse(response);
@@ -77,6 +77,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response)
 
     this->input_tokens = this->response_["usage"]["input_tokens"];
     this->output_tokens = this->response_["usage"]["output_tokens"];
+    this->total_time = total_time;
 }
 
 std::string OpenAIResponse::extract_output_from_response_()
@@ -163,13 +164,18 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
     }
 
     long http_status_code = -1;
-    curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
-    if (http_status_code != 200) {
-        return std::unexpected(OpenAIError(response, http_status_code));
+    const CURLcode return_code = curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
+    if (return_code == CURLE_OK) {
+        if (http_status_code != 200) {
+            return std::unexpected(OpenAIError(response, http_status_code));
+        }
+    } else {
+        throw std::runtime_error(curl_easy_strerror(return_code));
     }
 
-    return OpenAIResponse(response);
+    const double total_time = this->get_rtt_time_();
+    return OpenAIResponse(response, total_time);
 }
 
 } // namespace adapters
