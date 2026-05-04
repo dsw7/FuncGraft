@@ -7,6 +7,7 @@
 #include "file_io.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
+#include "reporting.hpp"
 #include "text_manip.hpp"
 #include "utils.hpp"
 
@@ -135,14 +136,6 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 // ----------------------------------------------------------------------------------------------------------
 
-void print_code_being_targeted_(const std::string &code)
-{
-    console::print_separator();
-    fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-    fmt::print(fg(fmt::terminal_color::bright_blue), "{}", code);
-    fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-}
-
 void print_prompt_if_verbose_(const std::string &prompt)
 {
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
@@ -180,7 +173,7 @@ std::expected<std::string, std::string> edit_delimited_text_openai_(const Config
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
-    print_code_being_targeted_(text_parts.original_text);
+    core::reporting::print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
@@ -212,7 +205,7 @@ std::expected<std::string, std::string> edit_delimited_text_ollama_(const Config
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
-    print_code_being_targeted_(text_parts.original_text);
+    core::reporting::print_code_being_targeted(text_parts.original_text);
 
     const std::string instructions = core::instructions::load_instructions(configs);
     const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
