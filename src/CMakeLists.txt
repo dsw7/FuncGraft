@@ -20,9 +20,9 @@ set(SRC_FILES
   core/file_io.cpp
   core/instructions.cpp
   core/prompt.cpp
+  core/text_manip.cpp
   main.cpp
   pipeline/process_file.cpp
-  pipeline/text_manip.cpp
   utils.cpp
 )
 

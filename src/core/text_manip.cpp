@@ -16,14 +16,14 @@ const std::string MARKER_ORIGINAL_ = "<<<<<<< Original code\n";
 const std::string MARKER_SPLIT_ = "=======\n";
 const std::string MARKER_MODIFIED_ = ">>>>>>> Modified code\n";
 
-struct Positions {
+struct Positions_ {
     std::size_t pos_start_1 = 0;
     std::size_t pos_end_1 = 0;
     std::size_t pos_start_2 = 0;
     std::size_t pos_end_2 = 0;
 };
 
-Positions get_delimiter_positions_(const std::string &text)
+Positions_ get_delimiter_positions_(const std::string &text)
 {
     std::vector<std::size_t> indices;
     std::size_t pos = text.find(DELIMITER_LINE_);
@@ -41,7 +41,7 @@ Positions get_delimiter_positions_(const std::string &text)
         throw std::runtime_error("The number of delimiter lines must be exactly 2");
     }
 
-    Positions positions;
+    Positions_ positions;
     positions.pos_start_1 = indices[0];
     positions.pos_end_1 = indices[0] + SIZE_DELIM_LINE_;
     positions.pos_start_2 = indices[1];
@@ -51,7 +51,8 @@ Positions get_delimiter_positions_(const std::string &text)
 
 } // namespace
 
-namespace pipeline {
+namespace core {
+namespace text_manip {
 
 bool is_text_empty(const std::string &input_text)
 {
@@ -83,7 +84,7 @@ Parts unpack_text_into_parts(const std::string &input_text)
      *
      * So we can operate on the "core" only
      */
-    const Positions positions = get_delimiter_positions_(input_text);
+    const Positions_ positions = get_delimiter_positions_(input_text);
 
     Parts parts;
     parts.head = input_text.substr(0, positions.pos_start_1);
@@ -119,4 +120,5 @@ std::string pack_parts_into_text(const Parts &parts)
 #endif
 }
 
-} // namespace pipeline
+} // namespace text_manip
+} // namespace core

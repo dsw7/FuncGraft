@@ -174,9 +174,9 @@ void report_query_info_(const T &response)
 
 std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
 {
-    pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
+    core::text_manip::Parts text_parts = core::text_manip::unpack_text_into_parts(input_text);
 
-    if (pipeline::is_text_empty(text_parts.original_text)) {
+    if (core::text_manip::is_text_empty(text_parts.original_text)) {
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
@@ -206,9 +206,9 @@ std::expected<std::string, std::string> edit_delimited_text_openai_(const Config
 
 std::expected<std::string, std::string> edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
-    pipeline::Parts text_parts = pipeline::unpack_text_into_parts(input_text);
+    core::text_manip::Parts text_parts = core::text_manip::unpack_text_into_parts(input_text);
 
-    if (pipeline::is_text_empty(text_parts.original_text)) {
+    if (core::text_manip::is_text_empty(text_parts.original_text)) {
         throw std::runtime_error("The delimited block does not contain any code");
     }
 
@@ -289,11 +289,11 @@ void process_file(const Configurations &configs)
 {
     const std::string input_text = core::file_io::import_file_to_edit(configs.input_file);
 
-    if (is_text_empty(input_text)) {
+    if (core::text_manip::is_text_empty(input_text)) {
         throw std::runtime_error("The file does not contain any code");
     }
 
-    bool text_delimited = is_text_delimited(input_text);
+    bool text_delimited = core::text_manip::is_text_delimited(input_text);
     std::expected<std::string, std::string> updated_code_or_error;
 
     if (text_delimited and configs.provider == "openai") {
