@@ -3,6 +3,7 @@
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
 #include "configs.hpp"
+#include "console.hpp"
 #include "file_io.hpp"
 #include "generate_prompt.hpp"
 #include "instructions.hpp"
@@ -107,7 +108,7 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 void print_code_being_targeted_(const std::string &code)
 {
-    utils::print_separator();
+    console::print_separator();
     fmt::print(fg(fmt::color::dim_gray), "@@@\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", code);
     fmt::print(fg(fmt::color::dim_gray), "@@@\n");
@@ -117,7 +118,7 @@ void print_prompt_if_verbose_(const std::string &prompt)
 {
     fmt::print(fmt::emphasis::bold, "Prompt:\n");
     fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-    utils::print_separator();
+    console::print_separator();
 }
 
 template<typename T>
@@ -288,9 +289,9 @@ void process_file(const Configurations &configs)
     }
 
 #ifndef TESTING_ENABLED
-    utils::print_separator();
+    console::print_separator();
     export_edited_file_with_prompt(edited_text, configs.input_file);
-    utils::print_separator();
+    console::print_separator();
 #endif
 }
 
