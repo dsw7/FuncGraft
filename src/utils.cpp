@@ -4,8 +4,22 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 namespace utils {
+
+unsigned short get_term_width()
+{
+    static struct winsize window_size;
+    window_size.ws_col = 0;
+
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &window_size) == 0) {
+        return window_size.ws_col;
+    }
+
+    return 20;
+}
 
 std::string read_from_file(const std::string &filename)
 {

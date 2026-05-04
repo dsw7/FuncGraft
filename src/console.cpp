@@ -1,26 +1,16 @@
 #include "console.hpp"
 
+#include "utils.hpp"
+
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <sys/ioctl.h>
 
 namespace {
 
-unsigned short get_terminal_columns_()
-{
-    static struct winsize window_size;
-    window_size.ws_col = 0;
-
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &window_size) == 0) {
-        return window_size.ws_col;
-    }
-
-    return 20;
-}
-
 std::string build_separator_()
 {
-    static unsigned short width = get_terminal_columns_();
+    static unsigned short width = utils::get_term_width();
     std::string s;
 
     for (short i = 0; i < width; i++) {
@@ -42,7 +32,7 @@ void print_separator()
 
 void print_right_align(const std::string &message)
 {
-    static unsigned short width = get_terminal_columns_();
+    static unsigned short width = utils::get_term_width();
     static unsigned short r_pad = 2;
 
     const unsigned short l_pad = width - r_pad;
