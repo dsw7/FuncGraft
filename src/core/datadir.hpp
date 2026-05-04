@@ -4,8 +4,6 @@
 
 namespace core {
 namespace datadir {
-
-std::filesystem::path get_project_data_dir();
-
+std::filesystem::path get_config_file();
 }
 } // namespace core

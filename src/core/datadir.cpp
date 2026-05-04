@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <fmt/core.h>
 #include <stdexcept>
-#include <string>
 
 namespace {
 
@@ -34,9 +33,15 @@ std::filesystem::path get_project_dir_()
 namespace core {
 namespace datadir {
 
-std::filesystem::path get_project_data_dir()
+std::filesystem::path get_config_file()
 {
-    return get_project_dir_();
+    static std::filesystem::path config_file = get_project_dir_() / "funcgraft.toml";
+
+    if (not std::filesystem::exists(config_file)) {
+        throw std::runtime_error("Could not locate FuncGraft configuration file!");
+    }
+
+    return config_file;
 }
 
 } // namespace datadir
