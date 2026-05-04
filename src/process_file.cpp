@@ -16,8 +16,6 @@
 #include <atomic>
 #include <chrono>
 #include <expected>
-#include <filesystem>
-#include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <optional>
@@ -32,38 +30,9 @@ using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
 using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
-std::string total_time_to_hhmmss_(const double total_time_s)
-{
-    int h = static_cast<int>(total_time_s) / 3600;
-    int m = (static_cast<int>(total_time_s) % 3600) / 60;
-    int s = static_cast<int>(total_time_s) % 60;
-
-    std::string result;
-
-    if (h > 0) {
-        result += std::to_string(h) + "h";
-        if (m > 0 || s > 0) {
-            result += " ";
-        }
-    }
-
-    if (m > 0) {
-        result += std::to_string(m) + "m";
-        if (s > 0) {
-            result += " ";
-        }
-    }
-
-    if (s > 0 || result.empty()) {
-        result += std::to_string(s) + "s";
-    }
-
-    return fmt::format("Total time: {}", result);
-}
-
 // Threading ------------------------------------------------------------------------------------------------
 
-std::atomic<bool> TIMER_ENABLED(false);
+std::atomic<bool> TIMER_ENABLED_(false);
 
 void time_api_call_()
 {
@@ -72,7 +41,7 @@ void time_api_call_()
     static std::array spinner = { "⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ " };
     const int num_frames = spinner.size();
 
-    while (TIMER_ENABLED.load()) {
+    while (TIMER_ENABLED_.load()) {
         for (int i = 0; i < num_frames; ++i) {
             std::cout << " \r" << spinner[i] << std::flush;
             std::this_thread::sleep_for(delay);
@@ -84,7 +53,7 @@ void time_api_call_()
 
 OpenAIResults run_openai_query_with_threading_(const Configurations &configs, const std::string &prompt)
 {
-    TIMER_ENABLED.store(true);
+    TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
 
     std::optional<OpenAIResults> results;
@@ -98,7 +67,7 @@ OpenAIResults run_openai_query_with_threading_(const Configurations &configs, co
         query_failed = true;
     }
 
-    TIMER_ENABLED.store(false);
+    TIMER_ENABLED_.store(false);
     timer.join();
 
     if (query_failed) {
@@ -110,7 +79,7 @@ OpenAIResults run_openai_query_with_threading_(const Configurations &configs, co
 
 OllamaResults run_ollama_query_with_threading_(const Configurations &configs, const std::string &prompt)
 {
-    TIMER_ENABLED.store(true);
+    TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
 
     std::optional<OllamaResults> results;
@@ -124,7 +93,7 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
         query_failed = true;
     }
 
-    TIMER_ENABLED.store(false);
+    TIMER_ENABLED_.store(false);
     timer.join();
 
     if (query_failed) {
@@ -135,28 +104,6 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 }
 
 // ----------------------------------------------------------------------------------------------------------
-
-template<typename T>
-void report_query_info_(const T &response)
-{
-    if (response.was_refused) {
-        fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red),
-            " Refused | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-    } else {
-        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
-            " Success | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-    }
-
-    fmt::print("\n\n");
-
-    if (response.was_refused) {
-        fmt::print(fg(fmt::terminal_color::bright_yellow), "{}\n", response.description);
-    } else {
-        fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
-    }
-
-    console::print_right_align(total_time_to_hhmmss_(response.total_time));
-}
 
 std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
 {
@@ -180,7 +127,7 @@ std::expected<std::string, std::string> edit_delimited_text_openai_(const Config
         throw std::runtime_error(results.error().errmsg);
     }
 
-    report_query_info_(*results);
+    core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
         return std::unexpected(results->description);
@@ -212,7 +159,7 @@ std::expected<std::string, std::string> edit_delimited_text_ollama_(const Config
         throw std::runtime_error(results.error().errmsg);
     }
 
-    report_query_info_(*results);
+    core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
         return std::unexpected(results->description);
@@ -236,7 +183,7 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
         throw std::runtime_error(results.error().errmsg);
     }
 
-    report_query_info_(*results);
+    core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
         return std::unexpected(results->description);
@@ -259,7 +206,7 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
         throw std::runtime_error(results.error().errmsg);
     }
 
-    report_query_info_(*results);
+    core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
         return std::unexpected(results->description);
