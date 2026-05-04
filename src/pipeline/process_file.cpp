@@ -31,6 +31,35 @@ using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
 using adapters::OpenAIResponse;
 using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
+std::string total_time_to_hhmmss_(const double total_time_s)
+{
+    int h = static_cast<int>(total_time_s) / 3600;
+    int m = (static_cast<int>(total_time_s) % 3600) / 60;
+    int s = static_cast<int>(total_time_s) % 60;
+
+    std::string result;
+
+    if (h > 0) {
+        result += std::to_string(h) + "h";
+        if (m > 0 || s > 0) {
+            result += " ";
+        }
+    }
+
+    if (m > 0) {
+        result += std::to_string(m) + "m";
+        if (s > 0) {
+            result += " ";
+        }
+    }
+
+    if (s > 0 || result.empty()) {
+        result += std::to_string(s) + "s";
+    }
+
+    return fmt::format("Total time: {}", result);
+}
+
 // Threading ------------------------------------------------------------------------------------------------
 
 std::atomic<bool> TIMER_ENABLED(false);
@@ -139,6 +168,8 @@ void report_query_info_(const T &response)
     } else {
         fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
     }
+
+    console::print_right_align(total_time_to_hhmmss_(response.total_time));
 }
 
 std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
