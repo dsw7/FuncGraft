@@ -251,8 +251,8 @@ void process_file(const Configurations &configs)
     }
 
 #ifndef TESTING_ENABLED
-    console::print_separator();
+    utils::print_separator();
     core::file_io::export_edited_file_with_prompt(edited_text, configs.input_file);
-    console::print_separator();
+    utils::print_separator();
 #endif
 }

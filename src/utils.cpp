@@ -1,11 +1,27 @@
 #include "utils.hpp"
 
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+namespace {
+
+std::string build_separator_(const unsigned short length)
+{
+    std::string s;
+
+    for (short i = 0; i < length; i++) {
+        s += "\u2500";
+    }
+
+    return s;
+}
+
+} // namespace
 
 namespace utils {
 
@@ -19,6 +35,14 @@ unsigned short get_term_width()
     }
 
     return 20;
+}
+
+void print_separator()
+{
+    static unsigned short width = get_term_width();
+    static std::string separator = build_separator_(width);
+
+    fmt::print(fg(fmt::color::gray), "{}\n", separator);
 }
 
 std::string read_from_file(const std::string &filename)

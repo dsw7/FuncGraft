@@ -1,6 +1,5 @@
 #include "instructions.hpp"
 
-#include "console.hpp"
 #include "utils.hpp"
 
 #include <filesystem>
@@ -23,7 +22,7 @@ std::string load_instructions_from_file_(const std::filesystem::path &filename)
 
 std::string load_instructions_from_stdin_()
 {
-    console::print_separator();
+    utils::print_separator();
     std::string instructions;
 
     while (true) {
@@ -35,7 +34,7 @@ std::string load_instructions_from_stdin_()
         }
     }
 
-    console::print_separator();
+    utils::print_separator();
     return instructions;
 }
 
