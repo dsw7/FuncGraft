@@ -21,8 +21,8 @@ set(SRC_FILES
   pipeline/file_io.cpp
   pipeline/process_file.cpp
   pipeline/text_manip.cpp
-  prompt/generate_prompt.cpp
-  prompt/instructions.cpp
+  pipeline/generate_prompt.cpp
+  pipeline/instructions.cpp
   utils.cpp
 )
 
@@ -46,7 +46,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/core
   ${CMAKE_SOURCE_DIR}/external
   ${CMAKE_SOURCE_DIR}/pipeline
-  ${CMAKE_SOURCE_DIR}/prompt
 )
 
 # -----------------------------------------------------------------------------------------------------------

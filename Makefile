@@ -6,7 +6,6 @@ format:
 		src/*.cpp src/*.hpp \
 		src/adapters/*.cpp src/adapters/*.hpp \
 		src/pipeline/*.cpp src/pipeline/*.hpp \
-		src/prompt/*.cpp src/prompt/*.hpp \
 		src/core/*.cpp src/core/*.hpp
 
 compile: format
