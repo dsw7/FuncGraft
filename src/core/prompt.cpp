@@ -1,4 +1,4 @@
-#include "generate_prompt.hpp"
+#include "prompt.hpp"
 
 #include "utils.hpp"
 
@@ -77,6 +77,7 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 
 } // namespace
 
+namespace core {
 namespace prompt {
 
 std::string build_prompt(const std::string &instructions, const std::string &input_text, const std::string &extension)
@@ -99,3 +100,4 @@ To the following code:
 }
 
 } // namespace prompt
+} // namespace core

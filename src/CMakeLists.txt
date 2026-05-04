@@ -18,11 +18,11 @@ set(SRC_FILES
   console.cpp
   core/datadir.cpp
   core/instructions.cpp
+  core/prompt.cpp
   main.cpp
   pipeline/file_io.cpp
   pipeline/process_file.cpp
   pipeline/text_manip.cpp
-  pipeline/generate_prompt.cpp
   utils.cpp
 )
 
