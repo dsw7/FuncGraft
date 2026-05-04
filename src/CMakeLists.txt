@@ -17,10 +17,10 @@ set(SRC_FILES
   configs.cpp
   console.cpp
   core/datadir.cpp
+  core/file_io.cpp
   core/instructions.cpp
   core/prompt.cpp
   main.cpp
-  pipeline/file_io.cpp
   pipeline/process_file.cpp
   pipeline/text_manip.cpp
   utils.cpp

@@ -287,7 +287,7 @@ namespace pipeline {
 
 void process_file(const Configurations &configs)
 {
-    const std::string input_text = import_file_to_edit(configs.input_file);
+    const std::string input_text = core::file_io::import_file_to_edit(configs.input_file);
 
     if (is_text_empty(input_text)) {
         throw std::runtime_error("The file does not contain any code");
@@ -315,13 +315,13 @@ void process_file(const Configurations &configs)
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
-        export_edited_file(edited_text, configs.output_file.value());
+        core::file_io::export_edited_file(edited_text, configs.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     console::print_separator();
-    export_edited_file_with_prompt(edited_text, configs.input_file);
+    core::file_io::export_edited_file_with_prompt(edited_text, configs.input_file);
     console::print_separator();
 #endif
 }
