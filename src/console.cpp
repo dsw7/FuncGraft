@@ -18,15 +18,25 @@ unsigned short get_terminal_columns_()
     return 20;
 }
 
+std::string build_separator_()
+{
+    static unsigned short width = get_terminal_columns_();
+    std::string s;
+
+    for (short i = 0; i < width; i++) {
+        s += "\u2500";
+    }
+
+    return s;
+}
+
 } // namespace
 
 namespace console {
 
 void print_separator()
 {
-    static unsigned short width = get_terminal_columns_();
-    static std::string separator = std::string(width, '-');
-
+    static std::string separator = build_separator_();
     fmt::print(fg(fmt::color::gray), "{}\n", separator);
 }
 
