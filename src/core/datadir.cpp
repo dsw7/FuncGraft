@@ -5,10 +5,9 @@
 #include <stdexcept>
 #include <string>
 
-namespace core {
-namespace datadir {
+namespace {
 
-std::filesystem::path get_project_data_dir()
+std::filesystem::path get_home_dir_()
 {
     const char *home_dir = std::getenv("HOME");
 
@@ -16,13 +15,28 @@ std::filesystem::path get_project_data_dir()
         throw std::runtime_error("Could not locate user home directory!");
     }
 
-    const std::string proj_dir = std::string(home_dir) + "/.funcgraft";
+    return std::filesystem::path(home_dir);
+}
+
+std::filesystem::path get_project_dir_()
+{
+    static std::filesystem::path proj_dir = get_home_dir_() / ".funcgraft";
 
     if (not std::filesystem::exists(proj_dir)) {
-        throw std::runtime_error(fmt::format("Could not locate '{}'", proj_dir));
+        throw std::runtime_error(fmt::format("Could not locate '{}'", proj_dir.string()));
     }
 
-    return std::filesystem::path(proj_dir);
+    return proj_dir;
+}
+
+} // namespace
+
+namespace core {
+namespace datadir {
+
+std::filesystem::path get_project_data_dir()
+{
+    return get_project_dir_();
 }
 
 } // namespace datadir
