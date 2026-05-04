@@ -22,7 +22,7 @@ set(SRC_FILES
   core/prompt.cpp
   core/text_manip.cpp
   main.cpp
-  pipeline/process_file.cpp
+  process_file.cpp
   utils.cpp
 )
 

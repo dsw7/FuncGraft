@@ -5,7 +5,6 @@ format:
 	@clang-format -i --verbose --style=file \
 		src/*.cpp src/*.hpp \
 		src/adapters/*.cpp src/adapters/*.hpp \
-		src/pipeline/*.cpp src/pipeline/*.hpp \
 		src/core/*.cpp src/core/*.hpp
 
 compile: format
