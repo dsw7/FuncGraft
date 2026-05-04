@@ -29,7 +29,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 namespace adapters {
 
-OllamaResponse::OllamaResponse(const std::string &response)
+OllamaResponse::OllamaResponse(const std::string &response, const double total_time)
 {
     nlohmann::json json;
 
@@ -54,6 +54,7 @@ OllamaResponse::OllamaResponse(const std::string &response)
 
     this->input_tokens = json["prompt_eval_count"];
     this->output_tokens = json["eval_count"];
+    this->total_time = total_time;
 }
 
 OllamaError::OllamaError(const std::string &response, const int status_code) :
@@ -116,7 +117,8 @@ std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std:
         throw std::runtime_error(curl_easy_strerror(return_code));
     }
 
-    return OllamaResponse(response);
+    const double total_time = this->get_rtt_time_();
+    return OllamaResponse(response, total_time);
 }
 
 } // namespace adapters
