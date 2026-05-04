@@ -136,13 +136,6 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 // ----------------------------------------------------------------------------------------------------------
 
-void print_prompt_if_verbose_(const std::string &prompt)
-{
-    fmt::print(fmt::emphasis::bold, "Prompt:\n");
-    fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-    console::print_separator();
-}
-
 template<typename T>
 void report_query_info_(const T &response)
 {
@@ -179,7 +172,7 @@ std::expected<std::string, std::string> edit_delimited_text_openai_(const Config
     const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
-        print_prompt_if_verbose_(prompt);
+        core::reporting::print_prompt(prompt);
     }
 
     const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
@@ -211,7 +204,7 @@ std::expected<std::string, std::string> edit_delimited_text_ollama_(const Config
     const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
 
     if (configs.verbose) {
-        print_prompt_if_verbose_(prompt);
+        core::reporting::print_prompt(prompt);
     }
 
     const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
@@ -235,7 +228,7 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
     const std::string prompt = core::prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
-        print_prompt_if_verbose_(prompt);
+        core::reporting::print_prompt(prompt);
     }
 
     const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
@@ -258,7 +251,7 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
     const std::string prompt = core::prompt::build_prompt(instructions, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
-        print_prompt_if_verbose_(prompt);
+        core::reporting::print_prompt(prompt);
     }
 
     const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
