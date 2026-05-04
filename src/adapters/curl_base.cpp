@@ -40,4 +40,16 @@ CurlBase::~CurlBase()
     curl_global_cleanup();
 }
 
+double CurlBase::get_rtt_time_()
+{
+    double rtt_time = 0.0;
+
+    const CURLcode return_code = curl_easy_getinfo(this->handle_, CURLINFO_TOTAL_TIME, &rtt_time);
+    if (return_code != CURLE_OK) {
+        throw std::runtime_error(curl_easy_strerror(return_code));
+    }
+
+    return rtt_time;
+}
+
 } // namespace adapters
