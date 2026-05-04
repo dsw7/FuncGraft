@@ -3,7 +3,6 @@
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
 #include "configs.hpp"
-#include "console.hpp"
 #include "file_io.hpp"
 #include "instructions.hpp"
 #include "prompt.hpp"
@@ -188,7 +187,6 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
     if (results->was_refused) {
         return std::unexpected(results->description);
     }
-
     return results->output_text;
 }
 

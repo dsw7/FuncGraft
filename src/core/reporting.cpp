@@ -1,12 +1,19 @@
 #include "reporting.hpp"
 
-#include "console.hpp"
 #include "utils.hpp"
 
 #include <fmt/color.h>
 #include <fmt/core.h>
 
 namespace {
+
+void print_right_aligned_text_(const std::string &message)
+{
+    static unsigned short width = utils::get_term_width();
+    static unsigned short r_pad = 2;
+
+    fmt::print(fg(fmt::color::gray), "{:>{}}\n", message, width - r_pad);
+}
 
 std::string total_time_to_hhmmss_(const double total_time_s)
 {
@@ -56,7 +63,7 @@ void print_query_info_(const T &response)
         fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
     }
 
-    console::print_right_align(total_time_to_hhmmss_(response.total_time));
+    print_right_aligned_text_(total_time_to_hhmmss_(response.total_time));
 }
 
 } // namespace

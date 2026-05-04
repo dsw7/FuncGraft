@@ -15,7 +15,6 @@ set(SRC_FILES
   adapters/components.cpp
   adapters/curl_base.cpp
   configs.cpp
-  console.cpp
   core/datadir.cpp
   core/file_io.cpp
   core/instructions.cpp
