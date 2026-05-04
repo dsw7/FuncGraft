@@ -16,6 +16,7 @@ set(SRC_FILES
   adapters/curl_base.cpp
   configs.cpp
   console.cpp
+  core/datadir.cpp
   main.cpp
   pipeline/file_io.cpp
   pipeline/process_file.cpp
@@ -42,6 +43,7 @@ endif()
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/adapters
+  ${CMAKE_SOURCE_DIR}/core
   ${CMAKE_SOURCE_DIR}/external
   ${CMAKE_SOURCE_DIR}/pipeline
   ${CMAKE_SOURCE_DIR}/prompt

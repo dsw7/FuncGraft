@@ -1,4 +1,5 @@
 #include "configs.hpp"
+#include "datadir.hpp"
 #include "process_file.hpp"
 #include "utils.hpp"
 
@@ -108,7 +109,7 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
 
 void load_additional_configs_from_file(Configurations &configs)
 {
-    const std::filesystem::path proj_config = utils::get_project_data_dir() / "funcgraft.toml";
+    const std::filesystem::path proj_config = core::datadir::get_project_data_dir() / "funcgraft.toml";
 
     if (not std::filesystem::exists(proj_config)) {
         throw std::runtime_error("Could not locate FuncGraft configuration file!");
