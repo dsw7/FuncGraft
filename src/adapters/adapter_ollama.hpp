@@ -9,12 +9,13 @@
 namespace adapters {
 
 struct OllamaResponse {
-    OllamaResponse(const std::string &response);
+    OllamaResponse(const std::string &response, const double total_time);
 
     bool was_refused = false;
     std::string description;
     std::string output_text;
 
+    double total_time = 0.0;
     int input_tokens = 0;
     int output_tokens = 0;
 };
