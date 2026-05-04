@@ -141,7 +141,7 @@ int main(int argc, char **argv)
     try {
         load_additional_configs_from_file(configs);
         configs.validate_configurations();
-        pipeline::process_file(configs);
+        process_file(configs);
     } catch (const std::runtime_error &e) {
         fmt::print(stderr, fg(fmt::color::red), "{}\n", e.what());
         return 1;

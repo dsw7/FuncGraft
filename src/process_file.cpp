@@ -283,8 +283,6 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
 
 } // namespace
 
-namespace pipeline {
-
 void process_file(const Configurations &configs)
 {
     const std::string input_text = core::file_io::import_file_to_edit(configs.input_file);
@@ -325,5 +323,3 @@ void process_file(const Configurations &configs)
     console::print_separator();
 #endif
 }
-
-} // namespace pipeline
