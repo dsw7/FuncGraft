@@ -103,6 +103,17 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 // ----------------------------------------------------------------------------------------------------------
 
+bool is_text_empty_(const std::string &input_text)
+{
+    if (input_text.empty()) {
+        return true;
+    }
+
+    return std::all_of(input_text.begin(), input_text.end(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    });
+}
+
 std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = core::instructions::load_instructions(configs);
@@ -153,6 +164,10 @@ void process_file(const Configurations &configs)
 {
     core::file_io::FileToEdit file(configs.input_file);
     std::string input_text = file.get_file_content();
+
+    if (is_text_empty_(input_text)) {
+        throw std::runtime_error("No code to edit");
+    }
 
     std::expected<std::string, std::string> updated_code_or_error;
 
