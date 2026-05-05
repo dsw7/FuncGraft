@@ -26,6 +26,7 @@ public:
     Content(const std::filesystem::path &filename);
     std::string get_file_content();
     void set_file_content(const std::string &content);
+    bool is_delimited();
     void export_content_to_file(const std::filesystem::path &filename);
 
 private:

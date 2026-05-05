@@ -136,6 +136,11 @@ void Content::set_file_content(const std::string &content)
     }
 }
 
+bool Content::is_delimited()
+{
+    return std::holds_alternative<DelimitedContent>(this->content_);
+}
+
 void Content::export_content_to_file(const std::filesystem::path &filename)
 {
     if (std::holds_alternative<std::string>(this->content_)) {
