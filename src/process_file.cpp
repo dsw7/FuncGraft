@@ -169,6 +169,10 @@ void process_file(const Configurations &configs)
         throw std::runtime_error("No code to edit");
     }
 
+    if (content.is_delimited()) {
+        core::reporting::print_code_being_targeted(input_text);
+    }
+
     std::expected<std::string, std::string> updated_code_or_error;
 
     if (configs.provider == "openai") {

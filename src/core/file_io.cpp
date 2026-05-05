@@ -1,6 +1,5 @@
 #include "file_io.hpp"
 
-#include "reporting.hpp"
 #include "utils.hpp"
 
 #include <fmt/core.h>
@@ -122,9 +121,7 @@ std::string Content::get_file_content()
         return std::get<std::string>(this->content_);
     }
 
-    const std::string content = std::get<DelimitedContent>(this->content_).get_core_original();
-    reporting::print_code_being_targeted(content);
-    return content;
+    return std::get<DelimitedContent>(this->content_).get_core_original();
 }
 
 void Content::set_file_content(const std::string &content)
