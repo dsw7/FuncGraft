@@ -155,7 +155,7 @@ def test_work_on_empty_file(provider: str, file_to_edit_is_empty: Path) -> None:
         f"--provider={provider}",
         f"--instructions='{instructions}'",
     )
-    assert "The file does not contain any code" in stderr
+    assert "No code to edit" in stderr
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
@@ -168,7 +168,7 @@ def test_work_with_empty_delims(
         f"--provider={provider}",
         f"--instructions='{instructions}'",
     )
-    assert "The delimited block does not contain any code" in stderr
+    assert "No code to edit" in stderr
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
@@ -181,4 +181,4 @@ def test_work_with_empty_delims_2(
         f"--provider={provider}",
         f"--instructions='{instructions}'",
     )
-    assert "The delimited block does not contain any code" in stderr
+    assert "No code to edit" in stderr
