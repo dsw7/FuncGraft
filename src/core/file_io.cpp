@@ -51,21 +51,21 @@ void DelimitedContent::unpack_content_into_parts(const std::string &content)
     std::size_t pos_end_2 = indices[1] + size_delim_line;
 
     this->head_ = content.substr(0, pos_start_1);
-    this->core_ = content.substr(pos_end_1, pos_start_2 - pos_end_1);
+    this->core_original_ = content.substr(pos_end_1, pos_start_2 - pos_end_1);
     this->tail_ = content.substr(pos_end_2);
 }
 
-std::string DelimitedContent::get_core()
+std::string DelimitedContent::get_core_original()
 {
-    return this->core_;
+    return this->core_original_;
 }
 
-void DelimitedContent::set_modified_core(const std::string &modified_core)
+void DelimitedContent::set_core_modified(const std::string &modified_core)
 {
-    this->modified_core_ = modified_core;
+    this->core_modified_ = modified_core;
 
-    if (not this->modified_core_.empty() and this->modified_core_.back() != '\n') {
-        this->modified_core_ += '\n';
+    if (not this->core_modified_.empty() and this->core_modified_.back() != '\n') {
+        this->core_modified_ += '\n';
     }
 }
 
@@ -75,7 +75,7 @@ std::string DelimitedContent::pack_parts_into_content()
     return fmt::format(
         "{}{}{}",
         this->head_,
-        this->modified_core_,
+        this->core_modified_,
         this->tail_);
 #else
     static std::string marker_original = "<<<<<<< Original code\n";
@@ -86,9 +86,9 @@ std::string DelimitedContent::pack_parts_into_content()
         "{}{}{}{}{}{}{}",
         this->head_,
         marker_original,
-        this->core_,
+        this->core_original_,
         marker_split,
-        this->modified_core_,
+        this->core_modified_,
         marker_modified,
         this->tail_);
 #endif
@@ -117,7 +117,7 @@ FileToEdit::FileToEdit(const std::filesystem::path &filename)
 std::string FileToEdit::get_file_content()
 {
     if (this->is_delimited_) {
-        return this->delim_content_.get_core();
+        return this->delim_content_.get_core_original();
     }
 
     return this->content_;
@@ -126,7 +126,7 @@ std::string FileToEdit::get_file_content()
 void FileToEdit::set_file_content(const std::string &content)
 {
     if (this->is_delimited_) {
-        this->delim_content_.set_modified_core(content);
+        this->delim_content_.set_core_modified(content);
     } else {
         this->content_ = content;
     }

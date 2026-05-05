@@ -9,14 +9,14 @@ namespace file_io {
 class DelimitedContent {
 public:
     void unpack_content_into_parts(const std::string &content);
-    std::string get_core();
-    void set_modified_core(const std::string &modified_core);
+    std::string get_core_original();
+    void set_core_modified(const std::string &modified_core);
     std::string pack_parts_into_content();
 
 private:
     std::string head_;
-    std::string core_;
-    std::string modified_core_;
+    std::string core_original_;
+    std::string core_modified_;
     std::string tail_;
 };
 
