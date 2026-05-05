@@ -1,5 +1,6 @@
 #include "file_io.hpp"
 
+#include "reporting.hpp"
 #include "utils.hpp"
 
 #include <fmt/core.h>
@@ -117,7 +118,9 @@ FileToEdit::FileToEdit(const std::filesystem::path &filename)
 std::string FileToEdit::get_file_content()
 {
     if (this->is_delimited_) {
-        return this->delim_content_.get_core_original();
+        const std::string content = this->delim_content_.get_core_original();
+        reporting::print_code_being_targeted(content);
+        return content;
     }
 
     return this->content_;

@@ -7,7 +7,6 @@
 #include "instructions.hpp"
 #include "prompt.hpp"
 #include "reporting.hpp"
-#include "text_manip.hpp"
 #include "utils.hpp"
 
 #include <algorithm>
@@ -104,70 +103,6 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
 
 // ----------------------------------------------------------------------------------------------------------
 
-std::expected<std::string, std::string> edit_delimited_text_openai_(const Configurations &configs, const std::string &input_text)
-{
-    core::text_manip::Parts text_parts = core::text_manip::unpack_text_into_parts(input_text);
-
-    if (core::text_manip::is_text_empty(text_parts.original_text)) {
-        throw std::runtime_error("The delimited block does not contain any code");
-    }
-
-    core::reporting::print_code_being_targeted(text_parts.original_text);
-
-    const std::string instructions = core::instructions::load_instructions(configs);
-    const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
-
-    if (configs.verbose) {
-        core::reporting::print_prompt(prompt);
-    }
-
-    const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
-
-    core::reporting::print_query_info(*results);
-
-    if (results->was_refused) {
-        return std::unexpected(results->description);
-    }
-
-    text_parts.modified_text = results->output_text;
-    return pack_parts_into_text(text_parts);
-}
-
-std::expected<std::string, std::string> edit_delimited_text_ollama_(const Configurations &configs, const std::string &input_text)
-{
-    core::text_manip::Parts text_parts = core::text_manip::unpack_text_into_parts(input_text);
-
-    if (core::text_manip::is_text_empty(text_parts.original_text)) {
-        throw std::runtime_error("The delimited block does not contain any code");
-    }
-
-    core::reporting::print_code_being_targeted(text_parts.original_text);
-
-    const std::string instructions = core::instructions::load_instructions(configs);
-    const std::string prompt = core::prompt::build_prompt(instructions, text_parts.original_text, configs.input_file.extension());
-
-    if (configs.verbose) {
-        core::reporting::print_prompt(prompt);
-    }
-
-    const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
-
-    core::reporting::print_query_info(*results);
-
-    if (results->was_refused) {
-        return std::unexpected(results->description);
-    }
-
-    text_parts.modified_text = results->output_text;
-    return pack_parts_into_text(text_parts);
-}
-
 std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = core::instructions::load_instructions(configs);
@@ -219,18 +154,9 @@ void process_file(const Configurations &configs)
     core::file_io::FileToEdit file(configs.input_file);
     std::string input_text = file.get_file_content();
 
-    if (core::text_manip::is_text_empty(input_text)) {
-        throw std::runtime_error("The file does not contain any code");
-    }
-
-    bool text_delimited = core::text_manip::is_text_delimited(input_text);
     std::expected<std::string, std::string> updated_code_or_error;
 
-    if (text_delimited and configs.provider == "openai") {
-        updated_code_or_error = edit_delimited_text_openai_(configs, input_text);
-    } else if (text_delimited and configs.provider == "ollama") {
-        updated_code_or_error = edit_delimited_text_ollama_(configs, input_text);
-    } else if (not text_delimited and configs.provider == "openai") {
+    if (configs.provider == "openai") {
         updated_code_or_error = edit_full_text_openai_(configs, input_text);
     } else {
         updated_code_or_error = edit_full_text_ollama_(configs, input_text);
