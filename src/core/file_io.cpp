@@ -95,7 +95,7 @@ std::string DelimitedContent::pack_parts_into_content()
 #endif
 }
 
-FileToEdit::FileToEdit(const std::filesystem::path &filename)
+Content::Content(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
@@ -115,7 +115,7 @@ FileToEdit::FileToEdit(const std::filesystem::path &filename)
     }
 }
 
-std::string FileToEdit::get_file_content()
+std::string Content::get_file_content()
 {
     if (this->is_delimited_) {
         const std::string content = this->delim_content_.get_core_original();
@@ -126,7 +126,7 @@ std::string FileToEdit::get_file_content()
     return this->content_;
 }
 
-void FileToEdit::set_file_content(const std::string &content)
+void Content::set_file_content(const std::string &content)
 {
     if (this->is_delimited_) {
         this->delim_content_.set_core_modified(content);
@@ -135,7 +135,7 @@ void FileToEdit::set_file_content(const std::string &content)
     }
 }
 
-void FileToEdit::export_content(const std::filesystem::path &filename)
+void Content::export_content_to_file(const std::filesystem::path &filename)
 {
     if (this->is_delimited_) {
         utils::write_to_file(filename, this->delim_content_.pack_parts_into_content());

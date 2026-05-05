@@ -20,12 +20,12 @@ private:
     std::string tail_;
 };
 
-class FileToEdit {
+class Content {
 public:
-    FileToEdit(const std::filesystem::path &filename);
+    Content(const std::filesystem::path &filename);
     std::string get_file_content();
     void set_file_content(const std::string &content);
-    void export_content(const std::filesystem::path &filename);
+    void export_content_to_file(const std::filesystem::path &filename);
 
 private:
     std::string content_;

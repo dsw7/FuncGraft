@@ -162,8 +162,8 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
 
 void process_file(const Configurations &configs)
 {
-    core::file_io::FileToEdit file(configs.input_file);
-    std::string input_text = file.get_file_content();
+    core::file_io::Content content(configs.input_file);
+    std::string input_text = content.get_file_content();
 
     if (is_text_empty_(input_text)) {
         throw std::runtime_error("No code to edit");
@@ -182,11 +182,11 @@ void process_file(const Configurations &configs)
         return;
     }
 
-    file.set_file_content(updated_code_or_error.value());
+    content.set_file_content(updated_code_or_error.value());
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
-        file.export_content(configs.output_file.value());
+        content.export_content_to_file(configs.output_file.value());
         return;
     }
 
@@ -206,7 +206,7 @@ void process_file(const Configurations &configs)
     }
 
     if (choice == 'y') {
-        file.export_content(configs.input_file);
+        content.export_content_to_file(configs.input_file);
     }
     utils::print_separator();
 #endif
