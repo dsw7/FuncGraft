@@ -8,18 +8,10 @@
 
 namespace {
 const std::string DELIMITER_LINE_ = "@@@\n";
+}
 
-class DelimitedContent {
-public:
-    void unpack_content_into_parts(const std::string &content);
-    std::string get_core();
-    std::string pack_parts_into_content(std::string &modified_core);
-
-private:
-    std::string head_;
-    std::string core_;
-    std::string tail_;
-};
+namespace core {
+namespace file_io {
 
 void DelimitedContent::unpack_content_into_parts(const std::string &content)
 {
@@ -68,17 +60,22 @@ std::string DelimitedContent::get_core()
     return this->core_;
 }
 
-std::string DelimitedContent::pack_parts_into_content(std::string &modified_core)
+void DelimitedContent::set_modified_core(const std::string &modified_core)
 {
-    if (not modified_core.empty() and modified_core.back() != '\n') {
-        modified_core += '\n';
-    }
+    this->modified_core_ = modified_core;
 
+    if (not this->modified_core_.empty() and this->modified_core_.back() != '\n') {
+        this->modified_core_ += '\n';
+    }
+}
+
+std::string DelimitedContent::pack_parts_into_content()
+{
 #ifdef TESTING_ENABLED
     return fmt::format(
         "{}{}{}",
         this->head_,
-        modified_core,
+        this->modified_core_,
         this->tail_);
 #else
     static std::string marker_original = "<<<<<<< Original code\n";
@@ -91,16 +88,11 @@ std::string DelimitedContent::pack_parts_into_content(std::string &modified_core
         marker_original,
         this->core_,
         marker_split,
-        modified_core,
+        this->modified_core_,
         marker_modified,
         this->tail_);
 #endif
 }
-
-} // namespace
-
-namespace core {
-namespace file_io {
 
 FileToEdit::FileToEdit(const std::filesystem::path &filename)
 {
@@ -112,23 +104,41 @@ FileToEdit::FileToEdit(const std::filesystem::path &filename)
         throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
     }
 
-    this->content_ = utils::read_from_file(filename);
-    this->is_delimited_ = this->content_.find(DELIMITER_LINE_) != std::string::npos;
+    const std::string content = utils::read_from_file(filename);
+    this->is_delimited_ = content.find(DELIMITER_LINE_) != std::string::npos;
+
+    if (this->is_delimited_) {
+        this->delim_content_.unpack_content_into_parts(content);
+    } else {
+        this->content_ = content;
+    }
 }
 
 std::string FileToEdit::get_file_content()
 {
+    if (this->is_delimited_) {
+        return this->delim_content_.get_core();
+    }
+
     return this->content_;
 }
 
 void FileToEdit::set_file_content(const std::string &content)
 {
-    this->content_ = content;
+    if (this->is_delimited_) {
+        this->delim_content_.set_modified_core(content);
+    } else {
+        this->content_ = content;
+    }
 }
 
 void FileToEdit::export_content(const std::filesystem::path &filename)
 {
-    utils::write_to_file(filename, this->content_);
+    if (this->is_delimited_) {
+        utils::write_to_file(filename, this->delim_content_.pack_parts_into_content());
+    } else {
+        utils::write_to_file(filename, this->content_);
+    }
 }
 
 } // namespace file_io
