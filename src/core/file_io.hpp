@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <variant>
 
 namespace core {
 namespace file_io {
@@ -28,9 +29,7 @@ public:
     void export_content_to_file(const std::filesystem::path &filename);
 
 private:
-    std::string content_;
-    bool is_delimited_ = false;
-    DelimitedContent delim_content_;
+    std::variant<std::string, DelimitedContent> content_;
 };
 
 } // namespace file_io

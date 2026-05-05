@@ -106,10 +106,11 @@ Content::Content(const std::filesystem::path &filename)
     }
 
     const std::string content = utils::read_from_file(filename);
-    this->is_delimited_ = content.find(DELIMITER_LINE_) != std::string::npos;
 
-    if (this->is_delimited_) {
-        this->delim_content_.unpack_content_into_parts(content);
+    if (content.find(DELIMITER_LINE_) != std::string::npos) {
+        DelimitedContent delim_content;
+        delim_content.unpack_content_into_parts(content);
+        this->content_ = delim_content;
     } else {
         this->content_ = content;
     }
@@ -117,30 +118,31 @@ Content::Content(const std::filesystem::path &filename)
 
 std::string Content::get_file_content()
 {
-    if (this->is_delimited_) {
-        const std::string content = this->delim_content_.get_core_original();
-        reporting::print_code_being_targeted(content);
-        return content;
+    if (std::holds_alternative<std::string>(this->content_)) {
+        return std::get<std::string>(this->content_);
     }
 
-    return this->content_;
+    const std::string content = std::get<DelimitedContent>(this->content_).get_core_original();
+    reporting::print_code_being_targeted(content);
+    return content;
 }
 
 void Content::set_file_content(const std::string &content)
 {
-    if (this->is_delimited_) {
-        this->delim_content_.set_core_modified(content);
+    if (std::holds_alternative<std::string>(this->content_)) {
+        std::get<std::string>(this->content_) = content;
     } else {
-        this->content_ = content;
+        std::get<DelimitedContent>(this->content_).set_core_modified(content);
     }
 }
 
 void Content::export_content_to_file(const std::filesystem::path &filename)
 {
-    if (this->is_delimited_) {
-        utils::write_to_file(filename, this->delim_content_.pack_parts_into_content());
+    if (std::holds_alternative<std::string>(this->content_)) {
+        utils::write_to_file(filename, std::get<std::string>(this->content_));
     } else {
-        utils::write_to_file(filename, this->content_);
+        const std::string content = std::get<DelimitedContent>(this->content_).pack_parts_into_content();
+        utils::write_to_file(filename, content);
     }
 }
 
