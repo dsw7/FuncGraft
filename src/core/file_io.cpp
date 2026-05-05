@@ -5,6 +5,10 @@
 #include <fmt/core.h>
 #include <stdexcept>
 
+namespace {
+const std::string DELIMITER_LINE_ = "@@@\n";
+}
+
 namespace core {
 namespace file_io {
 
@@ -19,6 +23,7 @@ FileToEdit::FileToEdit(const std::filesystem::path &filename)
     }
 
     this->content_ = utils::read_from_file(filename);
+    this->is_delimited_ = this->content_.find(DELIMITER_LINE_) != std::string::npos;
 }
 
 std::string FileToEdit::get_file_content()

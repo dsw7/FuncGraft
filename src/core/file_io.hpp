@@ -3,8 +3,6 @@
 #include <filesystem>
 #include <string>
 
-namespace fs = std::filesystem;
-
 namespace core {
 namespace file_io {
 
@@ -17,6 +15,7 @@ public:
 
 private:
     std::string content_;
+    bool is_delimited_ = false;
 };
 
 } // namespace file_io
