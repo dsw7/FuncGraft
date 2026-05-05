@@ -9,11 +9,11 @@
 namespace {
 const std::string DELIMITER_LINE_ = "@@@\n";
 
-class DelimitedContent_ {
+class DelimitedContent {
 public:
-    void unpack_text_into_parts(const std::string &content);
+    void unpack_content_into_parts(const std::string &content);
     std::string get_core();
-    std::string pack_parts_into_text(std::string &modified_core);
+    std::string pack_parts_into_content(std::string &modified_core);
 
 private:
     std::string head_;
@@ -21,7 +21,7 @@ private:
     std::string tail_;
 };
 
-void DelimitedContent_::unpack_text_into_parts(const std::string &content)
+void DelimitedContent::unpack_content_into_parts(const std::string &content)
 {
     /*
      * Unpack text of form:
@@ -63,12 +63,12 @@ void DelimitedContent_::unpack_text_into_parts(const std::string &content)
     this->tail_ = content.substr(pos_end_2);
 }
 
-std::string DelimitedContent_::get_core()
+std::string DelimitedContent::get_core()
 {
     return this->core_;
 }
 
-std::string DelimitedContent_::pack_parts_into_text(std::string &modified_core)
+std::string DelimitedContent::pack_parts_into_content(std::string &modified_core)
 {
     if (not modified_core.empty() and modified_core.back() != '\n') {
         modified_core += '\n';
