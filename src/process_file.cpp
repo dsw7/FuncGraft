@@ -216,7 +216,8 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
 
 void process_file(const Configurations &configs)
 {
-    const std::string input_text = core::file_io::import_file_to_edit(configs.input_file);
+    core::file_io::FileToEdit file(configs.input_file);
+    std::string input_text = file.get_file_content();
 
     if (core::text_manip::is_text_empty(input_text)) {
         throw std::runtime_error("The file does not contain any code");

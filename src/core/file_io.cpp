@@ -37,19 +37,6 @@ void FileToEdit::export_content(const std::filesystem::path &filename)
     utils::write_to_file(filename, this->content_);
 }
 
-std::string import_file_to_edit(const fs::path &filename)
-{
-    if (not fs::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
-    if (not fs::is_regular_file(filename)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
-    }
-
-    return utils::read_from_file(filename);
-}
-
 void export_edited_file(const std::string &code, const fs::path &filename)
 {
     utils::write_to_file(filename, code);
