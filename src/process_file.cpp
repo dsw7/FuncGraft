@@ -241,17 +241,32 @@ void process_file(const Configurations &configs)
         return;
     }
 
-    const std::string edited_text = updated_code_or_error.value();
+    file.set_file_content(updated_code_or_error.value());
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
-        core::file_io::export_edited_file(edited_text, configs.output_file.value());
+        file.export_content(configs.output_file.value());
         return;
     }
 
 #ifndef TESTING_ENABLED
     utils::print_separator();
-    core::file_io::export_edited_file_with_prompt(edited_text, configs.input_file);
+    char choice = 'n';
+
+    while (true) {
+        fmt::print("Overwrite file? [y/n]: ");
+        choice = std::cin.get();
+
+        if (choice == 'y' or choice == 'n') {
+            break;
+        } else {
+            fmt::print("Invalid choice. Input either 'y' or 'n'!\n");
+        }
+    }
+
+    if (choice == 'y') {
+        file.export_content(configs.input_file);
+    }
     utils::print_separator();
 #endif
 }

@@ -3,7 +3,6 @@
 #include "utils.hpp"
 
 #include <fmt/core.h>
-#include <iostream>
 #include <stdexcept>
 
 namespace core {
@@ -35,31 +34,6 @@ void FileToEdit::set_file_content(const std::string &content)
 void FileToEdit::export_content(const std::filesystem::path &filename)
 {
     utils::write_to_file(filename, this->content_);
-}
-
-void export_edited_file(const std::string &code, const fs::path &filename)
-{
-    utils::write_to_file(filename, code);
-}
-
-void export_edited_file_with_prompt(const std::string &code, const fs::path &filename)
-{
-    char choice = 'n';
-
-    while (true) {
-        fmt::print("Overwrite file? [y/n]: ");
-        choice = std::cin.get();
-
-        if (choice == 'y' or choice == 'n') {
-            break;
-        } else {
-            fmt::print("Invalid choice. Input either 'y' or 'n'!\n");
-        }
-    }
-
-    if (choice == 'y') {
-        export_edited_file(code, filename);
-    }
 }
 
 } // namespace file_io
