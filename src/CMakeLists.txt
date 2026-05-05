@@ -20,7 +20,6 @@ set(SRC_FILES
   core/instructions.cpp
   core/prompt.cpp
   core/reporting.cpp
-  core/text_manip.cpp
   main.cpp
   process_file.cpp
   utils.cpp
