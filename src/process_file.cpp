@@ -115,7 +115,7 @@ bool is_text_empty_(const std::string &input_text)
 
 std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string prompt = core::prompt::build_prompt(configs, input_text, configs.input_file.extension());
+    const std::string prompt = core::prompt::build_prompt(configs, input_text);
 
     if (configs.verbose) {
         core::reporting::print_prompt(prompt);
@@ -136,7 +136,7 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
 
 std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string prompt = core::prompt::build_prompt(configs, input_text, configs.input_file.extension());
+    const std::string prompt = core::prompt::build_prompt(configs, input_text);
 
     if (configs.verbose) {
         core::reporting::print_prompt(prompt);

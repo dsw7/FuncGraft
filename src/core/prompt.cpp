@@ -60,7 +60,7 @@ std::string load_instructions_(const Configurations &configs)
     return instructions;
 }
 
-std::optional<std::string> resolve_label_from_extension_(const std::string &extension)
+std::optional<std::string> resolve_label_from_extension_(const std::filesystem::path &filename)
 {
     static std::map<std::string, std::string> ext_to_label {
         { ".bash", "bash" },
@@ -91,6 +91,8 @@ std::optional<std::string> resolve_label_from_extension_(const std::string &exte
         { ".yaml", "yaml" },
         { ".yml", "yaml" },
     };
+
+    const std::string extension = filename.extension();
 
     if (ext_to_label.contains(extension)) {
         return ext_to_label[extension];
@@ -130,12 +132,12 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 namespace core {
 namespace prompt {
 
-std::string build_prompt(const Configurations &configs, const std::string &input_text, const std::string &extension)
+std::string build_prompt(const Configurations &configs, const std::string &input_text)
 {
     const std::string instructions = load_instructions_(configs);
     std::string code_block_to_edit;
 
-    if (const auto label = resolve_label_from_extension_(extension); label.has_value()) {
+    if (const auto label = resolve_label_from_extension_(configs.input_file); label.has_value()) {
         code_block_to_edit = get_code_block_(input_text, *label);
     } else {
         code_block_to_edit = get_code_block_(input_text);
