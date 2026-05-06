@@ -15,10 +15,6 @@ namespace {
 
 std::string load_instructions_from_file_(const std::filesystem::path &filename)
 {
-    if (not std::filesystem::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
     fmt::print("Loading instructions from file '{}'\n", filename.string());
     return utils::read_from_file(filename);
 }

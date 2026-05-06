@@ -92,14 +92,6 @@ std::string DelimitedCode::pack_parts_into_content()
 
 CodeToEdit::CodeToEdit(const std::filesystem::path &filename)
 {
-    if (not std::filesystem::exists(filename)) {
-        throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
-    }
-
-    if (not std::filesystem::is_regular_file(filename)) {
-        throw std::runtime_error(fmt::format("Input '{}' is not a file!", filename.string()));
-    }
-
     const std::string content = utils::read_from_file(filename);
 
     if (content.find(DELIMITER_LINE_) != std::string::npos) {
