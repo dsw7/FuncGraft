@@ -170,7 +170,7 @@ void process_file(const Configurations &configs)
         core::reporting::print_prompt(prompt);
     }
 
-    std::optional<std::string> updated_text = edit_text_using_llm_(configs, prompt);
+    const std::optional<std::string> updated_text = edit_text_using_llm_(configs, prompt);
 
     if (not updated_text) {
         return;
