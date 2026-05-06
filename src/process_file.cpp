@@ -22,10 +22,7 @@
 namespace {
 
 using adapters::OllamaResponse;
-using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
-
 using adapters::OpenAIResponse;
-using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -48,8 +45,10 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-OpenAIResults run_openai_query_with_threading_(const Configurations &configs, const std::string &prompt)
+OpenAIResponse run_openai_query_with_threading_(const Configurations &configs, const std::string &prompt)
 {
+    using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
+
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
 
@@ -71,11 +70,19 @@ OpenAIResults run_openai_query_with_threading_(const Configurations &configs, co
         throw std::runtime_error(errmsg);
     }
 
-    return results.value();
+    OpenAIResults response = results.value();
+
+    if (not response) {
+        throw std::runtime_error(response.error().errmsg);
+    }
+
+    return *response;
 }
 
-OllamaResults run_ollama_query_with_threading_(const Configurations &configs, const std::string &prompt)
+OllamaResponse run_ollama_query_with_threading_(const Configurations &configs, const std::string &prompt)
 {
+    using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
+
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
 
@@ -97,7 +104,13 @@ OllamaResults run_ollama_query_with_threading_(const Configurations &configs, co
         throw std::runtime_error(errmsg);
     }
 
-    return results.value();
+    OllamaResults response = results.value();
+
+    if (not response) {
+        throw std::runtime_error(response.error().errmsg);
+    }
+
+    return *response;
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -115,32 +128,26 @@ bool is_text_empty_(const std::string &input_text)
 
 std::optional<std::string> edit_using_openai_(const Configurations &configs, const std::string &prompt)
 {
-    const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
+    const OpenAIResponse response = run_openai_query_with_threading_(configs, prompt);
+    core::reporting::print_query_info(response);
 
-    core::reporting::print_query_info(*results);
-
-    if (results->was_refused) {
+    if (response.was_refused) {
         return std::nullopt;
     }
-    return results->output_text;
+
+    return response.output_text;
 }
 
 std::optional<std::string> edit_using_ollama_(const Configurations &configs, const std::string &prompt)
 {
-    const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
+    const OllamaResponse response = run_ollama_query_with_threading_(configs, prompt);
+    core::reporting::print_query_info(response);
 
-    core::reporting::print_query_info(*results);
-
-    if (results->was_refused) {
+    if (response.was_refused) {
         return std::nullopt;
     }
-    return results->output_text;
+
+    return response.output_text;
 }
 
 } // namespace
