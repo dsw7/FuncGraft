@@ -137,4 +137,4 @@ def test_reject_unrelated_instructions(provider: str, file_to_edit: Path) -> Non
         f"--instructions='{instructions}'",
         f"--output={file_to_edit}",
     )
-    assert "Query was rejected\n" in stdout
+    assert "Refused |" in stdout
