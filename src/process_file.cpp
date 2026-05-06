@@ -8,7 +8,6 @@
 #include "reporting.hpp"
 #include "utils.hpp"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -116,17 +115,6 @@ OllamaResponse run_ollama_query_with_threading_(const Configurations &configs, c
 
 // ----------------------------------------------------------------------------------------------------------
 
-bool is_text_empty_(const std::string &input_text)
-{
-    if (input_text.empty()) {
-        return true;
-    }
-
-    return std::all_of(input_text.begin(), input_text.end(), [](char c) {
-        return std::isspace(static_cast<unsigned char>(c));
-    });
-}
-
 std::optional<std::string> edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
     std::variant<OpenAIResponse, OllamaResponse> response;
@@ -156,10 +144,6 @@ void process_file(const Configurations &configs)
     const std::string raw_text = utils::read_from_file(configs.input_file);
     core::code::CodeToEdit content(raw_text);
     std::string input_text = content.get_original_code();
-
-    if (is_text_empty_(input_text)) {
-        throw std::runtime_error("No code to edit");
-    }
 
     if (content.is_delimited()) {
         core::reporting::print_code_being_targeted(input_text);

@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -97,9 +98,20 @@ std::optional<std::string> resolve_label_from_extension_(const std::filesystem::
     return std::nullopt;
 }
 
-std::string get_code_block_(const std::string &body)
+bool is_body_empty_(const std::string &body)
 {
     if (body.empty()) {
+        return true;
+    }
+
+    return std::all_of(body.begin(), body.end(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    });
+}
+
+std::string get_code_block_(const std::string &body)
+{
+    if (is_body_empty_(body)) {
         throw std::runtime_error("Body is empty. Cannot extract code block");
     }
 
@@ -112,7 +124,7 @@ std::string get_code_block_(const std::string &body)
 
 std::string get_code_block_(const std::string &body, const std::string &label)
 {
-    if (body.empty()) {
+    if (is_body_empty_(body)) {
         throw std::runtime_error("Body is empty. Cannot extract code block");
     }
 
