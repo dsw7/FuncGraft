@@ -7,7 +7,7 @@
 namespace core {
 namespace code {
 
-class DelimitedContent {
+class DelimitedCode {
 public:
     void unpack_content_into_parts(const std::string &content);
     std::string get_core_original();
@@ -30,7 +30,7 @@ public:
     void export_content_to_file(const std::filesystem::path &filename);
 
 private:
-    std::variant<std::string, DelimitedContent> content_;
+    std::variant<std::string, DelimitedCode> content_;
 };
 
 } // namespace code

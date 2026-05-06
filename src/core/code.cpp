@@ -13,7 +13,7 @@ const std::string DELIMITER_LINE_ = "@@@\n";
 namespace core {
 namespace code {
 
-void DelimitedContent::unpack_content_into_parts(const std::string &content)
+void DelimitedCode::unpack_content_into_parts(const std::string &content)
 {
     /*
      * Unpack text of form:
@@ -55,12 +55,12 @@ void DelimitedContent::unpack_content_into_parts(const std::string &content)
     this->tail_ = content.substr(pos_end_2);
 }
 
-std::string DelimitedContent::get_core_original()
+std::string DelimitedCode::get_core_original()
 {
     return this->core_original_;
 }
 
-void DelimitedContent::set_core_modified(const std::string &modified_core)
+void DelimitedCode::set_core_modified(const std::string &modified_core)
 {
     this->core_modified_ = modified_core;
 
@@ -69,7 +69,7 @@ void DelimitedContent::set_core_modified(const std::string &modified_core)
     }
 }
 
-std::string DelimitedContent::pack_parts_into_content()
+std::string DelimitedCode::pack_parts_into_content()
 {
 #ifdef TESTING_ENABLED
     return fmt::format(
@@ -103,7 +103,7 @@ CodeToEdit::CodeToEdit(const std::filesystem::path &filename)
     const std::string content = utils::read_from_file(filename);
 
     if (content.find(DELIMITER_LINE_) != std::string::npos) {
-        DelimitedContent delim_content;
+        DelimitedCode delim_content;
         delim_content.unpack_content_into_parts(content);
         this->content_ = delim_content;
     } else {
@@ -117,7 +117,7 @@ std::string CodeToEdit::get_file_content()
         return std::get<std::string>(this->content_);
     }
 
-    return std::get<DelimitedContent>(this->content_).get_core_original();
+    return std::get<DelimitedCode>(this->content_).get_core_original();
 }
 
 void CodeToEdit::set_file_content(const std::string &content)
@@ -125,13 +125,13 @@ void CodeToEdit::set_file_content(const std::string &content)
     if (std::holds_alternative<std::string>(this->content_)) {
         std::get<std::string>(this->content_) = content;
     } else {
-        std::get<DelimitedContent>(this->content_).set_core_modified(content);
+        std::get<DelimitedCode>(this->content_).set_core_modified(content);
     }
 }
 
 bool CodeToEdit::is_delimited()
 {
-    return std::holds_alternative<DelimitedContent>(this->content_);
+    return std::holds_alternative<DelimitedCode>(this->content_);
 }
 
 void CodeToEdit::export_content_to_file(const std::filesystem::path &filename)
@@ -139,7 +139,7 @@ void CodeToEdit::export_content_to_file(const std::filesystem::path &filename)
     if (std::holds_alternative<std::string>(this->content_)) {
         utils::write_to_file(filename, std::get<std::string>(this->content_));
     } else {
-        const std::string content = std::get<DelimitedContent>(this->content_).pack_parts_into_content();
+        const std::string content = std::get<DelimitedCode>(this->content_).pack_parts_into_content();
         utils::write_to_file(filename, content);
     }
 }
