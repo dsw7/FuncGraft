@@ -113,14 +113,8 @@ bool is_text_empty_(const std::string &input_text)
     });
 }
 
-std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &prompt)
 {
-    const std::string prompt = core::prompt::build_prompt(configs, input_text);
-
-    if (configs.verbose) {
-        core::reporting::print_prompt(prompt);
-    }
-
     const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
@@ -134,14 +128,8 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
     return results->output_text;
 }
 
-std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
+std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &prompt)
 {
-    const std::string prompt = core::prompt::build_prompt(configs, input_text);
-
-    if (configs.verbose) {
-        core::reporting::print_prompt(prompt);
-    }
-
     const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
@@ -168,6 +156,12 @@ void process_file(const Configurations &configs)
 
     if (content.is_delimited()) {
         core::reporting::print_code_being_targeted(input_text);
+    }
+
+    const std::string prompt = core::prompt::build_prompt(configs, input_text);
+
+    if (configs.verbose) {
+        core::reporting::print_prompt(prompt);
     }
 
     std::expected<std::string, std::string> updated_code_or_error;
