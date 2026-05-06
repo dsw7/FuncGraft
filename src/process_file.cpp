@@ -143,25 +143,23 @@ void process_file(const Configurations &configs)
 {
     const std::string raw_text = utils::read_from_file(configs.input_file);
     core::code::CodeToEdit content(raw_text);
-    std::string input_text = content.get_original_code();
 
+    std::string original_code = content.get_original_code();
     if (content.is_delimited()) {
-        core::reporting::print_code_being_targeted(input_text);
+        core::reporting::print_code_being_targeted(original_code);
     }
 
-    const std::string prompt = core::prompt::build_prompt(configs, input_text);
-
+    const std::string prompt = core::prompt::build_prompt(configs, original_code);
     if (configs.verbose) {
         core::reporting::print_prompt(prompt);
     }
 
-    const std::optional<std::string> modified_text = edit_text_using_llm_(configs, prompt);
-
-    if (not modified_text) {
+    const std::optional<std::string> modified_code = edit_text_using_llm_(configs, prompt);
+    if (not modified_code) {
         return;
     }
 
-    content.overwrite_original_code(*modified_text);
+    content.overwrite_original_code(*modified_code);
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
