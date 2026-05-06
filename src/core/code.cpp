@@ -90,46 +90,46 @@ std::string DelimitedCode::pack_parts_into_content()
 #endif
 }
 
-CodeToEdit::CodeToEdit(const std::string &raw_text)
+CodeToEdit::CodeToEdit(const std::string &original_code)
 {
-    if (raw_text.find(DELIMITER_LINE_) != std::string::npos) {
-        DelimitedCode delim_content;
-        delim_content.unpack_content_into_parts(raw_text);
-        this->content_ = delim_content;
+    if (original_code.find(DELIMITER_LINE_) != std::string::npos) {
+        DelimitedCode delimited_code;
+        delimited_code.unpack_content_into_parts(original_code);
+        this->code_ = delimited_code;
     } else {
-        this->content_ = raw_text;
+        this->code_ = original_code;
     }
 }
 
 std::string CodeToEdit::get_file_content()
 {
-    if (std::holds_alternative<std::string>(this->content_)) {
-        return std::get<std::string>(this->content_);
+    if (std::holds_alternative<std::string>(this->code_)) {
+        return std::get<std::string>(this->code_);
     }
 
-    return std::get<DelimitedCode>(this->content_).get_core_original();
+    return std::get<DelimitedCode>(this->code_).get_core_original();
 }
 
 void CodeToEdit::set_file_content(const std::string &content)
 {
-    if (std::holds_alternative<std::string>(this->content_)) {
-        std::get<std::string>(this->content_) = content;
+    if (std::holds_alternative<std::string>(this->code_)) {
+        std::get<std::string>(this->code_) = content;
     } else {
-        std::get<DelimitedCode>(this->content_).set_core_modified(content);
+        std::get<DelimitedCode>(this->code_).set_core_modified(content);
     }
 }
 
 bool CodeToEdit::is_delimited()
 {
-    return std::holds_alternative<DelimitedCode>(this->content_);
+    return std::holds_alternative<DelimitedCode>(this->code_);
 }
 
 void CodeToEdit::export_content_to_file(const std::filesystem::path &filename)
 {
-    if (std::holds_alternative<std::string>(this->content_)) {
-        utils::write_to_file(filename, std::get<std::string>(this->content_));
+    if (std::holds_alternative<std::string>(this->code_)) {
+        utils::write_to_file(filename, std::get<std::string>(this->code_));
     } else {
-        const std::string content = std::get<DelimitedCode>(this->content_).pack_parts_into_content();
+        const std::string content = std::get<DelimitedCode>(this->code_).pack_parts_into_content();
         utils::write_to_file(filename, content);
     }
 }

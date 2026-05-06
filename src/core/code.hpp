@@ -23,14 +23,14 @@ private:
 
 class CodeToEdit {
 public:
-    CodeToEdit(const std::string &raw_text);
+    CodeToEdit(const std::string &original_code);
     std::string get_file_content();
     void set_file_content(const std::string &content);
     bool is_delimited();
     void export_content_to_file(const std::filesystem::path &filename);
 
 private:
-    std::variant<std::string, DelimitedCode> content_;
+    std::variant<std::string, DelimitedCode> code_;
 };
 
 } // namespace code
