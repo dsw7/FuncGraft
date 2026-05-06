@@ -101,7 +101,7 @@ CodeToEdit::CodeToEdit(const std::string &original_code)
     }
 }
 
-std::string CodeToEdit::get_file_content()
+std::string CodeToEdit::get_original_code()
 {
     if (std::holds_alternative<std::string>(this->code_)) {
         return std::get<std::string>(this->code_);
@@ -110,12 +110,12 @@ std::string CodeToEdit::get_file_content()
     return std::get<DelimitedCode>(this->code_).get_core_original();
 }
 
-void CodeToEdit::set_file_content(const std::string &content)
+void CodeToEdit::overwrite_original_code(const std::string &modified_code)
 {
     if (std::holds_alternative<std::string>(this->code_)) {
-        std::get<std::string>(this->code_) = content;
+        std::get<std::string>(this->code_) = modified_code;
     } else {
-        std::get<DelimitedCode>(this->code_).set_core_modified(content);
+        std::get<DelimitedCode>(this->code_).set_core_modified(modified_code);
     }
 }
 

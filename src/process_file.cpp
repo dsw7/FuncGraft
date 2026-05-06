@@ -155,7 +155,7 @@ void process_file(const Configurations &configs)
 {
     const std::string raw_text = utils::read_from_file(configs.input_file);
     core::code::CodeToEdit content(raw_text);
-    std::string input_text = content.get_file_content();
+    std::string input_text = content.get_original_code();
 
     if (is_text_empty_(input_text)) {
         throw std::runtime_error("No code to edit");
@@ -171,13 +171,13 @@ void process_file(const Configurations &configs)
         core::reporting::print_prompt(prompt);
     }
 
-    const std::optional<std::string> updated_text = edit_text_using_llm_(configs, prompt);
+    const std::optional<std::string> modified_text = edit_text_using_llm_(configs, prompt);
 
-    if (not updated_text) {
+    if (not modified_text) {
         return;
     }
 
-    content.set_file_content(*updated_text);
+    content.overwrite_original_code(*modified_text);
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());

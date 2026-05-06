@@ -24,8 +24,8 @@ private:
 class CodeToEdit {
 public:
     CodeToEdit(const std::string &original_code);
-    std::string get_file_content();
-    void set_file_content(const std::string &content);
+    std::string get_original_code();
+    void overwrite_original_code(const std::string &modified_code);
     bool is_delimited();
     void export_content_to_file(const std::filesystem::path &filename);
 
