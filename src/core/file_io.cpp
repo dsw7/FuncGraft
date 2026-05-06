@@ -78,18 +78,14 @@ std::string DelimitedContent::pack_parts_into_content()
         this->core_modified_,
         this->tail_);
 #else
-    static std::string marker_original = "<<<<<<< Original code\n";
-    static std::string marker_split = "=======\n";
-    static std::string marker_modified = ">>>>>>> Modified code\n";
-
     return fmt::format(
         "{}{}{}{}{}{}{}",
         this->head_,
-        marker_original,
+        "<<<<<<< Original code\n",
         this->core_original_,
-        marker_split,
+        "=======\n",
         this->core_modified_,
-        marker_modified,
+        ">>>>>>> Modified code\n",
         this->tail_);
 #endif
 }
