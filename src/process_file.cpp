@@ -167,9 +167,9 @@ void process_file(const Configurations &configs)
     std::expected<std::string, std::string> updated_code_or_error;
 
     if (configs.provider == "openai") {
-        updated_code_or_error = edit_full_text_openai_(configs, input_text);
+        updated_code_or_error = edit_full_text_openai_(configs, prompt);
     } else {
-        updated_code_or_error = edit_full_text_ollama_(configs, input_text);
+        updated_code_or_error = edit_full_text_ollama_(configs, prompt);
     }
 
     if (not updated_code_or_error) {
