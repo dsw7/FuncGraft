@@ -1,4 +1,4 @@
-#include "file_io.hpp"
+#include "code.hpp"
 
 #include "utils.hpp"
 
@@ -11,7 +11,7 @@ const std::string DELIMITER_LINE_ = "@@@\n";
 }
 
 namespace core {
-namespace file_io {
+namespace code {
 
 void DelimitedContent::unpack_content_into_parts(const std::string &content)
 {
@@ -144,5 +144,5 @@ void Content::export_content_to_file(const std::filesystem::path &filename)
     }
 }
 
-} // namespace file_io
+} // namespace code
 } // namespace core

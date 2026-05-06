@@ -5,7 +5,7 @@
 #include <variant>
 
 namespace core {
-namespace file_io {
+namespace code {
 
 class DelimitedContent {
 public:
@@ -33,5 +33,5 @@ private:
     std::variant<std::string, DelimitedContent> content_;
 };
 
-} // namespace file_io
+} // namespace code
 } // namespace core

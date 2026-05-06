@@ -2,8 +2,8 @@
 
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
+#include "code.hpp"
 #include "configs.hpp"
-#include "file_io.hpp"
 #include "prompt.hpp"
 #include "reporting.hpp"
 #include "utils.hpp"
@@ -153,7 +153,7 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
 
 void process_file(const Configurations &configs)
 {
-    core::file_io::Content content(configs.input_file);
+    core::code::Content content(configs.input_file);
     std::string input_text = content.get_file_content();
 
     if (is_text_empty_(input_text)) {
