@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <string>
 #include <variant>
 
@@ -27,7 +26,7 @@ public:
     std::string get_original_code();
     void overwrite_original_code(const std::string &modified_code);
     bool is_delimited();
-    void export_content_to_file(const std::filesystem::path &filename);
+    std::string get_modified_code();
 
 private:
     std::variant<std::string, DelimitedCode> code_;

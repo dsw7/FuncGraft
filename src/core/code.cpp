@@ -1,7 +1,5 @@
 #include "code.hpp"
 
-#include "utils.hpp"
-
 #include <fmt/core.h>
 #include <stdexcept>
 #include <vector>
@@ -124,14 +122,13 @@ bool CodeToEdit::is_delimited()
     return std::holds_alternative<DelimitedCode>(this->code_);
 }
 
-void CodeToEdit::export_content_to_file(const std::filesystem::path &filename)
+std::string CodeToEdit::get_modified_code()
 {
     if (std::holds_alternative<std::string>(this->code_)) {
-        utils::write_to_file(filename, std::get<std::string>(this->code_));
-    } else {
-        const std::string content = std::get<DelimitedCode>(this->code_).pack_parts_into_content();
-        utils::write_to_file(filename, content);
+        return std::get<std::string>(this->code_);
     }
+
+    return std::get<DelimitedCode>(this->code_).pack_parts_into_content();
 }
 
 } // namespace code

@@ -181,7 +181,7 @@ void process_file(const Configurations &configs)
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
-        content.export_content_to_file(configs.output_file.value());
+        utils::write_to_file(configs.output_file.value(), content.get_modified_code());
         return;
     }
 
@@ -201,7 +201,7 @@ void process_file(const Configurations &configs)
     }
 
     if (choice == 'y') {
-        content.export_content_to_file(configs.input_file);
+        utils::write_to_file(configs.input_file, content.get_modified_code());
     }
     utils::print_separator();
 #endif
