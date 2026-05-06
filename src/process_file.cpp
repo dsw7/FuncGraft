@@ -153,7 +153,8 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
 
 void process_file(const Configurations &configs)
 {
-    core::code::CodeToEdit content(configs.input_file);
+    const std::string raw_text = utils::read_from_file(configs.input_file);
+    core::code::CodeToEdit content(raw_text);
     std::string input_text = content.get_file_content();
 
     if (is_text_empty_(input_text)) {

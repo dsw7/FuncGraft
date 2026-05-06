@@ -90,16 +90,14 @@ std::string DelimitedCode::pack_parts_into_content()
 #endif
 }
 
-CodeToEdit::CodeToEdit(const std::filesystem::path &filename)
+CodeToEdit::CodeToEdit(const std::string &raw_text)
 {
-    const std::string content = utils::read_from_file(filename);
-
-    if (content.find(DELIMITER_LINE_) != std::string::npos) {
+    if (raw_text.find(DELIMITER_LINE_) != std::string::npos) {
         DelimitedCode delim_content;
-        delim_content.unpack_content_into_parts(content);
+        delim_content.unpack_content_into_parts(raw_text);
         this->content_ = delim_content;
     } else {
-        this->content_ = content;
+        this->content_ = raw_text;
     }
 }
 

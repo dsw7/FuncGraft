@@ -23,7 +23,7 @@ private:
 
 class CodeToEdit {
 public:
-    CodeToEdit(const std::filesystem::path &filename);
+    CodeToEdit(const std::string &raw_text);
     std::string get_file_content();
     void set_file_content(const std::string &content);
     bool is_delimited();
