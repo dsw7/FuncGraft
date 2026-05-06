@@ -41,7 +41,7 @@ std::string load_instructions_from_stdin_()
     return instructions;
 }
 
-std::string load_instructions_(const Configurations &configs)
+std::string load_user_instructions_(const Configurations &configs)
 {
     std::string instructions;
 
@@ -134,7 +134,7 @@ namespace prompt {
 
 std::string build_prompt(const Configurations &configs, const std::string &input_text)
 {
-    const std::string instructions = load_instructions_(configs);
+    const std::string instructions = load_user_instructions_(configs);
     std::string code_block_to_edit;
 
     if (const auto label = resolve_label_from_extension_(configs.input_file); label.has_value()) {
