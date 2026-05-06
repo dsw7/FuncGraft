@@ -113,7 +113,7 @@ bool is_text_empty_(const std::string &input_text)
     });
 }
 
-std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &prompt)
+std::optional<std::string> edit_full_text_openai_(const Configurations &configs, const std::string &prompt)
 {
     const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
     if (not results) {
@@ -123,12 +123,12 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
     core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
-        return std::unexpected(results->description);
+        return std::nullopt;
     }
     return results->output_text;
 }
 
-std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &prompt)
+std::optional<std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &prompt)
 {
     const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
     if (not results) {
@@ -138,7 +138,7 @@ std::expected<std::string, std::string> edit_full_text_ollama_(const Configurati
     core::reporting::print_query_info(*results);
 
     if (results->was_refused) {
-        return std::unexpected(results->description);
+        return std::nullopt;
     }
     return results->output_text;
 }
@@ -164,20 +164,19 @@ void process_file(const Configurations &configs)
         core::reporting::print_prompt(prompt);
     }
 
-    std::expected<std::string, std::string> updated_code_or_error;
+    std::optional<std::string> updated_text;
 
     if (configs.provider == "openai") {
-        updated_code_or_error = edit_full_text_openai_(configs, prompt);
+        updated_text = edit_full_text_openai_(configs, prompt);
     } else {
-        updated_code_or_error = edit_full_text_ollama_(configs, prompt);
+        updated_text = edit_full_text_ollama_(configs, prompt);
     }
 
-    if (not updated_code_or_error) {
-        fmt::print("Query was rejected\n");
+    if (not updated_text) {
         return;
     }
 
-    content.set_file_content(updated_code_or_error.value());
+    content.set_file_content(*updated_text);
 
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
