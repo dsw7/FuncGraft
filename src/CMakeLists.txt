@@ -17,7 +17,6 @@ set(SRC_FILES
   configs.cpp
   core/datadir.cpp
   core/file_io.cpp
-  core/instructions.cpp
   core/prompt.cpp
   core/reporting.cpp
   main.cpp

@@ -4,7 +4,6 @@
 #include "adapter_openai.hpp"
 #include "configs.hpp"
 #include "file_io.hpp"
-#include "instructions.hpp"
 #include "prompt.hpp"
 #include "reporting.hpp"
 #include "utils.hpp"
@@ -116,8 +115,7 @@ bool is_text_empty_(const std::string &input_text)
 
 std::expected<std::string, std::string> edit_full_text_openai_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string instructions = core::instructions::load_instructions(configs);
-    const std::string prompt = core::prompt::build_prompt(instructions, input_text, configs.input_file.extension());
+    const std::string prompt = core::prompt::build_prompt(configs, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
         core::reporting::print_prompt(prompt);
@@ -138,8 +136,7 @@ std::expected<std::string, std::string> edit_full_text_openai_(const Configurati
 
 std::expected<std::string, std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &input_text)
 {
-    const std::string instructions = core::instructions::load_instructions(configs);
-    const std::string prompt = core::prompt::build_prompt(instructions, input_text, configs.input_file.extension());
+    const std::string prompt = core::prompt::build_prompt(configs, input_text, configs.input_file.extension());
 
     if (configs.verbose) {
         core::reporting::print_prompt(prompt);
