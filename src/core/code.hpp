@@ -21,9 +21,9 @@ private:
     std::string tail_;
 };
 
-class Content {
+class CodeToEdit {
 public:
-    Content(const std::filesystem::path &filename);
+    CodeToEdit(const std::filesystem::path &filename);
     std::string get_file_content();
     void set_file_content(const std::string &content);
     bool is_delimited();

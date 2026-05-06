@@ -90,7 +90,7 @@ std::string DelimitedContent::pack_parts_into_content()
 #endif
 }
 
-Content::Content(const std::filesystem::path &filename)
+CodeToEdit::CodeToEdit(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
         throw std::runtime_error(fmt::format("File '{}' does not exist!", filename.string()));
@@ -111,7 +111,7 @@ Content::Content(const std::filesystem::path &filename)
     }
 }
 
-std::string Content::get_file_content()
+std::string CodeToEdit::get_file_content()
 {
     if (std::holds_alternative<std::string>(this->content_)) {
         return std::get<std::string>(this->content_);
@@ -120,7 +120,7 @@ std::string Content::get_file_content()
     return std::get<DelimitedContent>(this->content_).get_core_original();
 }
 
-void Content::set_file_content(const std::string &content)
+void CodeToEdit::set_file_content(const std::string &content)
 {
     if (std::holds_alternative<std::string>(this->content_)) {
         std::get<std::string>(this->content_) = content;
@@ -129,12 +129,12 @@ void Content::set_file_content(const std::string &content)
     }
 }
 
-bool Content::is_delimited()
+bool CodeToEdit::is_delimited()
 {
     return std::holds_alternative<DelimitedContent>(this->content_);
 }
 
-void Content::export_content_to_file(const std::filesystem::path &filename)
+void CodeToEdit::export_content_to_file(const std::filesystem::path &filename)
 {
     if (std::holds_alternative<std::string>(this->content_)) {
         utils::write_to_file(filename, std::get<std::string>(this->content_));
