@@ -113,7 +113,7 @@ bool is_text_empty_(const std::string &input_text)
     });
 }
 
-std::optional<std::string> edit_full_text_openai_(const Configurations &configs, const std::string &prompt)
+std::optional<std::string> edit_using_openai_(const Configurations &configs, const std::string &prompt)
 {
     const OpenAIResults results = run_openai_query_with_threading_(configs, prompt);
     if (not results) {
@@ -128,7 +128,7 @@ std::optional<std::string> edit_full_text_openai_(const Configurations &configs,
     return results->output_text;
 }
 
-std::optional<std::string> edit_full_text_ollama_(const Configurations &configs, const std::string &prompt)
+std::optional<std::string> edit_using_ollama_(const Configurations &configs, const std::string &prompt)
 {
     const OllamaResults results = run_ollama_query_with_threading_(configs, prompt);
     if (not results) {
@@ -167,9 +167,9 @@ void process_file(const Configurations &configs)
     std::optional<std::string> updated_text;
 
     if (configs.provider == "openai") {
-        updated_text = edit_full_text_openai_(configs, prompt);
+        updated_text = edit_using_openai_(configs, prompt);
     } else {
-        updated_text = edit_full_text_ollama_(configs, prompt);
+        updated_text = edit_using_ollama_(configs, prompt);
     }
 
     if (not updated_text) {
