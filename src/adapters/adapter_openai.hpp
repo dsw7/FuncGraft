@@ -11,6 +11,7 @@ namespace adapters {
 
 class OpenAIResponse {
 public:
+    OpenAIResponse() = default; // needed for variants
     OpenAIResponse(const std::string &response, const double total_time);
 
     bool was_refused = false;

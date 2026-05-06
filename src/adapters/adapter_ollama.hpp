@@ -9,6 +9,7 @@
 namespace adapters {
 
 struct OllamaResponse {
+    OllamaResponse() = default; // needed for variants
     OllamaResponse(const std::string &response, const double total_time);
 
     bool was_refused = false;
