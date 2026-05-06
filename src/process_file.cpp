@@ -18,6 +18,7 @@
 #include <optional>
 #include <stdexcept>
 #include <thread>
+#include <variant>
 
 namespace {
 
@@ -126,28 +127,26 @@ bool is_text_empty_(const std::string &input_text)
     });
 }
 
-std::optional<std::string> edit_using_openai_(const Configurations &configs, const std::string &prompt)
+std::optional<std::string> edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
-    const OpenAIResponse response = run_openai_query_with_threading_(configs, prompt);
-    core::reporting::print_query_info(response);
+    std::variant<OpenAIResponse, OllamaResponse> response;
 
-    if (response.was_refused) {
-        return std::nullopt;
+    if (configs.provider == "openai") {
+        response = run_openai_query_with_threading_(configs, prompt);
+    } else {
+        response = run_ollama_query_with_threading_(configs, prompt);
     }
 
-    return response.output_text;
-}
+    return std::visit([](auto &&arg) -> std::optional<std::string> {
+        core::reporting::print_query_info(arg);
 
-std::optional<std::string> edit_using_ollama_(const Configurations &configs, const std::string &prompt)
-{
-    const OllamaResponse response = run_ollama_query_with_threading_(configs, prompt);
-    core::reporting::print_query_info(response);
+        if (arg.was_refused) {
+            return std::nullopt;
+        }
 
-    if (response.was_refused) {
-        return std::nullopt;
-    }
-
-    return response.output_text;
+        return arg.output_text;
+    },
+        response);
 }
 
 } // namespace
@@ -171,13 +170,7 @@ void process_file(const Configurations &configs)
         core::reporting::print_prompt(prompt);
     }
 
-    std::optional<std::string> updated_text;
-
-    if (configs.provider == "openai") {
-        updated_text = edit_using_openai_(configs, prompt);
-    } else {
-        updated_text = edit_using_ollama_(configs, prompt);
-    }
+    std::optional<std::string> updated_text = edit_text_using_llm_(configs, prompt);
 
     if (not updated_text) {
         return;
