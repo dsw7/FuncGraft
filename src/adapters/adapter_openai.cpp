@@ -106,7 +106,8 @@ std::string OpenAIResponse::extract_output_from_response_()
     }
 
     if (content["type"] == "refusal") {
-        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", content["refusal"]));
+        const std::string refusal = content["refusal"];
+        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", refusal));
     }
 
     throw std::runtime_error("Some unknown object type was returned from OpenAI");
