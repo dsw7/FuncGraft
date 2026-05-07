@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(GPTifierEdit VERSION 1.0)
+project(FuncGraft VERSION 1.0)
 
 option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
@@ -27,7 +27,10 @@ set(SRC_FILES
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 string(TIMESTAMP CURRENT_YEAR "%Y")
-add_compile_definitions(CURRENT_YEAR="${CURRENT_YEAR}")
+add_compile_definitions(
+  CURRENT_YEAR="${CURRENT_YEAR}"
+  PROJECT_VERSION="${PROJECT_VERSION}"
+)
 
 if(ENABLE_TESTING)
   add_compile_definitions(TESTING_ENABLED)
