@@ -60,7 +60,7 @@ make clean
 ```
 Then copy the project configuration directory:
 ```console
-cp -rv .funcgraft/ ~
+cp -rv .funcgraft ~
 ```
 And edit `~/.funcgraft/funcgraft.toml` to match your infrastructure.
 
