@@ -141,6 +141,8 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
 
 void process_file(const Configurations &configs)
 {
+    core::reporting::print_program_info(configs);
+
     const std::string raw_text = utils::read_from_file(configs.input_file);
     core::code::CodeToEdit content(raw_text);
 
