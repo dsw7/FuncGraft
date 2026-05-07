@@ -79,6 +79,7 @@ void print_program_info(const Configurations &configs)
     if (configs.provider) {
         if (*configs.provider == "ollama") {
             fmt::print("● Ollama · {}\n", configs.model_ollama);
+            fmt::print(fg(fmt::color::gray), "  ⎿ {}:{}\n", configs.host_ollama, configs.port_ollama);
         } else {
             fmt::print("● OpenAI · {}\n", configs.model_openai);
         }
