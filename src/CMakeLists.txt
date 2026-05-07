@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(FuncGraft VERSION 1.0)
+project(FuncGraft VERSION 1.0.0)
 
 option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
