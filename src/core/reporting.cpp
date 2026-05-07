@@ -71,6 +71,23 @@ void print_query_info_(const T &response)
 namespace core {
 namespace reporting {
 
+void print_program_info(const Configurations &configs)
+{
+    fmt::print("● FuncGraft ");
+    fmt::print(fg(fmt::color::gray), "v{}\n", PROJECT_VERSION);
+
+    if (configs.provider) {
+        if (*configs.provider == "ollama") {
+            fmt::print("● Ollama · {}\n", configs.model_ollama);
+        } else {
+            fmt::print("● OpenAI · {}\n", configs.model_openai);
+        }
+    }
+
+    fmt::print("● ");
+    fmt::print(fg(fmt::color::yellow_green), "{}\n\n", configs.input_file.string());
+}
+
 void print_code_being_targeted(const std::string &code)
 {
     utils::print_separator();
