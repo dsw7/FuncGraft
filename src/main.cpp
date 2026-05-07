@@ -1,7 +1,6 @@
 #include "configs.hpp"
 #include "datadir.hpp"
 #include "process_file.hpp"
-#include "utils.hpp"
 
 #include <filesystem>
 #include <fmt/color.h>
