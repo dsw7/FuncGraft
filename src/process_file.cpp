@@ -156,6 +156,7 @@ void process_file(const Configurations &configs)
 
     const std::optional<std::string> modified_code = edit_text_using_llm_(configs, prompt);
     if (not modified_code) {
+        utils::print_separator();
         return;
     }
 
