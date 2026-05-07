@@ -62,20 +62,22 @@ FuncGraft follows a layered architecture:
 ```
 src/
 ├── main.cpp              # CLI entry point, argument parsing
-├── configs.hpp/.cpp      # Configuration management (provider, models)
+├── configs.cpp/.hpp      # Configuration management (provider, models)
 ├── adapters/             # LLM provider implementations
 │   ├── adapter_openai.cpp/.hpp
 │   ├── adapter_ollama.cpp/.hpp
 │   ├── curl_base.cpp/.hpp       # Shared curl connection logic
-│   └── components.cpp/.hpp      # JSON schema generation, structured output parsing
-├── pipeline/             # Core editing pipeline
-│   ├── file_io.cpp/.hpp               # File read/write operations
-│   ├── process_file.cpp/.hpp          # Orchestrates editing flow
-│   └── text_manip.cpp/.hpp            # Code block extraction/manipulation
-├── prompt/               # Prompt generation
-│   ├── generate_prompt.cpp/.hpp       # Builds prompts for LLM
-│   └── instructions.cpp/.hpp           # Loads instructions from CLI/files/stdin
-└── utils.cpp/.hpp       # Utility functions (file I/O helpers)
+│   ├── components.cpp/.hpp      # JSON schema generation, structured output parsing
+├── core/                 # Core domain logic
+│   ├── prompt.cpp/.hpp   # Prompt generation and building
+│   ├── code.cpp/.hpp     # Code block extraction/manipulation
+│   ├── datadir.cpp/.hpp  # Data directory management
+│   └── reporting.cpp/.hpp # Error/status reporting
+├── utils.cpp/.hpp        # Utility functions (file I/O helpers)
+├── process_file.cpp/.hpp # Orchestrates editing flow
+└── external/             # Third-party dependencies
+    ├── json.hpp          # nlohmann/json
+    └── toml.hpp          # toml++
 ```
 
 ## Data Flow
@@ -105,9 +107,9 @@ src/
 
 ## Key Concepts
 
-### `@ @@` Delimiters
+### `@@@` Delimiters
 
-The `@@@` delimiter wraps code regions that need editing. This enables targeted editing:
+The `@@@` delimiters wrap code regions that need editing. This enables targeted editing:
 
 ```cpp
 @@@
@@ -129,7 +131,7 @@ Central configuration state passed through the pipeline. Includes:
 
 ### Prompt Building
 
-`build_prompt()` in `generate_prompt.cpp`:
+`build_prompt()` in `prompt.cpp` (core/prompt.cpp):
 1. Wraps instructions in a markdown code block
 2. Wraps target code with language-specific markdown fences (detected from file extension)
 3. Returns a formatted prompt: "Apply the following instructions:\n{instructions}\nTo the following code:\n{code}"
@@ -176,7 +178,7 @@ The program validates that input and output files exist before proceeding.
 
 # Vim Integration
 
-For wrapping code with `@ @@` markers in Vim, add to `.vimrc`:
+For wrapping code with `@@@` markers in Vim, add to `.vimrc`:
 
 ```vim
 function! WrapCodeWithFuncGraftDelimiters()
