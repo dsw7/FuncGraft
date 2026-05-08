@@ -88,7 +88,9 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
     const std::string prompt = core::prompt::build_prompt(configs, instructions, original_code);
 
     if (configs.verbose) {
-        core::reporting::print_prompt(prompt);
+        fmt::print(fmt::emphasis::bold, "Prompt:\n");
+        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
+        utils::print_separator();
     }
 
     return prompt;

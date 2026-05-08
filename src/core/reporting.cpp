@@ -71,13 +71,6 @@ void print_query_info_(const T &response)
 namespace core {
 namespace reporting {
 
-void print_prompt(const std::string &prompt)
-{
-    fmt::print(fmt::emphasis::bold, "Prompt:\n");
-    fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-    utils::print_separator();
-}
-
 void print_query_info(const adapters::OllamaResponse &response)
 {
     print_query_info_(response);
