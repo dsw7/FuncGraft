@@ -45,6 +45,14 @@ void print_separator()
     fmt::print(fg(fmt::color::gray), "{}\n", separator);
 }
 
+void print_right_aligned_text(const std::string &message)
+{
+    static unsigned short width = get_term_width();
+    static unsigned short r_pad = 2;
+
+    fmt::print(fg(fmt::color::gray), "{:>{}}\n", message, width - r_pad);
+}
+
 std::string read_from_file(const std::filesystem::path &filename)
 {
     if (not std::filesystem::exists(filename)) {
