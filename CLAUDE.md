@@ -72,7 +72,7 @@ src/
 │   ├── prompt.cpp/.hpp   # Prompt generation and building
 │   ├── code.cpp/.hpp     # Code block extraction/manipulation
 │   ├── datadir.cpp/.hpp  # Data directory management
-│   └── reporting.cpp/.hpp # Error/status reporting
+│   ├── run_queries.cpp/.hpp # Threading support for API queries
 ├── utils.cpp/.hpp        # Utility functions (file I/O helpers)
 ├── process_file.cpp/.hpp # Orchestrates editing flow
 └── external/             # Third-party dependencies
@@ -128,6 +128,15 @@ Central configuration state passed through the pipeline. Includes:
 - CLI options (verbose, output file, instructions, provider)
 - Provider configuration (OpenAI model, Ollama host/port/model)
 - Validation logic for required fields
+
+### Threading
+
+`run_queries.cpp/.hpp` (core/run_queries.{cpp,hpp}):
+- Manages timer threads with visual spinners during long API waits
+- Uses `std::atomic<bool>` for atomic flag operations
+- Runs timer thread in parallel with the actual API query, prints spinner in foreground
+- Handles errors and rethrows after query completes
+- Exports functions: `run_openai_query()` and `run_ollama_query()`
 
 ### Prompt Building
 
