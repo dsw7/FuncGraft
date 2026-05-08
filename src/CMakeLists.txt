@@ -18,7 +18,6 @@ set(SRC_FILES
   core/code.cpp
   core/datadir.cpp
   core/prompt.cpp
-  core/reporting.cpp
   core/run_queries.cpp
   main.cpp
   process_file.cpp
