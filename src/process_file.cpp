@@ -18,6 +18,24 @@
 
 namespace {
 
+void print_program_info_(const Configurations &configs)
+{
+    fmt::print("● FuncGraft ");
+    fmt::print(fg(fmt::color::gray), "v{}\n", PROJECT_VERSION);
+
+    if (configs.provider) {
+        if (*configs.provider == "ollama") {
+            fmt::print("● Ollama · {}\n", configs.model_ollama);
+            fmt::print(fg(fmt::color::gray), "  ⎿ {}:{}\n", configs.host_ollama, configs.port_ollama);
+        } else {
+            fmt::print("● OpenAI · {}\n", configs.model_openai);
+        }
+    }
+
+    fmt::print("● ");
+    fmt::print(fg(fmt::color::yellow_green), "{}\n\n", configs.input_file.string());
+}
+
 using core::code::CodeToEdit;
 
 CodeToEdit import_file_to_edit_(const Configurations &configs)
@@ -129,7 +147,8 @@ void export_edited_file_(const Configurations &configs, const CodeToEdit &conten
 
 void process_file(const Configurations &configs)
 {
-    core::reporting::print_program_info(configs);
+    print_program_info_(configs);
+
     CodeToEdit content = import_file_to_edit_(configs);
     const std::string instructions = load_instructions_(configs);
     const std::string prompt = create_prompt_(configs, content, instructions);
