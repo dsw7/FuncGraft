@@ -90,4 +90,33 @@ void write_to_file(const std::string &filename, const std::string &text)
     file.close();
 }
 
+std::string seconds_to_hhmmss(const double total_time_s)
+{
+    int h = static_cast<int>(seconds) / 3600;
+    int m = (static_cast<int>(seconds) % 3600) / 60;
+    int s = static_cast<int>(seconds) % 60;
+
+    std::string result;
+
+    if (h > 0) {
+        result += std::to_string(h) + "h";
+        if (m > 0 || s > 0) {
+            result += " ";
+        }
+    }
+
+    if (m > 0) {
+        result += std::to_string(m) + "m";
+        if (s > 0) {
+            result += " ";
+        }
+    }
+
+    if (s > 0 || result.empty()) {
+        result += std::to_string(s) + "s";
+    }
+
+    return result;
+}
+
 } // namespace utils
