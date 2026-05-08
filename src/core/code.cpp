@@ -53,7 +53,7 @@ void DelimitedCode::unpack_content_into_parts(const std::string &content)
     this->tail_ = content.substr(pos_end_2);
 }
 
-std::string DelimitedCode::get_core_original()
+std::string DelimitedCode::get_core_original() const
 {
     return this->core_original_;
 }
@@ -99,7 +99,7 @@ CodeToEdit::CodeToEdit(const std::string &original_code)
     }
 }
 
-std::string CodeToEdit::get_original_code()
+std::string CodeToEdit::get_original_code() const
 {
     if (std::holds_alternative<std::string>(this->code_)) {
         return std::get<std::string>(this->code_);
