@@ -67,7 +67,7 @@ void DelimitedCode::set_core_modified(const std::string &modified_core)
     }
 }
 
-std::string DelimitedCode::pack_parts_into_content()
+std::string DelimitedCode::pack_parts_into_content() const
 {
 #ifdef TESTING_ENABLED
     return fmt::format(
@@ -122,7 +122,7 @@ bool CodeToEdit::is_delimited()
     return std::holds_alternative<DelimitedCode>(this->code_);
 }
 
-std::string CodeToEdit::get_modified_code()
+std::string CodeToEdit::get_modified_code() const
 {
     if (std::holds_alternative<std::string>(this->code_)) {
         return std::get<std::string>(this->code_);
