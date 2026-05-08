@@ -1,61 +1,14 @@
 #include "prompt.hpp"
 
-#include "utils.hpp"
-
 #include <algorithm>
 #include <filesystem>
-#include <fmt/color.h>
 #include <fmt/core.h>
-#include <iostream>
 #include <json.hpp>
 #include <map>
 #include <optional>
 #include <stdexcept>
 
 namespace {
-
-std::string load_instructions_from_file_(const std::filesystem::path &filename)
-{
-    fmt::print("Loading instructions from file '{}'\n", filename.string());
-    return utils::read_from_file(filename);
-}
-
-std::string load_instructions_from_stdin_()
-{
-    utils::print_separator();
-    std::string instructions;
-
-    while (true) {
-        fmt::print(fmt::emphasis::bold, "> ");
-        std::getline(std::cin, instructions);
-
-        if (not instructions.empty()) {
-            break;
-        }
-    }
-
-    utils::print_separator();
-    return instructions;
-}
-
-std::string load_user_instructions_(const Configurations &configs)
-{
-    std::string instructions;
-
-    if (configs.instructions_from_cli) {
-        instructions = configs.instructions_from_cli.value();
-    } else if (configs.instructions_file) {
-        instructions = load_instructions_from_file_(configs.instructions_file.value());
-    } else {
-        instructions = load_instructions_from_stdin_();
-    }
-
-    if (instructions.empty()) {
-        throw std::runtime_error("Instructions are empty!");
-    }
-
-    return instructions;
-}
 
 std::optional<std::string> resolve_label_from_extension_(const std::filesystem::path &filename)
 {
@@ -140,15 +93,18 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 namespace core {
 namespace prompt {
 
-std::string build_prompt(const Configurations &configs, const std::string &input_text)
+std::string build_prompt(const Configurations &configs, const std::string &instructions, const std::string &text_to_edit)
 {
-    const std::string instructions = load_user_instructions_(configs);
+    if (instructions.empty()) {
+        throw std::runtime_error("Instructions are empty!");
+    }
+
     std::string code_block_to_edit;
 
     if (const auto label = resolve_label_from_extension_(configs.input_file); label.has_value()) {
-        code_block_to_edit = get_code_block_(input_text, *label);
+        code_block_to_edit = get_code_block_(text_to_edit, *label);
     } else {
-        code_block_to_edit = get_code_block_(input_text);
+        code_block_to_edit = get_code_block_(text_to_edit);
     }
 
     return fmt::format(R"(Apply the following instructions:
