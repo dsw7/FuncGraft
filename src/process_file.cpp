@@ -98,21 +98,22 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
 template<typename T>
 void print_query_info_(const T &response)
 {
-    if (response.was_refused) {
-        fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red),
-            " Refused | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-    } else {
-        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
-            " Success | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-    }
+    fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
+        " Success | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
 
-    fmt::print("\n\n");
+    fmt::print(fg(fmt::color::dim_gray), "\n\n{}\n", response.description);
 
-    if (response.was_refused) {
-        fmt::print(fg(fmt::terminal_color::bright_yellow), "{}\n", response.description);
-    } else {
-        fmt::print(fg(fmt::color::dim_gray), "{}\n", response.description);
-    }
+    utils::print_right_aligned_text(
+        fmt::format("Total time: {}", utils::seconds_to_hhmmss(response.total_time)));
+}
+
+template<typename T>
+void print_refusal_info_(const T &response)
+{
+    fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red),
+        " Refused | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
+
+    fmt::print(fg(fmt::terminal_color::bright_yellow), "\n\n{}\n", response.description);
 
     utils::print_right_aligned_text(
         fmt::format("Total time: {}", utils::seconds_to_hhmmss(response.total_time)));
@@ -129,12 +130,12 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
     }
 
     return std::visit([](auto &&arg) -> std::optional<std::string> {
-        print_query_info_(arg);
-
         if (arg.was_refused) {
+            print_refusal_info_(arg);
             return std::nullopt;
         }
 
+        print_query_info_(arg);
         return arg.output_text;
     },
         response);
