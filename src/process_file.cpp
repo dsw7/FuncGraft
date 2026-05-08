@@ -45,7 +45,10 @@ CodeToEdit import_file_to_edit_(const Configurations &configs)
     CodeToEdit content(raw_text);
 
     if (content.is_delimited()) {
-        core::reporting::print_code_being_targeted(content.get_original_code());
+        utils::print_separator();
+        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
+        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", content.get_original_code());
+        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
     }
 
     return content;
