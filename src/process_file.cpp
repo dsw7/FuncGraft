@@ -23,6 +23,7 @@ namespace {
 
 using adapters::OllamaResponse;
 using adapters::OpenAIResponse;
+using core::code::CodeToEdit;
 
 // Threading ------------------------------------------------------------------------------------------------
 
@@ -115,11 +116,11 @@ OllamaResponse run_ollama_query_with_threading_(const Configurations &configs, c
 
 // Steps ----------------------------------------------------------------------------------------------------
 
-core::code::CodeToEdit import_file_to_edit_(const Configurations &configs)
+CodeToEdit import_file_to_edit_(const Configurations &configs)
 {
     const std::string raw_text = utils::read_from_file(configs.input_file);
 
-    core::code::CodeToEdit content(raw_text);
+    CodeToEdit content(raw_text);
 
     if (content.is_delimited()) {
         core::reporting::print_code_being_targeted(content.get_original_code());
@@ -128,7 +129,7 @@ core::code::CodeToEdit import_file_to_edit_(const Configurations &configs)
     return content;
 }
 
-std::string create_prompt_(const Configurations &configs, const core::code::CodeToEdit &content)
+std::string create_prompt_(const Configurations &configs, const CodeToEdit &content)
 {
     const std::string original_code = content.get_original_code();
     const std::string prompt = core::prompt::build_prompt(configs, original_code);
@@ -162,7 +163,7 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
         response);
 }
 
-void export_edited_file_(const Configurations &configs, core::code::CodeToEdit &content)
+void export_edited_file_(const Configurations &configs, CodeToEdit &content)
 {
     if (configs.output_file) {
         fmt::print("Exported updated content to file '{}'\n", configs.output_file.value().string());
@@ -197,7 +198,7 @@ void export_edited_file_(const Configurations &configs, core::code::CodeToEdit &
 void process_file(const Configurations &configs)
 {
     core::reporting::print_program_info(configs);
-    core::code::CodeToEdit content = import_file_to_edit_(configs);
+    CodeToEdit content = import_file_to_edit_(configs);
     const std::string prompt = create_prompt_(configs, content);
 
     const std::optional<std::string> modified_code = edit_text_using_llm_(configs, prompt);
