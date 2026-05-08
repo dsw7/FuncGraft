@@ -90,7 +90,7 @@ void write_to_file(const std::string &filename, const std::string &text)
     file.close();
 }
 
-std::string seconds_to_hhmmss(const double total_time_s)
+std::string seconds_to_hhmmss(const double seconds)
 {
     int h = static_cast<int>(seconds) / 3600;
     int m = (static_cast<int>(seconds) % 3600) / 60;
