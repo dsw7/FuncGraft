@@ -6,116 +6,19 @@
 #include "configs.hpp"
 #include "prompt.hpp"
 #include "reporting.hpp"
+#include "run_queries.hpp"
 #include "utils.hpp"
 
-#include <array>
-#include <atomic>
-#include <chrono>
-#include <expected>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <optional>
 #include <stdexcept>
-#include <thread>
 #include <variant>
 
 namespace {
 
-using adapters::OllamaResponse;
-using adapters::OpenAIResponse;
 using core::code::CodeToEdit;
-
-// Threading ------------------------------------------------------------------------------------------------
-
-std::atomic<bool> TIMER_ENABLED_(false);
-
-void time_api_call_()
-{
-    const std::chrono::duration delay = std::chrono::milliseconds(100);
-
-    static std::array spinner = { "⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ " };
-    const int num_frames = spinner.size();
-
-    while (TIMER_ENABLED_.load()) {
-        for (int i = 0; i < num_frames; ++i) {
-            std::cout << " \r" << spinner[i] << std::flush;
-            std::this_thread::sleep_for(delay);
-        }
-    }
-
-    std::cout << " \r" << std::flush;
-}
-
-OpenAIResponse run_openai_query_with_threading_(const Configurations &configs, const std::string &prompt)
-{
-    using OpenAIResults = std::expected<OpenAIResponse, adapters::OpenAIError>;
-
-    TIMER_ENABLED_.store(true);
-    std::thread timer(time_api_call_);
-
-    std::optional<OpenAIResults> results;
-    bool query_failed = false;
-    std::string errmsg;
-
-    try {
-        results = adapters::OpenAI(configs).query_messages_api(prompt);
-    } catch (std::runtime_error &e) {
-        errmsg = e.what();
-        query_failed = true;
-    }
-
-    TIMER_ENABLED_.store(false);
-    timer.join();
-
-    if (query_failed) {
-        throw std::runtime_error(errmsg);
-    }
-
-    OpenAIResults response = results.value();
-
-    if (not response) {
-        throw std::runtime_error(response.error().errmsg);
-    }
-
-    return *response;
-}
-
-OllamaResponse run_ollama_query_with_threading_(const Configurations &configs, const std::string &prompt)
-{
-    using OllamaResults = std::expected<OllamaResponse, adapters::OllamaError>;
-
-    TIMER_ENABLED_.store(true);
-    std::thread timer(time_api_call_);
-
-    std::optional<OllamaResults> results;
-    bool query_failed = false;
-    std::string errmsg;
-
-    try {
-        results = adapters::Ollama(configs).query_generate_api(prompt);
-    } catch (std::runtime_error &e) {
-        errmsg = e.what();
-        query_failed = true;
-    }
-
-    TIMER_ENABLED_.store(false);
-    timer.join();
-
-    if (query_failed) {
-        throw std::runtime_error(errmsg);
-    }
-
-    OllamaResults response = results.value();
-
-    if (not response) {
-        throw std::runtime_error(response.error().errmsg);
-    }
-
-    return *response;
-}
-
-// Steps ----------------------------------------------------------------------------------------------------
 
 CodeToEdit import_file_to_edit_(const Configurations &configs)
 {
@@ -172,12 +75,12 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
 
 std::optional<std::string> edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
-    std::variant<OpenAIResponse, OllamaResponse> response;
+    std::variant<adapters::OpenAIResponse, adapters::OllamaResponse> response;
 
     if (configs.provider == "openai") {
-        response = run_openai_query_with_threading_(configs, prompt);
+        response = core::threading::run_openai_query(configs, prompt);
     } else {
-        response = run_ollama_query_with_threading_(configs, prompt);
+        response = core::threading::run_ollama_query(configs, prompt);
     }
 
     return std::visit([](auto &&arg) -> std::optional<std::string> {
