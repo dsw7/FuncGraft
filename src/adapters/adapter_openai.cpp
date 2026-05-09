@@ -162,8 +162,7 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
         { "text", response_format },
     };
 
-    const std::string post_fields = fields.dump();
-    const std::string response = this->query_responses_api_(post_fields);
+    const std::string response = this->query_responses_api_(fields.dump());
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {

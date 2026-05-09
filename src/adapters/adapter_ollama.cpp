@@ -152,8 +152,7 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
         { "stream", false },
     };
 
-    const std::string post_fields = fields.dump();
-    const std::string response = this->query_chat_api_(post_fields);
+    const std::string response = this->query_chat_api_(fields.dump());
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
