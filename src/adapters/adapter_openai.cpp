@@ -29,7 +29,7 @@ std::string get_openai_user_api_key_()
 
 namespace adapters {
 
-OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_time)
+OpenAIResponse::OpenAIResponse(const std::string &response)
 {
     try {
         this->response_ = nlohmann::json::parse(response);
@@ -44,19 +44,18 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
     if (this->response_["object"] != "response") {
         throw std::runtime_error("The response from OpenAI is not an OpenAI Response");
     }
-
-    const std::string content = this->extract_output_from_response_();
-    const structured_output::SchemaEditCode so(content);
-    this->description = so.description;
-    this->output_text = so.code;
-    this->was_refused = so.was_refused;
-
-    this->input_tokens = this->response_["usage"]["input_tokens"];
-    this->output_tokens = this->response_["usage"]["output_tokens"];
-    this->total_time = total_time;
 }
 
-std::string OpenAIEditResponse::extract_output_from_response_()
+OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_t) :
+    OpenAIResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
+
+    this->unpack_structured_output_();
+}
+
+void OpenAIEditResponse::unpack_structured_output_()
 {
     nlohmann::json content;
     bool job_complete = false;
@@ -77,16 +76,27 @@ std::string OpenAIEditResponse::extract_output_from_response_()
         throw std::runtime_error("OpenAI did not complete the transaction");
     }
 
-    if (content["type"] == "output_text") {
-        return content["text"];
+    if (content["type"] != "output_text") {
+        if (content["type"] == "refusal") {
+            const std::string refusal = content["refusal"];
+            throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", refusal));
+        } else {
+            throw std::runtime_error("Some unknown object type was returned from OpenAI");
+        }
     }
 
-    if (content["type"] == "refusal") {
-        const std::string refusal = content["refusal"];
-        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", refusal));
+    nlohmann::json structured_output_;
+
+    try {
+        const std::string text = content["text"];
+        structured_output_ = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    throw std::runtime_error("Some unknown object type was returned from OpenAI");
+    this->was_refused = structured_output_.at("was_refused").get<bool>();
+    this->output_text = structured_output_["code"];
+    this->description = structured_output_["description_of_changes"];
 }
 
 OpenAIError::OpenAIError(const std::string &response, const int status_code) :

@@ -9,10 +9,20 @@
 
 namespace adapters {
 
-class OpenAIEditResponse {
+class OpenAIResponse {
 public:
-    OpenAIEditResponse() = default; // needed for variants
-    OpenAIEditResponse(const std::string &response, const double total_time);
+    OpenAIResponse() = default;
+    OpenAIResponse(const std::string &response);
+
+protected:
+    nlohmann::json response_;
+};
+
+class OpenAIEditResponse: public OpenAIResponse {
+public:
+    OpenAIEditResponse() :
+        OpenAIResponse() {} // needed for variants
+    OpenAIEditResponse(const std::string &response, const double total_t);
 
     bool was_refused = false;
     std::string description;
@@ -23,8 +33,7 @@ public:
     int output_tokens = 0;
 
 private:
-    std::string extract_output_from_response_();
-    nlohmann::json response_;
+    void unpack_structured_output_();
 };
 
 struct OpenAIError {

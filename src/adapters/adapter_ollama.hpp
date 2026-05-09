@@ -11,6 +11,7 @@ namespace adapters {
 
 class OllamaResponse {
 public:
+    OllamaResponse() = default;
     OllamaResponse(const std::string &response);
 
 protected:
@@ -19,7 +20,8 @@ protected:
 
 class OllamaEditResponse: public OllamaResponse {
 public:
-    OllamaEditResponse() = default; // needed for variants
+    OllamaEditResponse() :
+        OllamaResponse() {} // needed for variants
     OllamaEditResponse(const std::string &response, const double total_t);
 
     bool was_refused = false;
