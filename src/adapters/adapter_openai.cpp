@@ -57,46 +57,34 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
 
 void OpenAIEditResponse::unpack_structured_output_()
 {
-    nlohmann::json content;
-    bool job_complete = false;
+    std::string text;
 
     for (const auto &item: this->response_["output"]) {
-        if (item["type"] != "message") {
-            continue;
-        }
-
-        if (item["status"] == "completed") {
-            content = item["content"][0];
-            job_complete = true;
-            break;
-        }
-    }
-
-    if (not job_complete) {
-        throw std::runtime_error("OpenAI did not complete the transaction");
-    }
-
-    if (content["type"] != "output_text") {
-        if (content["type"] == "refusal") {
-            const std::string refusal = content["refusal"];
-            throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", refusal));
-        } else {
-            throw std::runtime_error("Some unknown object type was returned from OpenAI");
+        if (item["type"] == "message") {
+            if (item["status"] == "completed") {
+                if (item["content"][0]["type"] == "output_text") {
+                    text = item["content"][0]["text"];
+                    break;
+                }
+            }
         }
     }
 
-    nlohmann::json structured_output_;
+    if (text.empty()) {
+        throw std::runtime_error("Something went wrong. OpenAI did not return output text");
+    }
+
+    nlohmann::json structured_output;
 
     try {
-        const std::string text = content["text"];
-        structured_output_ = nlohmann::json::parse(text);
+        structured_output = nlohmann::json::parse(text);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    this->was_refused = structured_output_.at("was_refused").get<bool>();
-    this->output_text = structured_output_["code"];
-    this->description = structured_output_["description_of_changes"];
+    this->was_refused = structured_output.at("was_refused").get<bool>();
+    this->output_text = structured_output["code"];
+    this->description = structured_output["description_of_changes"];
 }
 
 OpenAIError::OpenAIError(const std::string &response, const int status_code) :

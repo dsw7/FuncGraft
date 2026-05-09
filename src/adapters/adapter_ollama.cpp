@@ -36,18 +36,18 @@ OllamaEditResponse::OllamaEditResponse(const std::string &response, const double
 
 void OllamaEditResponse::unpack_structured_output_()
 {
-    nlohmann::json structured_output_;
+    nlohmann::json structured_output;
 
     try {
         const std::string content = this->response_["message"]["content"];
-        structured_output_ = nlohmann::json::parse(content);
+        structured_output = nlohmann::json::parse(content);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    this->was_refused = structured_output_.at("was_refused").get<bool>();
-    this->output_text = structured_output_["code"];
-    this->description = structured_output_["description_of_changes"];
+    this->was_refused = structured_output.at("was_refused").get<bool>();
+    this->output_text = structured_output["code"];
+    this->description = structured_output["description_of_changes"];
 }
 
 OllamaError::OllamaError(const std::string &response, const int status_code) :
