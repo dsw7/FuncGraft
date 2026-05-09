@@ -134,7 +134,7 @@ std::string edit_text_using_llm_(const Configurations &configs, const std::strin
             " Success | Input tokens: {} | Output tokens: {} ", arg.input_tokens, arg.output_tokens);
 
         fmt::print("\n\n");
-        fmt::print(fg(fmt::color::dim_gray), "● {}\n", arg.description);
+        fmt::print(fg(fmt::color::dim_gray), "● {}\n", arg.description_of_changes);
         utils::print_right_aligned_text(fmt::format("Total time: {}", utils::seconds_to_hhmmss(arg.total_time)));
 
         return arg.output_text;

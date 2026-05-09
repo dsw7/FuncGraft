@@ -34,7 +34,7 @@ public:
         OpenAIResponse() {} // needed for variants
     OpenAIEditResponse(const std::string &response, const double total_t);
 
-    std::string description;
+    std::string description_of_changes;
     std::string output_text;
 
     double total_time = 0.0;

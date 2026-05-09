@@ -105,7 +105,7 @@ void OpenAIEditResponse::unpack_structured_output_()
     }
 
     this->output_text = structured_output["code"];
-    this->description = structured_output["description_of_changes"];
+    this->description_of_changes = structured_output["description_of_changes"];
 }
 
 OpenAIError::OpenAIError(const std::string &response, const int status_code) :
