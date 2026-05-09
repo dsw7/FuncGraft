@@ -9,22 +9,40 @@
 
 namespace adapters {
 
-class OpenAIEditResponse {
+class OpenAIResponse {
 public:
-    OpenAIEditResponse() = default; // needed for variants
-    OpenAIEditResponse(const std::string &response, const double total_time);
+    OpenAIResponse() = default;
+    OpenAIResponse(const std::string &response);
 
-    bool was_refused = false;
-    std::string description;
-    std::string output_text;
+protected:
+    std::string get_text_from_response_();
+    nlohmann::json response_;
+};
+
+struct OpenAIClassificationResponse: public OpenAIResponse {
+    OpenAIClassificationResponse() :
+        OpenAIResponse() {} // needed for variants
+    OpenAIClassificationResponse(const std::string &response);
+
+    bool valid_instructions = false;
+    std::string reasoning;
+};
+
+class OpenAIEditResponse: public OpenAIResponse {
+public:
+    OpenAIEditResponse() :
+        OpenAIResponse() {} // needed for variants
+    OpenAIEditResponse(const std::string &response, const double total_t);
+
+    std::string description_of_changes;
+    std::string code;
 
     double total_time = 0.0;
     int input_tokens = 0;
     int output_tokens = 0;
 
 private:
-    std::string extract_output_from_response_();
-    nlohmann::json response_;
+    void unpack_structured_output_();
 };
 
 struct OpenAIError {
@@ -37,6 +55,7 @@ struct OpenAIError {
 class OpenAI: public CurlBase {
 public:
     OpenAI(const Configurations &configs);
+    std::expected<OpenAIClassificationResponse, OpenAIError> classify_instructions(const std::string &prompt);
     std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:

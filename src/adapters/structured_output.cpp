@@ -1,9 +1,22 @@
 #include "structured_output.hpp"
 
-#include <fmt/core.h>
-#include <stdexcept>
-
 namespace structured_output {
+
+nlohmann::json schema_classify_instructions()
+{
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "reasoning", { { "type", "string" } } },
+                { "valid_instructions", { { "type", "boolean" } } },
+            },
+        },
+        { "required", { "reasoning", "valid_instructions" } },
+        { "additionalProperties", false },
+    };
+}
 
 nlohmann::json schema_edit_code()
 {
@@ -12,29 +25,13 @@ nlohmann::json schema_edit_code()
         {
             "properties",
             {
-                { "was_refused", { { "type", "boolean" } } },
-                { "code", { { "type", "string" } } },
                 { "description_of_changes", { { "type", "string" } } },
+                { "code", { { "type", "string" } } },
             },
         },
-        { "required", { "was_refused", "code", "description_of_changes" } },
+        { "required", { "description_of_changes", "code" } },
         { "additionalProperties", false },
     };
-}
-
-SchemaEditCode::SchemaEditCode(const std::string &content)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(content);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->was_refused = json.at("was_refused").get<bool>();
-    this->code = json["code"];
-    this->description = json["description_of_changes"];
 }
 
 } // namespace structured_output

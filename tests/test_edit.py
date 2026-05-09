@@ -137,4 +137,26 @@ def test_reject_unrelated_instructions(provider: str, file_to_edit: Path) -> Non
         f"--instructions='{instructions}'",
         f"--output={file_to_edit}",
     )
-    assert "Refused |" in stdout
+    assert "Cannot process this query" in stdout
+
+
+@mark.parametrize(
+    "instructions",
+    [
+        "What is the weather in Phoenix, Arizona?",
+        "Why did the dinosaurs go extinct?",
+        "How to sew a canvas tool roll?",
+        "Who is the 32 Prime Minister of Canada?",
+        "What is limit sell order?",
+    ],
+)
+def test_reject_unrelated_instructions_ollama(
+    instructions: str, file_to_edit: Path
+) -> None:
+    stdout = assert_command_success(
+        f"{file_to_edit}",
+        "--provider=ollama",
+        f"--instructions='{instructions}'",
+        f"--output={file_to_edit}",
+    )
+    assert "Cannot process this query" in stdout

@@ -29,7 +29,7 @@ std::string get_openai_user_api_key_()
 
 namespace adapters {
 
-OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_time)
+OpenAIResponse::OpenAIResponse(const std::string &response)
 {
     try {
         this->response_ = nlohmann::json::parse(response);
@@ -44,49 +44,68 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
     if (this->response_["object"] != "response") {
         throw std::runtime_error("The response from OpenAI is not an OpenAI Response");
     }
-
-    const std::string content = this->extract_output_from_response_();
-    const structured_output::SchemaEditCode so(content);
-    this->description = so.description;
-    this->output_text = so.code;
-    this->was_refused = so.was_refused;
-
-    this->input_tokens = this->response_["usage"]["input_tokens"];
-    this->output_tokens = this->response_["usage"]["output_tokens"];
-    this->total_time = total_time;
 }
 
-std::string OpenAIEditResponse::extract_output_from_response_()
+std::string OpenAIResponse::get_text_from_response_()
 {
-    nlohmann::json content;
-    bool job_complete = false;
+    std::string text;
 
     for (const auto &item: this->response_["output"]) {
-        if (item["type"] != "message") {
-            continue;
+        if (item["type"] == "message") {
+            if (item["status"] == "completed") {
+                if (item["content"][0]["type"] == "output_text") {
+                    text = item["content"][0]["text"];
+                    break;
+                }
+            }
         }
-
-        if (item["status"] == "completed") {
-            content = item["content"][0];
-            job_complete = true;
-            break;
-        }
     }
 
-    if (not job_complete) {
-        throw std::runtime_error("OpenAI did not complete the transaction");
+    if (text.empty()) {
+        throw std::runtime_error("Something went wrong. OpenAI did not return output text");
     }
 
-    if (content["type"] == "output_text") {
-        return content["text"];
+    return text;
+}
+
+OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
+    OpenAIResponse(response)
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    if (content["type"] == "refusal") {
-        const std::string refusal = content["refusal"];
-        throw std::runtime_error(fmt::format("OpenAI returned a refusal: {}", refusal));
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
+
+OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_t) :
+    OpenAIResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
+
+    this->unpack_structured_output_();
+}
+
+void OpenAIEditResponse::unpack_structured_output_()
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    throw std::runtime_error("Some unknown object type was returned from OpenAI");
+    this->code = structured_output["code"];
+    this->description_of_changes = structured_output["description_of_changes"];
 }
 
 OpenAIError::OpenAIError(const std::string &response, const int status_code) :
@@ -142,6 +161,37 @@ std::string OpenAI::query_responses_api_(const std::string &post_fields)
     return response;
 }
 
+std::expected<OpenAIClassificationResponse, OpenAIError> OpenAI::classify_instructions(const std::string &prompt)
+{
+    const nlohmann::json response_format = {
+        {
+            "format",
+            {
+                { "name", "instruction_classification" },
+                { "schema", structured_output::schema_classify_instructions() },
+                { "strict", true },
+                { "type", "json_schema" },
+            },
+        }
+    };
+    const nlohmann::json fields = {
+        { "input", prompt },
+        { "instructions", system_prompts::system_prompt_classify_instructions() },
+        { "model", this->model_ },
+        { "store", false },
+        { "temperature", 0.00 },
+        { "text", response_format },
+    };
+
+    const std::string response = this->query_responses_api_(fields.dump());
+
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OpenAIError(response, http_status_code));
+    }
+    return OpenAIClassificationResponse(response);
+}
+
 std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
 {
     const nlohmann::json response_format = {
@@ -164,8 +214,7 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
         { "text", response_format },
     };
 
-    const std::string post_fields = fields.dump();
-    const std::string response = this->query_responses_api_(post_fields);
+    const std::string response = this->query_responses_api_(fields.dump());
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {

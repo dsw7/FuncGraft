@@ -4,37 +4,65 @@
 #include "system_prompts.hpp"
 
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
 
 namespace adapters {
 
-OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_time)
+OllamaResponse::OllamaResponse(const std::string &response)
 {
-    nlohmann::json json;
-
     try {
-        json = nlohmann::json::parse(response);
+        this->response_ = nlohmann::json::parse(response);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
     }
 
-    if (not json.contains("done")) {
+    if (not this->response_.contains("done")) {
         throw std::runtime_error("The response from Ollama does not contain the 'done' key");
     }
 
-    if (not json["done"]) {
+    if (not this->response_["done"]) {
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
+}
 
-    const structured_output::SchemaEditCode so(json["message"]["content"]);
-    this->description = so.description;
-    this->output_text = so.code;
-    this->was_refused = so.was_refused;
+OllamaClassificationResponse::OllamaClassificationResponse(const std::string &response) :
+    OllamaResponse(response)
+{
+    nlohmann::json structured_output;
 
-    this->input_tokens = json["prompt_eval_count"];
-    this->output_tokens = json["eval_count"];
-    this->total_time = total_time;
+    try {
+        const std::string content = this->response_["message"]["content"];
+        structured_output = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
+
+OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_t) :
+    OllamaResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["prompt_eval_count"];
+    this->output_tokens = this->response_["eval_count"];
+
+    this->unpack_structured_output_();
+}
+
+void OllamaEditResponse::unpack_structured_output_()
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string content = this->response_["message"]["content"];
+        structured_output = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->code = structured_output["code"];
+    this->description_of_changes = structured_output["description_of_changes"];
 }
 
 OllamaError::OllamaError(const std::string &response, const int status_code) :
@@ -88,6 +116,29 @@ std::string Ollama::query_chat_api_(const std::string &post_fields)
     return response;
 }
 
+std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instructions(const std::string &prompt)
+{
+    const auto messages = nlohmann::json::array({
+        { { "role", "system" }, { "content", system_prompts::system_prompt_classify_instructions() } },
+        { { "role", "user" }, { "content", prompt } },
+    });
+    const nlohmann::json fields = {
+        { "format", structured_output::schema_classify_instructions() },
+        { "messages", messages },
+        { "model", this->model_ },
+        { "stream", false },
+        { "temperature", 0.00 },
+    };
+
+    const std::string response = this->query_chat_api_(fields.dump());
+
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OllamaError(response, http_status_code));
+    }
+    return OllamaClassificationResponse(response);
+}
+
 std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
@@ -101,8 +152,7 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
         { "stream", false },
     };
 
-    const std::string post_fields = fields.dump();
-    const std::string response = this->query_chat_api_(post_fields);
+    const std::string response = this->query_chat_api_(fields.dump());
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {

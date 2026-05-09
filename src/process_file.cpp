@@ -81,6 +81,30 @@ std::string load_instructions_(const Configurations &configs)
     return instructions;
 }
 
+bool validate_instructions_(const Configurations &configs, const std::string &instructions)
+{
+    const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
+    std::variant<adapters::OpenAIClassificationResponse, adapters::OllamaClassificationResponse> response;
+
+    if (configs.provider == "openai") {
+        response = core::threading::classify_instructions_openai(configs, prompt);
+    } else {
+        response = core::threading::classify_instructions_ollama(configs, prompt);
+    }
+
+    return std::visit([](auto &&arg) -> bool {
+        if (arg.valid_instructions) {
+            return true;
+        }
+
+        fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red), " Cannot process this query ");
+        fmt::print("\n\n");
+        fmt::print(fg(fmt::terminal_color::bright_yellow), "● {}\n", arg.reasoning);
+        return false;
+    },
+        response);
+}
+
 std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
 {
     const std::string original_code = content.get_original_code();
@@ -95,31 +119,7 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
     return prompt;
 }
 
-template<typename T>
-void print_query_info_(const T &response)
-{
-    fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
-        " Success | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-
-    fmt::print(fg(fmt::color::dim_gray), "\n\n{}\n", response.description);
-
-    utils::print_right_aligned_text(
-        fmt::format("Total time: {}", utils::seconds_to_hhmmss(response.total_time)));
-}
-
-template<typename T>
-void print_refusal_info_(const T &response)
-{
-    fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red),
-        " Refused | Input tokens: {} | Output tokens: {} ", response.input_tokens, response.output_tokens);
-
-    fmt::print(fg(fmt::terminal_color::bright_yellow), "\n\n{}\n", response.description);
-
-    utils::print_right_aligned_text(
-        fmt::format("Total time: {}", utils::seconds_to_hhmmss(response.total_time)));
-}
-
-std::optional<std::string> edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
+std::string edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
     std::variant<adapters::OpenAIEditResponse, adapters::OllamaEditResponse> response;
 
@@ -129,14 +129,15 @@ std::optional<std::string> edit_text_using_llm_(const Configurations &configs, c
         response = core::threading::run_ollama_query(configs, prompt);
     }
 
-    return std::visit([](auto &&arg) -> std::optional<std::string> {
-        if (arg.was_refused) {
-            print_refusal_info_(arg);
-            return std::nullopt;
-        }
+    return std::visit([](auto &&arg) -> std::string {
+        fmt::print(fg(fmt::color::white) | bg(fmt::color::dark_golden_rod),
+            " Success | Input tokens: {} | Output tokens: {} ", arg.input_tokens, arg.output_tokens);
 
-        print_query_info_(arg);
-        return arg.output_text;
+        fmt::print("\n\n");
+        fmt::print(fg(fmt::color::dim_gray), "● {}\n", arg.description_of_changes);
+        utils::print_right_aligned_text(fmt::format("Total time: {}", utils::seconds_to_hhmmss(arg.total_time)));
+
+        return arg.code;
     },
         response);
 }
@@ -179,14 +180,15 @@ void process_file(const Configurations &configs)
 
     CodeToEdit content = import_file_to_edit_(configs);
     const std::string instructions = load_instructions_(configs);
-    const std::string prompt = create_prompt_(configs, content, instructions);
 
-    const std::optional<std::string> modified_code = edit_text_using_llm_(configs, prompt);
-    if (not modified_code) {
+    if (not validate_instructions_(configs, instructions)) {
         utils::print_separator();
         return;
     }
 
-    content.overwrite_original_code(*modified_code);
+    const std::string prompt = create_prompt_(configs, content, instructions);
+    const std::string modified_code = edit_text_using_llm_(configs, prompt);
+
+    content.overwrite_original_code(modified_code);
     export_edited_file_(configs, content);
 }
