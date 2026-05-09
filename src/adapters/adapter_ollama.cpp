@@ -117,11 +117,11 @@ std::string Ollama::query_chat_api_(const std::string &post_fields)
     return response;
 }
 
-std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instructions(const std::string &instructions)
+std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instructions(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompts::system_prompt_classify_instructions() } },
-        { { "role", "user" }, { "content", instructions } },
+        { { "role", "user" }, { "content", prompt } },
     });
     const nlohmann::json fields = {
         { "format", structured_output::schema_classify_instructions() },
