@@ -4,37 +4,50 @@
 #include "system_prompts.hpp"
 
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
 
 namespace adapters {
 
-OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_time)
+OllamaResponse::OllamaResponse(const std::string &response)
 {
-    nlohmann::json json;
-
     try {
-        json = nlohmann::json::parse(response);
+        this->response_ = nlohmann::json::parse(response);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
     }
 
-    if (not json.contains("done")) {
+    if (not this->response_.contains("done")) {
         throw std::runtime_error("The response from Ollama does not contain the 'done' key");
     }
 
-    if (not json["done"]) {
+    if (not this->response_["done"]) {
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
+}
 
-    const structured_output::SchemaEditCode so(json["message"]["content"]);
-    this->description = so.description;
-    this->output_text = so.code;
-    this->was_refused = so.was_refused;
+OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_t) :
+    OllamaResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["prompt_eval_count"];
+    this->output_tokens = this->response_["eval_count"];
 
-    this->input_tokens = json["prompt_eval_count"];
-    this->output_tokens = json["eval_count"];
-    this->total_time = total_time;
+    this->unpack_structured_output_();
+}
+
+void OllamaEditResponse::unpack_structured_output_()
+{
+    nlohmann::json structured_output_;
+
+    try {
+        const std::string content = this->response_["message"]["content"];
+        structured_output_ = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->was_refused = structured_output_.at("was_refused").get<bool>();
+    this->output_text = structured_output_["code"];
+    this->description = structured_output_["description_of_changes"];
 }
 
 OllamaError::OllamaError(const std::string &response, const int status_code) :

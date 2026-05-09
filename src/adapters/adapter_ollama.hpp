@@ -4,13 +4,23 @@
 #include "curl_base.hpp"
 
 #include <expected>
+#include <json.hpp>
 #include <string>
 
 namespace adapters {
 
-struct OllamaEditResponse {
+class OllamaResponse {
+public:
+    OllamaResponse(const std::string &response);
+
+protected:
+    nlohmann::json response_;
+};
+
+class OllamaEditResponse: public OllamaResponse {
+public:
     OllamaEditResponse() = default; // needed for variants
-    OllamaEditResponse(const std::string &response, const double total_time);
+    OllamaEditResponse(const std::string &response, const double total_t);
 
     bool was_refused = false;
     std::string description;
@@ -19,6 +29,9 @@ struct OllamaEditResponse {
     double total_time = 0.0;
     int input_tokens = 0;
     int output_tokens = 0;
+
+private:
+    void unpack_structured_output_();
 };
 
 struct OllamaError {
