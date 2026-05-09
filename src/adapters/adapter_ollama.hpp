@@ -57,6 +57,7 @@ struct OllamaError {
 class Ollama: public CurlBase {
 public:
     Ollama(const Configurations &configs);
+    std::expected<OllamaClassificationResponse, OllamaError> classify_instructions(const std::string &instructions);
     std::expected<OllamaEditResponse, OllamaError> query_edit_code(const std::string &prompt);
 
 private:

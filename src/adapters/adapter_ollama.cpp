@@ -117,6 +117,28 @@ std::string Ollama::query_chat_api_(const std::string &post_fields)
     return response;
 }
 
+std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instructions(const std::string &instructions)
+{
+    const auto messages = nlohmann::json::array({
+        { { "role", "system" }, { "content", system_prompts::system_prompt_classify_instructions() } },
+        { { "role", "user" }, { "content", instructions } },
+    });
+    const nlohmann::json fields = {
+        { "format", structured_output::schema_classify_instructions() },
+        { "messages", messages },
+        { "model", this->model_ },
+        { "stream", false },
+    };
+
+    const std::string response = this->query_chat_api_(fields.dump());
+
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OllamaError(response, http_status_code));
+    }
+    return OllamaClassificationResponse(response);
+}
+
 std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
