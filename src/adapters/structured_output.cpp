@@ -22,7 +22,7 @@ nlohmann::json schema_edit_code()
     };
 }
 
-StructuredOutput::StructuredOutput(const std::string &content)
+SchemaEditCode::SchemaEditCode(const std::string &content)
 {
     nlohmann::json json;
 

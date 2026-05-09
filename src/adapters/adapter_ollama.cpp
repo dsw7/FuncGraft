@@ -27,7 +27,7 @@ OllamaEditResponse::OllamaEditResponse(const std::string &response, const double
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const structured_output::StructuredOutput so(json["message"]["content"]);
+    const structured_output::SchemaEditCode so(json["message"]["content"]);
     this->description = so.description;
     this->output_text = so.code;
     this->was_refused = so.was_refused;
@@ -94,7 +94,6 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
         { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
         { { "role", "user" }, { "content", prompt } },
     });
-
     const nlohmann::json fields = {
         { "format", structured_output::schema_edit_code() },
         { "messages", messages },

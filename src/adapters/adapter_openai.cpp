@@ -46,7 +46,7 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
     }
 
     const std::string content = this->extract_output_from_response_();
-    const structured_output::StructuredOutput so(content);
+    const structured_output::SchemaEditCode so(content);
     this->description = so.description;
     this->output_text = so.code;
     this->was_refused = so.was_refused;
@@ -155,7 +155,6 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
             },
         }
     };
-
     const nlohmann::json fields = {
         { "input", prompt },
         { "instructions", system_prompts::system_prompt_edit_code() },
