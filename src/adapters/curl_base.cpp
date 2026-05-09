@@ -40,6 +40,18 @@ CurlBase::~CurlBase()
     curl_global_cleanup();
 }
 
+long CurlBase::get_http_status_code_()
+{
+    long http_status_code = -1;
+
+    const CURLcode return_code = curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
+    if (return_code != CURLE_OK) {
+        throw std::runtime_error(curl_easy_strerror(return_code));
+    }
+
+    return http_status_code;
+}
+
 double CurlBase::get_rtt_time_()
 {
     double rtt_time = 0.0;

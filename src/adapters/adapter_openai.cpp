@@ -165,15 +165,9 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
         throw std::runtime_error(curl_easy_strerror(code));
     }
 
-    long http_status_code = -1;
-
-    const CURLcode return_code = curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
-    if (return_code == CURLE_OK) {
-        if (http_status_code != 200) {
-            return std::unexpected(OpenAIError(response, http_status_code));
-        }
-    } else {
-        throw std::runtime_error(curl_easy_strerror(return_code));
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OpenAIError(response, http_status_code));
     }
 
     const double total_time = this->get_rtt_time_();
