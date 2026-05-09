@@ -18,15 +18,11 @@ protected:
     nlohmann::json response_;
 };
 
-class OllamaClassificationResponse: public OllamaResponse {
-public:
+struct OllamaClassificationResponse: public OllamaResponse {
     OllamaClassificationResponse(const std::string &response);
 
     bool valid_instructions = false;
     std::string reasoning;
-
-private:
-    void unpack_structured_output_();
 };
 
 class OllamaEditResponse: public OllamaResponse {
