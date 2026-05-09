@@ -61,7 +61,7 @@ void OllamaEditResponse::unpack_structured_output_()
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    this->output_text = structured_output["code"];
+    this->code = structured_output["code"];
     this->description_of_changes = structured_output["description_of_changes"];
 }
 

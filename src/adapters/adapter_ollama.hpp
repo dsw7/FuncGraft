@@ -32,7 +32,7 @@ public:
     OllamaEditResponse(const std::string &response, const double total_t);
 
     std::string description_of_changes;
-    std::string output_text;
+    std::string code;
 
     double total_time = 0.0;
     int input_tokens = 0;
