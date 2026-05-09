@@ -1,6 +1,7 @@
 #include "adapter_openai.hpp"
 
 #include "components.hpp"
+#include "system_prompts.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
@@ -40,7 +41,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
     const nlohmann::json fields = {
         { "input", prompt },
-        { "instructions", components::get_system_prompt() },
+        { "instructions", system_prompts::system_prompt_edit_code() },
         { "model", model },
         { "store", false },
         { "temperature", 1.00 },

@@ -14,6 +14,7 @@ set(SRC_FILES
   adapters/adapter_openai.cpp
   adapters/components.cpp
   adapters/curl_base.cpp
+  adapters/system_prompts.cpp
   configs.cpp
   core/code.cpp
   core/datadir.cpp

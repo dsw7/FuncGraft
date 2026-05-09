@@ -1,6 +1,7 @@
 #include "adapter_ollama.hpp"
 
 #include "components.hpp"
+#include "system_prompts.hpp"
 
 #include <fmt/core.h>
 #include <json.hpp>
@@ -11,7 +12,7 @@ namespace {
 std::string get_post_fields_(const std::string &prompt, const std::string &model)
 {
     const auto messages = nlohmann::json::array({
-        { { "role", "system" }, { "content", components::get_system_prompt() } },
+        { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
         { { "role", "user" }, { "content", prompt } },
     });
 
