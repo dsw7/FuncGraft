@@ -81,6 +81,30 @@ std::string load_instructions_(const Configurations &configs)
     return instructions;
 }
 
+bool validate_instructions_(const Configurations &configs, const std::string &instructions)
+{
+    const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
+    std::variant<adapters::OpenAIClassificationResponse, adapters::OllamaClassificationResponse> response;
+
+    if (configs.provider == "openai") {
+        response = core::threading::classify_instructions_openai(configs, prompt);
+    } else {
+        response = core::threading::classify_instructions_ollama(configs, prompt);
+    }
+
+    return std::visit([](auto &&arg) -> bool {
+        if (arg.valid_instructions) {
+            return true;
+        }
+
+        fmt::print(fg(fmt::color::black) | bg(fmt::color::orange_red), " Cannot process this query ");
+        fmt::print("\n\n");
+        fmt::print(fg(fmt::terminal_color::bright_yellow), "● {}\n", arg.reasoning);
+        return false;
+    },
+        response);
+}
+
 std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
 {
     const std::string original_code = content.get_original_code();
@@ -179,6 +203,12 @@ void process_file(const Configurations &configs)
 
     CodeToEdit content = import_file_to_edit_(configs);
     const std::string instructions = load_instructions_(configs);
+
+    if (not validate_instructions_(configs, instructions)) {
+        utils::print_separator();
+        return;
+    }
+
     const std::string prompt = create_prompt_(configs, content, instructions);
 
     const std::optional<std::string> modified_code = edit_text_using_llm_(configs, prompt);
