@@ -9,11 +9,11 @@ nlohmann::json schema_classify_instructions()
         {
             "properties",
             {
-                { "valid_instructions", { { "type", "boolean" } } },
                 { "reasoning", { { "type", "string" } } },
+                { "valid_instructions", { { "type", "boolean" } } },
             },
         },
-        { "required", { "valid_instructions", "reasoning" } },
+        { "required", { "reasoning", "valid_instructions" } },
         { "additionalProperties", false },
     };
 }
