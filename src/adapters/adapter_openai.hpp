@@ -34,7 +34,6 @@ public:
         OpenAIResponse() {} // needed for variants
     OpenAIEditResponse(const std::string &response, const double total_t);
 
-    bool was_refused = false;
     std::string description;
     std::string output_text;
 

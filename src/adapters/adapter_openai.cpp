@@ -104,7 +104,6 @@ void OpenAIEditResponse::unpack_structured_output_()
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
     }
 
-    this->was_refused = structured_output.at("was_refused").get<bool>();
     this->output_text = structured_output["code"];
     this->description = structured_output["description_of_changes"];
 }
