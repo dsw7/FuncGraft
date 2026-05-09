@@ -1,6 +1,6 @@
 #include "adapter_ollama.hpp"
 
-#include "components.hpp"
+#include "structured_output.hpp"
 #include "system_prompts.hpp"
 
 #include <fmt/core.h>
@@ -17,7 +17,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
     });
 
     const nlohmann::json fields = {
-        { "format", components::get_structured_output_schema() },
+        { "format", structured_output::get_structured_output_schema() },
         { "messages", messages },
         { "model", model },
         { "stream", false },
@@ -48,7 +48,7 @@ OllamaResponse::OllamaResponse(const std::string &response, const double total_t
         throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
 
-    const components::StructuredOutput so(json["message"]["content"]);
+    const structured_output::StructuredOutput so(json["message"]["content"]);
     this->description = so.description;
     this->output_text = so.code;
     this->was_refused = so.was_refused;

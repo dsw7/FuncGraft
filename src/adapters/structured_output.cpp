@@ -1,9 +1,9 @@
-#include "components.hpp"
+#include "structured_output.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
 
-namespace components {
+namespace structured_output {
 
 nlohmann::json get_structured_output_schema()
 {
@@ -37,4 +37,4 @@ StructuredOutput::StructuredOutput(const std::string &content)
     this->description = json["description_of_changes"];
 }
 
-} // namespace components
+} // namespace structured_output

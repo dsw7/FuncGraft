@@ -3,7 +3,7 @@
 #include <json.hpp>
 #include <string>
 
-namespace components {
+namespace structured_output {
 
 nlohmann::json get_structured_output_schema();
 
@@ -15,4 +15,4 @@ struct StructuredOutput {
     std::string description;
 };
 
-} // namespace components
+} // namespace structured_output

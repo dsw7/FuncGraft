@@ -1,6 +1,6 @@
 #include "adapter_openai.hpp"
 
-#include "components.hpp"
+#include "structured_output.hpp"
 #include "system_prompts.hpp"
 
 #include <fmt/core.h>
@@ -32,7 +32,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
             "format",
             {
                 { "name", "updated_code" },
-                { "schema", components::get_structured_output_schema() },
+                { "schema", structured_output::get_structured_output_schema() },
                 { "strict", true },
                 { "type", "json_schema" },
             },
@@ -71,7 +71,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response, const double total_t
     }
 
     const std::string content = this->extract_output_from_response_();
-    const components::StructuredOutput so(content);
+    const structured_output::StructuredOutput so(content);
     this->description = so.description;
     this->output_text = so.code;
     this->was_refused = so.was_refused;
