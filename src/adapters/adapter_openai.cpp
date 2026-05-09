@@ -46,6 +46,38 @@ OpenAIResponse::OpenAIResponse(const std::string &response)
     }
 }
 
+OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
+    OpenAIResponse(response)
+{
+    std::string text;
+
+    for (const auto &item: this->response_["output"]) {
+        if (item["type"] == "message") {
+            if (item["status"] == "completed") {
+                if (item["content"][0]["type"] == "output_text") {
+                    text = item["content"][0]["text"];
+                    break;
+                }
+            }
+        }
+    }
+
+    if (text.empty()) {
+        throw std::runtime_error("Something went wrong. OpenAI did not return output text");
+    }
+
+    nlohmann::json structured_output;
+
+    try {
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
+
 OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_t) :
     OpenAIResponse(response), total_time(total_t)
 {
@@ -138,6 +170,37 @@ std::string OpenAI::query_responses_api_(const std::string &post_fields)
     }
 
     return response;
+}
+
+std::expected<OpenAIClassificationResponse, OpenAIError> OpenAI::classify_instructions(const std::string &prompt)
+{
+    const nlohmann::json response_format = {
+        {
+            "format",
+            {
+                { "name", "instruction_classification" },
+                { "schema", structured_output::schema_classify_instructions() },
+                { "strict", true },
+                { "type", "json_schema" },
+            },
+        }
+    };
+    const nlohmann::json fields = {
+        { "input", prompt },
+        { "instructions", system_prompts::system_prompt_classify_instructions() },
+        { "model", this->model_ },
+        { "store", false },
+        { "temperature", 0.00 },
+        { "text", response_format },
+    };
+
+    const std::string response = this->query_responses_api_(fields.dump());
+
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OpenAIError(response, http_status_code));
+    }
+    return OpenAIClassificationResponse(response);
 }
 
 std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)

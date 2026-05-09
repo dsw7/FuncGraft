@@ -18,6 +18,13 @@ protected:
     nlohmann::json response_;
 };
 
+struct OpenAIClassificationResponse: public OpenAIResponse {
+    OpenAIClassificationResponse(const std::string &response);
+
+    bool valid_instructions = false;
+    std::string reasoning;
+};
+
 class OpenAIEditResponse: public OpenAIResponse {
 public:
     OpenAIEditResponse() :
@@ -46,6 +53,7 @@ struct OpenAIError {
 class OpenAI: public CurlBase {
 public:
     OpenAI(const Configurations &configs);
+    std::expected<OpenAIClassificationResponse, OpenAIError> classify_instructions(const std::string &prompt);
     std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:
