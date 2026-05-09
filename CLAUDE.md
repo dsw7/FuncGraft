@@ -66,8 +66,9 @@ src/
 ├── adapters/             # LLM provider implementations
 │   ├── adapter_openai.cpp/.hpp
 │   ├── adapter_ollama.cpp/.hpp
-│   ├── curl_base.cpp/.hpp       # Shared curl connection logic
-│   ├── components.cpp/.hpp      # JSON schema generation, structured output parsing
+│   ├── curl_base.cpp/.hpp          # Shared curl connection logic
+│   ├── system_prompts.cpp/.hpp     # Generate system prompts
+│   ├── structured_output.cpp/.hpp  # All structured output management
 ├── core/                 # Core domain logic
 │   ├── prompt.cpp/.hpp   # Prompt generation and building
 │   ├── code.cpp/.hpp     # Code block extraction/manipulation
