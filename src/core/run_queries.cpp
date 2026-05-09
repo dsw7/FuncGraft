@@ -34,6 +34,30 @@ void time_api_call_()
 namespace core {
 namespace threading {
 
+adapters::OpenAIClassificationResponse classify_instructions_openai(const Configurations &configs, const std::string &prompt)
+{
+    using OpenAIResults = std::expected<adapters::OpenAIClassificationResponse, adapters::OpenAIError>;
+
+    OpenAIResults results = adapters::OpenAI(configs).classify_instructions(prompt);
+
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
+    }
+    return *results;
+}
+
+adapters::OllamaClassificationResponse classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
+{
+    using OllamaResults = std::expected<adapters::OllamaClassificationResponse, adapters::OllamaError>;
+
+    OllamaResults results = adapters::Ollama(configs).classify_instructions(prompt);
+
+    if (not results) {
+        throw std::runtime_error(results.error().errmsg);
+    }
+    return *results;
+}
+
 adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, const std::string &prompt)
 {
     using OpenAIResults = std::expected<adapters::OpenAIEditResponse, adapters::OpenAIError>;
