@@ -34,6 +34,8 @@ public:
     std::expected<OllamaEditResponse, OllamaError> query_edit_code(const std::string &prompt);
 
 private:
+    std::string query_chat_api_(const std::string &post_fields);
+
     std::string model_;
     std::string host_ollama_;
     int port_ollama_ = 11434;

@@ -7,27 +7,6 @@
 #include <json.hpp>
 #include <stdexcept>
 
-namespace {
-
-std::string get_post_fields_(const std::string &prompt, const std::string &model)
-{
-    const auto messages = nlohmann::json::array({
-        { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
-        { { "role", "user" }, { "content", prompt } },
-    });
-
-    const nlohmann::json fields = {
-        { "format", structured_output::get_structured_output_schema() },
-        { "messages", messages },
-        { "model", model },
-        { "stream", false },
-    };
-
-    return fields.dump();
-}
-
-} // namespace
-
 namespace adapters {
 
 OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_time)
@@ -83,7 +62,7 @@ Ollama::Ollama(const Configurations &configs)
     this->port_ollama_ = configs.port_ollama;
 }
 
-std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
+std::string Ollama::query_chat_api_(const std::string &post_fields)
 {
     const std::string url = fmt::format("http://{}:{}/api/chat", this->host_ollama_, this->port_ollama_);
     curl_easy_setopt(this->handle_, CURLOPT_URL, url.c_str());
@@ -93,7 +72,6 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = get_post_fields_(prompt, this->model_);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
@@ -106,6 +84,26 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
+
+    return response;
+}
+
+std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
+{
+    const auto messages = nlohmann::json::array({
+        { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
+        { { "role", "user" }, { "content", prompt } },
+    });
+
+    const nlohmann::json fields = {
+        { "format", structured_output::get_structured_output_schema() },
+        { "messages", messages },
+        { "model", this->model_ },
+        { "stream", false },
+    };
+
+    const std::string post_fields = fields.dump();
+    const std::string response = this->query_chat_api_(post_fields);
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
