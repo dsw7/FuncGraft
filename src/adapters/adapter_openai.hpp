@@ -20,6 +20,8 @@ protected:
 };
 
 struct OpenAIClassificationResponse: public OpenAIResponse {
+    OpenAIClassificationResponse() :
+        OpenAIResponse() {} // needed for variants
     OpenAIClassificationResponse(const std::string &response);
 
     bool valid_instructions = false;
