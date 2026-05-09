@@ -96,7 +96,7 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
     });
 
     const nlohmann::json fields = {
-        { "format", structured_output::get_structured_output_schema() },
+        { "format", structured_output::schema_edit_code() },
         { "messages", messages },
         { "model", this->model_ },
         { "stream", false },

@@ -5,7 +5,7 @@
 
 namespace structured_output {
 
-nlohmann::json get_structured_output_schema()
+nlohmann::json schema_edit_code()
 {
     return {
         { "type", "object" },

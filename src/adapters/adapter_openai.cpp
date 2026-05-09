@@ -149,7 +149,7 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
             "format",
             {
                 { "name", "updated_code" },
-                { "schema", structured_output::get_structured_output_schema() },
+                { "schema", structured_output::schema_edit_code() },
                 { "strict", true },
                 { "type", "json_schema" },
             },
