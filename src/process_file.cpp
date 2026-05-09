@@ -4,8 +4,8 @@
 #include "adapter_openai.hpp"
 #include "code.hpp"
 #include "configs.hpp"
-#include "prompt.hpp"
 #include "run_queries.hpp"
+#include "user_prompts.hpp"
 #include "utils.hpp"
 
 #include <fmt/color.h>
@@ -84,7 +84,7 @@ std::string load_instructions_(const Configurations &configs)
 std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
 {
     const std::string original_code = content.get_original_code();
-    const std::string prompt = core::prompt::build_prompt(configs, instructions, original_code);
+    const std::string prompt = core::user_prompts::prompt_edit_code(configs, instructions, original_code);
 
     if (configs.verbose) {
         fmt::print(fmt::emphasis::bold, "Prompt:\n");

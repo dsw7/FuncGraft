@@ -1,4 +1,4 @@
-#include "prompt.hpp"
+#include "user_prompts.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -91,9 +91,9 @@ std::string get_code_block_(const std::string &body, const std::string &label)
 } // namespace
 
 namespace core {
-namespace prompt {
+namespace user_prompts {
 
-std::string build_prompt(const Configurations &configs, const std::string &instructions, const std::string &text_to_edit)
+std::string prompt_edit_code(const Configurations &configs, const std::string &instructions, const std::string &text_to_edit)
 {
     if (instructions.empty()) {
         throw std::runtime_error("Instructions are empty!");
@@ -116,5 +116,5 @@ To the following code:
         code_block_to_edit);
 }
 
-} // namespace prompt
+} // namespace user_prompts
 } // namespace core
