@@ -46,8 +46,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response)
     }
 }
 
-OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
-    OpenAIResponse(response)
+std::string OpenAIResponse::get_text_from_response_()
 {
     std::string text;
 
@@ -66,9 +65,16 @@ OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &re
         throw std::runtime_error("Something went wrong. OpenAI did not return output text");
     }
 
+    return text;
+}
+
+OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
+    OpenAIResponse(response)
+{
     nlohmann::json structured_output;
 
     try {
+        const std::string text = this->get_text_from_response_();
         structured_output = nlohmann::json::parse(text);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
@@ -89,26 +95,10 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
 
 void OpenAIEditResponse::unpack_structured_output_()
 {
-    std::string text;
-
-    for (const auto &item: this->response_["output"]) {
-        if (item["type"] == "message") {
-            if (item["status"] == "completed") {
-                if (item["content"][0]["type"] == "output_text") {
-                    text = item["content"][0]["text"];
-                    break;
-                }
-            }
-        }
-    }
-
-    if (text.empty()) {
-        throw std::runtime_error("Something went wrong. OpenAI did not return output text");
-    }
-
     nlohmann::json structured_output;
 
     try {
+        const std::string text = this->get_text_from_response_();
         structured_output = nlohmann::json::parse(text);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));

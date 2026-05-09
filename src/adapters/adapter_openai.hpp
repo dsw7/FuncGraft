@@ -15,6 +15,7 @@ public:
     OpenAIResponse(const std::string &response);
 
 protected:
+    std::string get_text_from_response_();
     nlohmann::json response_;
 };
 
