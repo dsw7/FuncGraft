@@ -8,9 +8,9 @@
 
 namespace adapters {
 
-struct OllamaResponse {
-    OllamaResponse() = default; // needed for variants
-    OllamaResponse(const std::string &response, const double total_time);
+struct OllamaEditResponse {
+    OllamaEditResponse() = default; // needed for variants
+    OllamaEditResponse(const std::string &response, const double total_time);
 
     bool was_refused = false;
     std::string description;
@@ -31,9 +31,11 @@ struct OllamaError {
 class Ollama: public CurlBase {
 public:
     Ollama(const Configurations &configs);
-    std::expected<OllamaResponse, OllamaError> query_generate_api(const std::string &prompt);
+    std::expected<OllamaEditResponse, OllamaError> query_edit_code(const std::string &prompt);
 
 private:
+    std::string query_chat_api_(const std::string &post_fields);
+
     std::string model_;
     std::string host_ollama_;
     int port_ollama_ = 11434;

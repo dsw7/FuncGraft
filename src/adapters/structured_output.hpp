@@ -5,10 +5,10 @@
 
 namespace structured_output {
 
-nlohmann::json get_structured_output_schema();
+nlohmann::json schema_edit_code();
 
-struct StructuredOutput {
-    StructuredOutput(const std::string &message);
+struct SchemaEditCode {
+    SchemaEditCode(const std::string &message);
 
     bool was_refused = false;
     std::string code;

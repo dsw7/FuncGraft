@@ -25,36 +25,11 @@ std::string get_openai_user_api_key_()
     return api_key;
 }
 
-std::string get_post_fields_(const std::string &prompt, const std::string &model)
-{
-    const nlohmann::json response_format = {
-        {
-            "format",
-            {
-                { "name", "updated_code" },
-                { "schema", structured_output::get_structured_output_schema() },
-                { "strict", true },
-                { "type", "json_schema" },
-            },
-        }
-    };
-
-    const nlohmann::json fields = {
-        { "input", prompt },
-        { "instructions", system_prompts::system_prompt_edit_code() },
-        { "model", model },
-        { "store", false },
-        { "temperature", 1.00 },
-        { "text", response_format },
-    };
-    return fields.dump();
-}
-
 } // namespace
 
 namespace adapters {
 
-OpenAIResponse::OpenAIResponse(const std::string &response, const double total_time)
+OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_time)
 {
     try {
         this->response_ = nlohmann::json::parse(response);
@@ -71,7 +46,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response, const double total_t
     }
 
     const std::string content = this->extract_output_from_response_();
-    const structured_output::StructuredOutput so(content);
+    const structured_output::SchemaEditCode so(content);
     this->description = so.description;
     this->output_text = so.code;
     this->was_refused = so.was_refused;
@@ -81,7 +56,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response, const double total_t
     this->total_time = total_time;
 }
 
-std::string OpenAIResponse::extract_output_from_response_()
+std::string OpenAIEditResponse::extract_output_from_response_()
 {
     nlohmann::json content;
     bool job_complete = false;
@@ -141,7 +116,7 @@ OpenAI::OpenAI(const Configurations &configs)
     this->model_ = configs.model_openai;
 }
 
-std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std::string &prompt)
+std::string OpenAI::query_responses_api_(const std::string &post_fields)
 {
     curl_easy_setopt(this->handle_, CURLOPT_URL, "https://api.openai.com/v1/responses");
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
@@ -151,7 +126,6 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
     headers = curl_slist_append(headers, ("Authorization: Bearer " + get_openai_user_api_key_()).c_str());
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = get_post_fields_(prompt, this->model_);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
@@ -165,19 +139,41 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
         throw std::runtime_error(curl_easy_strerror(code));
     }
 
-    long http_status_code = -1;
+    return response;
+}
 
-    const CURLcode return_code = curl_easy_getinfo(this->handle_, CURLINFO_RESPONSE_CODE, &http_status_code);
-    if (return_code == CURLE_OK) {
-        if (http_status_code != 200) {
-            return std::unexpected(OpenAIError(response, http_status_code));
+std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
+{
+    const nlohmann::json response_format = {
+        {
+            "format",
+            {
+                { "name", "updated_code" },
+                { "schema", structured_output::schema_edit_code() },
+                { "strict", true },
+                { "type", "json_schema" },
+            },
         }
-    } else {
-        throw std::runtime_error(curl_easy_strerror(return_code));
+    };
+    const nlohmann::json fields = {
+        { "input", prompt },
+        { "instructions", system_prompts::system_prompt_edit_code() },
+        { "model", this->model_ },
+        { "store", false },
+        { "temperature", 1.00 },
+        { "text", response_format },
+    };
+
+    const std::string post_fields = fields.dump();
+    const std::string response = this->query_responses_api_(post_fields);
+
+    long http_status_code = this->get_http_status_code_();
+    if (http_status_code != 200) {
+        return std::unexpected(OpenAIError(response, http_status_code));
     }
 
     const double total_time = this->get_rtt_time_();
-    return OpenAIResponse(response, total_time);
+    return OpenAIEditResponse(response, total_time);
 }
 
 } // namespace adapters

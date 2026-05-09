@@ -5,8 +5,8 @@
 #include <string>
 
 namespace core {
-namespace prompt {
-std::string build_prompt(
+namespace user_prompts {
+std::string prompt_edit_code(
     const Configurations &configs, const std::string &instructions, const std::string &text_to_edit);
 }
 } // namespace core

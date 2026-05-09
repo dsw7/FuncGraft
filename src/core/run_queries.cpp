@@ -34,9 +34,9 @@ void time_api_call_()
 namespace core {
 namespace threading {
 
-adapters::OpenAIResponse run_openai_query(const Configurations &configs, const std::string &prompt)
+adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, const std::string &prompt)
 {
-    using OpenAIResults = std::expected<adapters::OpenAIResponse, adapters::OpenAIError>;
+    using OpenAIResults = std::expected<adapters::OpenAIEditResponse, adapters::OpenAIError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
@@ -46,7 +46,7 @@ adapters::OpenAIResponse run_openai_query(const Configurations &configs, const s
     std::string errmsg;
 
     try {
-        results = adapters::OpenAI(configs).query_messages_api(prompt);
+        results = adapters::OpenAI(configs).query_edit_code(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -68,9 +68,9 @@ adapters::OpenAIResponse run_openai_query(const Configurations &configs, const s
     return *response;
 }
 
-adapters::OllamaResponse run_ollama_query(const Configurations &configs, const std::string &prompt)
+adapters::OllamaEditResponse run_ollama_query(const Configurations &configs, const std::string &prompt)
 {
-    using OllamaResults = std::expected<adapters::OllamaResponse, adapters::OllamaError>;
+    using OllamaResults = std::expected<adapters::OllamaEditResponse, adapters::OllamaError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
@@ -80,7 +80,7 @@ adapters::OllamaResponse run_ollama_query(const Configurations &configs, const s
     std::string errmsg;
 
     try {
-        results = adapters::Ollama(configs).query_generate_api(prompt);
+        results = adapters::Ollama(configs).query_edit_code(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;

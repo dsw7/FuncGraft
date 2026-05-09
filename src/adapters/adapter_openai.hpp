@@ -9,10 +9,10 @@
 
 namespace adapters {
 
-class OpenAIResponse {
+class OpenAIEditResponse {
 public:
-    OpenAIResponse() = default; // needed for variants
-    OpenAIResponse(const std::string &response, const double total_time);
+    OpenAIEditResponse() = default; // needed for variants
+    OpenAIEditResponse(const std::string &response, const double total_time);
 
     bool was_refused = false;
     std::string description;
@@ -37,9 +37,11 @@ struct OpenAIError {
 class OpenAI: public CurlBase {
 public:
     OpenAI(const Configurations &configs);
-    std::expected<OpenAIResponse, OpenAIError> query_messages_api(const std::string &prompt);
+    std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:
+    std::string query_responses_api_(const std::string &post_fields);
+
     std::string model_;
 };
 
