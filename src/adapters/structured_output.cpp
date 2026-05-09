@@ -25,12 +25,11 @@ nlohmann::json schema_edit_code()
         {
             "properties",
             {
-                { "was_refused", { { "type", "boolean" } } },
-                { "code", { { "type", "string" } } },
                 { "description_of_changes", { { "type", "string" } } },
+                { "code", { { "type", "string" } } },
             },
         },
-        { "required", { "was_refused", "code", "description_of_changes" } },
+        { "required", { "description_of_changes", "code" } },
         { "additionalProperties", false },
     };
 }
