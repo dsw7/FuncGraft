@@ -63,13 +63,4 @@ SchemaClassifyInstructions::SchemaClassifyInstructions(const std::string &conten
     this->reasoning = json["reasoning"];
 }
 
-SchemaEditCode::SchemaEditCode(const std::string &content)
-{
-    const nlohmann::json json = parse_structured_output_(content);
-
-    this->was_refused = json.at("was_refused").get<bool>();
-    this->code = json["code"];
-    this->description = json["description_of_changes"];
-}
-
 } // namespace structured_output
