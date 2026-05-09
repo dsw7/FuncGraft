@@ -40,6 +40,8 @@ public:
     std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:
+    std::string query_responses_api_(const std::string &post_fields);
+
     std::string model_;
 };
 

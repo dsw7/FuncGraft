@@ -25,31 +25,6 @@ std::string get_openai_user_api_key_()
     return api_key;
 }
 
-std::string get_post_fields_(const std::string &prompt, const std::string &model)
-{
-    const nlohmann::json response_format = {
-        {
-            "format",
-            {
-                { "name", "updated_code" },
-                { "schema", structured_output::get_structured_output_schema() },
-                { "strict", true },
-                { "type", "json_schema" },
-            },
-        }
-    };
-
-    const nlohmann::json fields = {
-        { "input", prompt },
-        { "instructions", system_prompts::system_prompt_edit_code() },
-        { "model", model },
-        { "store", false },
-        { "temperature", 1.00 },
-        { "text", response_format },
-    };
-    return fields.dump();
-}
-
 } // namespace
 
 namespace adapters {
@@ -141,7 +116,7 @@ OpenAI::OpenAI(const Configurations &configs)
     this->model_ = configs.model_openai;
 }
 
-std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
+std::string OpenAI::query_responses_api_(const std::string &post_fields)
 {
     curl_easy_setopt(this->handle_, CURLOPT_URL, "https://api.openai.com/v1/responses");
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
@@ -151,7 +126,6 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
     headers = curl_slist_append(headers, ("Authorization: Bearer " + get_openai_user_api_key_()).c_str());
     curl_easy_setopt(this->handle_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = get_post_fields_(prompt, this->model_);
     curl_easy_setopt(this->handle_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
@@ -164,6 +138,35 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
+
+    return response;
+}
+
+std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
+{
+    const nlohmann::json response_format = {
+        {
+            "format",
+            {
+                { "name", "updated_code" },
+                { "schema", structured_output::get_structured_output_schema() },
+                { "strict", true },
+                { "type", "json_schema" },
+            },
+        }
+    };
+
+    const nlohmann::json fields = {
+        { "input", prompt },
+        { "instructions", system_prompts::system_prompt_edit_code() },
+        { "model", this->model_ },
+        { "store", false },
+        { "temperature", 1.00 },
+        { "text", response_format },
+    };
+
+    const std::string post_fields = fields.dump();
+    const std::string response = this->query_responses_api_(post_fields);
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
