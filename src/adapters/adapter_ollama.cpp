@@ -128,6 +128,7 @@ std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instru
         { "messages", messages },
         { "model", this->model_ },
         { "stream", false },
+        { "temperature", 0.00 },
     };
 
     const std::string response = this->query_chat_api_(fields.dump());
