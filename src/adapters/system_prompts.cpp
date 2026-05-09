@@ -2,6 +2,21 @@
 
 namespace system_prompts {
 
+std::string system_prompt_classify_instructions()
+{
+    return R"(
+You are a helpful assistant that specializes in classification.
+The user will provide instructions. Classify the instructions as follows:
+
+If the instructions are related to programming, then:
+  Set `valid_instructions` to true.
+  Set `reasoning` to "Valid instructions".
+Otherwise:
+  Set `valid_instructions` to false.
+  Set `reasoning` to a description of why the instructions are invalid.
+)";
+}
+
 std::string system_prompt_edit_code()
 {
     return R"(
