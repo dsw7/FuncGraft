@@ -54,7 +54,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 namespace adapters {
 
-OpenAIResponse::OpenAIResponse(const std::string &response, const double total_time)
+OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_time)
 {
     try {
         this->response_ = nlohmann::json::parse(response);
@@ -81,7 +81,7 @@ OpenAIResponse::OpenAIResponse(const std::string &response, const double total_t
     this->total_time = total_time;
 }
 
-std::string OpenAIResponse::extract_output_from_response_()
+std::string OpenAIEditResponse::extract_output_from_response_()
 {
     nlohmann::json content;
     bool job_complete = false;
@@ -141,7 +141,7 @@ OpenAI::OpenAI(const Configurations &configs)
     this->model_ = configs.model_openai;
 }
 
-std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std::string &prompt)
+std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
 {
     curl_easy_setopt(this->handle_, CURLOPT_URL, "https://api.openai.com/v1/responses");
     curl_easy_setopt(this->handle_, CURLOPT_POST, 1L);
@@ -177,7 +177,7 @@ std::expected<OpenAIResponse, OpenAIError> OpenAI::query_messages_api(const std:
     }
 
     const double total_time = this->get_rtt_time_();
-    return OpenAIResponse(response, total_time);
+    return OpenAIEditResponse(response, total_time);
 }
 
 } // namespace adapters
