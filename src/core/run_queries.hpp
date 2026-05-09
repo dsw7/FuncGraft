@@ -9,6 +9,6 @@
 namespace core {
 namespace threading {
 adapters::OpenAIResponse run_openai_query(const Configurations &configs, const std::string &prompt);
-adapters::OllamaResponse run_ollama_query(const Configurations &configs, const std::string &prompt);
+adapters::OllamaEditResponse run_ollama_query(const Configurations &configs, const std::string &prompt);
 } // namespace threading
 } // namespace core

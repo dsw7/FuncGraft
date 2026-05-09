@@ -121,7 +121,7 @@ void print_refusal_info_(const T &response)
 
 std::optional<std::string> edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
-    std::variant<adapters::OpenAIResponse, adapters::OllamaResponse> response;
+    std::variant<adapters::OpenAIResponse, adapters::OllamaEditResponse> response;
 
     if (configs.provider == "openai") {
         response = core::threading::run_openai_query(configs, prompt);

@@ -30,7 +30,7 @@ std::string get_post_fields_(const std::string &prompt, const std::string &model
 
 namespace adapters {
 
-OllamaResponse::OllamaResponse(const std::string &response, const double total_time)
+OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_time)
 {
     nlohmann::json json;
 
@@ -83,7 +83,7 @@ Ollama::Ollama(const Configurations &configs)
     this->port_ollama_ = configs.port_ollama;
 }
 
-std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std::string &prompt)
+std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
 {
     const std::string url = fmt::format("http://{}:{}/api/chat", this->host_ollama_, this->port_ollama_);
     curl_easy_setopt(this->handle_, CURLOPT_URL, url.c_str());
@@ -119,7 +119,7 @@ std::expected<OllamaResponse, OllamaError> Ollama::query_generate_api(const std:
     }
 
     const double total_time = this->get_rtt_time_();
-    return OllamaResponse(response, total_time);
+    return OllamaEditResponse(response, total_time);
 }
 
 } // namespace adapters
