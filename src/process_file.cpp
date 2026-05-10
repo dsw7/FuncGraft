@@ -65,6 +65,17 @@ std::string load_instructions_(const Configurations &configs)
     return instructions;
 }
 
+bool check_for_special_command_(const std::string &instructions)
+{
+    if (instructions == "quit") {
+        return false;
+    } else if (instructions == "exit") {
+        return false;
+    }
+
+    return true;
+}
+
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
     const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
@@ -179,6 +190,10 @@ void process_file(const Configurations &configs)
     print_program_info_(configs);
 
     const std::string instructions = load_instructions_(configs);
+
+    if (not check_for_special_command_(instructions)) {
+        return;
+    }
 
     if (not validate_instructions_(configs, instructions)) {
         utils::print_separator();
