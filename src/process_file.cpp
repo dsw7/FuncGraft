@@ -68,9 +68,10 @@ std::string load_instructions_(const Configurations &configs)
 
 bool check_for_special_command_(const std::string &instructions)
 {
-    if (instructions == "quit") {
-        return false;
-    } else if (instructions == "exit") {
+    if (instructions == "quit" or instructions == "exit") {
+#ifdef TESTING_ENABLED
+        fmt::print("Program aborted\n");
+#endif
         return false;
     }
 
