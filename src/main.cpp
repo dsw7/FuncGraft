@@ -14,7 +14,9 @@
 void print_help_messages()
 {
     fmt::print("-- FuncGraft | Copyright (C) {} by David Weber\n", CURRENT_YEAR);
-
+#ifdef TESTING_ENABLED
+    fmt::print("-- Build type: TESTING\n");
+#endif
     const std::string messages = R"(-- See https://github.com/dsw7/FuncGraft for more information
 
 Program for editing individual files using LLMs. This program
@@ -43,7 +45,6 @@ Examples:
     $ edit foo.cpp -o bar.cpp
   > Edit a file in accordance with a long, multiline prompt:
     $ edit foo.cpp -o bar.cpp -f instructions.txt
-
 )";
 
     fmt::print("{}", messages);
