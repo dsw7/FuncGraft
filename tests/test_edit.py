@@ -146,7 +146,7 @@ def test_reject_unrelated_instructions(provider: str, file_to_edit: Path) -> Non
         "What is the weather in Phoenix, Arizona?",
         "Why did the dinosaurs go extinct?",
         "How to sew a canvas tool roll?",
-        "Who is the 32 Prime Minister of Canada?",
+        "Who is the 32nd Prime Minister of Canada?",
         "What is limit sell order?",
     ],
 )

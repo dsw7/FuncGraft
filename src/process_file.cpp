@@ -17,6 +17,8 @@
 
 namespace {
 
+using core::code::CodeToEdit;
+
 void print_program_info_(const Configurations &configs)
 {
     fmt::print("● FuncGraft ");
@@ -35,26 +37,10 @@ void print_program_info_(const Configurations &configs)
     fmt::print(fg(fmt::color::yellow_green), "{}\n\n", configs.input_file.string());
 }
 
-using core::code::CodeToEdit;
-
-CodeToEdit import_file_to_edit_(const Configurations &configs)
-{
-    const std::string raw_text = utils::read_from_file(configs.input_file);
-
-    CodeToEdit content(raw_text);
-
-    if (content.is_delimited()) {
-        utils::print_separator();
-        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", content.get_original_code());
-        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-    }
-
-    return content;
-}
-
 std::string load_instructions_(const Configurations &configs)
 {
+    utils::print_separator();
+
     if (configs.instructions_from_cli) {
         return configs.instructions_from_cli.value();
     }
@@ -65,7 +51,6 @@ std::string load_instructions_(const Configurations &configs)
         return utils::read_from_file(instructions_file);
     }
 
-    utils::print_separator();
     std::string instructions;
 
     while (true) {
@@ -79,6 +64,18 @@ std::string load_instructions_(const Configurations &configs)
 
     utils::print_separator();
     return instructions;
+}
+
+bool check_for_special_command_(const std::string &instructions)
+{
+    if (instructions == "quit" or instructions == "exit") {
+#ifdef TESTING_ENABLED
+        fmt::print("Program aborted\n");
+#endif
+        return false;
+    }
+
+    return true;
 }
 
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
@@ -103,6 +100,22 @@ bool validate_instructions_(const Configurations &configs, const std::string &in
         return false;
     },
         response);
+}
+
+CodeToEdit import_file_to_edit_(const Configurations &configs)
+{
+    const std::string raw_text = utils::read_from_file(configs.input_file);
+
+    CodeToEdit content(raw_text);
+
+    if (content.is_delimited()) {
+        utils::print_separator();
+        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
+        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", content.get_original_code());
+        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
+    }
+
+    return content;
 }
 
 std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
@@ -178,14 +191,18 @@ void process_file(const Configurations &configs)
 {
     print_program_info_(configs);
 
-    CodeToEdit content = import_file_to_edit_(configs);
     const std::string instructions = load_instructions_(configs);
+
+    if (not check_for_special_command_(instructions)) {
+        return;
+    }
 
     if (not validate_instructions_(configs, instructions)) {
         utils::print_separator();
         return;
     }
 
+    CodeToEdit content = import_file_to_edit_(configs);
     const std::string prompt = create_prompt_(configs, content, instructions);
     const std::string modified_code = edit_text_using_llm_(configs, prompt);
 

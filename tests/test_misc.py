@@ -59,3 +59,11 @@ def test_empty_instructions_file(
 def test_empty_instructions(dummy_python_file: Path) -> None:
     stderr = assert_command_failure(f"{dummy_python_file}", "--instructions=")
     assert "CLI instructions are empty. Cannot proceed" in stderr
+
+
+@mark.parametrize("instruction", ["quit", "exit"])
+def test_exit_program(dummy_python_file: Path, instruction: str) -> None:
+    stdout = assert_command_success(
+        f"{dummy_python_file}", f"--instructions={instruction}"
+    )
+    assert "Program aborted" in stdout

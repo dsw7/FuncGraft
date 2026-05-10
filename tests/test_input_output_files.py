@@ -102,17 +102,17 @@ def main() -> None:
 
 
 def test_input_file_is_empty() -> None:
-    stderr = assert_command_failure("")
+    stderr = assert_command_failure("", "-i'Fix the null pointer exception'")
     assert "No filename was provided. Cannot proceed" in stderr
 
 
 def test_input_file_is_not_a_file() -> None:
-    stderr = assert_command_failure("/tmp", "-iFoo")
+    stderr = assert_command_failure("/tmp", "-i'Fix the null pointer exception'")
     assert "Input '/tmp' is not a file!" in stderr
 
 
 def test_input_file_is_missing() -> None:
-    stderr = assert_command_failure("abc.txt", "-iFoo")
+    stderr = assert_command_failure("abc.txt", "-i'Fix the null pointer exception'")
     assert "File 'abc.txt' does not exist!" in stderr
 
 
