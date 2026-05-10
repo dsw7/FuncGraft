@@ -39,8 +39,9 @@ void print_program_info_(const Configurations &configs)
 
 std::string load_instructions_(const Configurations &configs)
 {
+    utils::print_separator();
+
     if (configs.instructions_from_cli) {
-        utils::print_separator();
         return configs.instructions_from_cli.value();
     }
 
@@ -50,7 +51,6 @@ std::string load_instructions_(const Configurations &configs)
         return utils::read_from_file(instructions_file);
     }
 
-    utils::print_separator();
     std::string instructions;
 
     while (true) {
