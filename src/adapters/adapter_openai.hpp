@@ -6,36 +6,9 @@
 #include "responses_openai.hpp"
 
 #include <expected>
-#include <json.hpp>
 #include <string>
 
 namespace adapters {
-
-struct OpenAIClassificationResponse: public OpenAIResponse {
-    OpenAIClassificationResponse() :
-        OpenAIResponse() {} // needed for variants
-    OpenAIClassificationResponse(const std::string &response);
-
-    bool valid_instructions = false;
-    std::string reasoning;
-};
-
-class OpenAIEditResponse: public OpenAIResponse {
-public:
-    OpenAIEditResponse() :
-        OpenAIResponse() {} // needed for variants
-    OpenAIEditResponse(const std::string &response, const double total_t);
-
-    std::string description_of_changes;
-    std::string code;
-
-    double total_time = 0.0;
-    int input_tokens = 0;
-    int output_tokens = 0;
-
-private:
-    void unpack_structured_output_();
-};
 
 class OpenAI: public CurlBase {
 public:

@@ -6,7 +6,6 @@
 #include "responses_ollama.hpp"
 
 #include <expected>
-#include <json.hpp>
 #include <string>
 
 namespace adapters {

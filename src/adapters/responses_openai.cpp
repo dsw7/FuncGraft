@@ -39,4 +39,44 @@ std::string OpenAIResponse::get_text_from_response_()
     return text;
 }
 
+OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
+    OpenAIResponse(response)
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
+
+OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_t) :
+    OpenAIResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
+
+    this->unpack_structured_output_();
+}
+
+void OpenAIEditResponse::unpack_structured_output_()
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->code = structured_output["code"];
+    this->description_of_changes = structured_output["description_of_changes"];
+}
+
 } // namespace adapters
