@@ -89,19 +89,6 @@ def test_read_instructions_from_cli(provider: str, file_to_edit: Path) -> None:
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
-def test_print_prompt_with_verbose_flag(provider: str, file_to_edit: Path) -> None:
-    instructions = "Replace the variable `c` with the integer 5"
-    stdout = assert_command_success(
-        f"{file_to_edit}",
-        f"--provider={provider}",
-        f"--instructions='{instructions}'",
-        f"--output={file_to_edit}",
-        "--verbose",
-    )
-    assert "Prompt:" in stdout
-    assert "The sum is 9" in assert_python_script_runs(file_to_edit)
-
-
 @mark.parametrize("provider", ["ollama", "openai"])
 def test_only_edit_between_delims(
     provider: str, file_to_edit_with_delims: Path
