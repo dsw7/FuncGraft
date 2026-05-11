@@ -13,6 +13,7 @@ set(SRC_FILES
   adapters/adapter_ollama.cpp
   adapters/adapter_openai.cpp
   adapters/curl_base.cpp
+  adapters/errors.cpp
   adapters/structured_output.cpp
   adapters/system_prompts.cpp
   configs.cpp

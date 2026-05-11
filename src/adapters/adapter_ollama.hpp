@@ -2,6 +2,7 @@
 
 #include "configs.hpp"
 #include "curl_base.hpp"
+#include "errors.hpp"
 
 #include <expected>
 #include <json.hpp>
@@ -40,13 +41,6 @@ public:
 
 private:
     void unpack_structured_output_();
-};
-
-struct OllamaError {
-    OllamaError(const std::string &response, const int status_code);
-
-    std::string errmsg;
-    int status_code = 200;
 };
 
 class Ollama: public CurlBase {
