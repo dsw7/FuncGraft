@@ -89,7 +89,6 @@ def test_read_instructions_from_cli(provider: str, file_to_edit: Path) -> None:
 
 
 @mark.parametrize("provider", ["ollama", "openai"])
-@mark.parametrize("provider", ["ollama", "openai"])
 def test_only_edit_between_delims(
     provider: str, file_to_edit_with_delims: Path
 ) -> None:
