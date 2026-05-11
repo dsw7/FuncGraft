@@ -54,9 +54,9 @@ adapters::OpenAIClassificationResponse classify_instructions_openai(const Config
     return *results;
 }
 
-adapters::OllamaClassificationResponse classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
+adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
 {
-    using OllamaResults = std::expected<adapters::OllamaClassificationResponse, adapters::OllamaError>;
+    using OllamaResults = std::expected<adapters::OllamaClassification, adapters::OllamaError>;
 
     OllamaResults results = adapters::Ollama(configs).classify_instructions(prompt);
 

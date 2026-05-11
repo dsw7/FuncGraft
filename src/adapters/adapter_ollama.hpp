@@ -11,13 +11,6 @@
 
 namespace adapters {
 
-struct OllamaClassificationResponse: public OllamaResponse {
-    OllamaClassificationResponse(const std::string &response);
-
-    bool valid_instructions = false;
-    std::string reasoning;
-};
-
 class OllamaEditResponse: public OllamaResponse {
 public:
     OllamaEditResponse() :
@@ -38,7 +31,7 @@ private:
 class Ollama: public CurlBase {
 public:
     Ollama(const Configurations &configs);
-    std::expected<OllamaClassificationResponse, OllamaError> classify_instructions(const std::string &prompt);
+    std::expected<OllamaClassification, OllamaError> classify_instructions(const std::string &prompt);
     std::expected<OllamaEditResponse, OllamaError> query_edit_code(const std::string &prompt);
 
 private:

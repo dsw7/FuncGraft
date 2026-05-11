@@ -8,22 +8,6 @@
 
 namespace adapters {
 
-OllamaClassificationResponse::OllamaClassificationResponse(const std::string &response) :
-    OllamaResponse(response)
-{
-    nlohmann::json structured_output;
-
-    try {
-        const std::string content = this->response_["message"]["content"];
-        structured_output = nlohmann::json::parse(content);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
-    this->reasoning = structured_output["reasoning"];
-}
-
 OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_t) :
     OllamaResponse(response), total_time(total_t)
 {
@@ -81,7 +65,7 @@ std::string Ollama::query_chat_api_(const std::string &post_fields)
     return response;
 }
 
-std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instructions(const std::string &prompt)
+std::expected<OllamaClassification, OllamaError> Ollama::classify_instructions(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompts::system_prompt_classify_instructions() } },
@@ -101,7 +85,7 @@ std::expected<OllamaClassificationResponse, OllamaError> Ollama::classify_instru
     if (http_status_code != 200) {
         return std::unexpected(OllamaError(response, http_status_code));
     }
-    return OllamaClassificationResponse(response);
+    return OllamaClassification(response);
 }
 
 std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)

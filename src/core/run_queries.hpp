@@ -9,7 +9,7 @@
 namespace core {
 namespace threading {
 adapters::OpenAIClassificationResponse classify_instructions_openai(const Configurations &configs, const std::string &prompt);
-adapters::OllamaClassificationResponse classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
+adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
 
 adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, const std::string &prompt);
 adapters::OllamaEditResponse run_ollama_query(const Configurations &configs, const std::string &prompt);
