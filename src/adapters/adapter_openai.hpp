@@ -3,22 +3,13 @@
 #include "configs.hpp"
 #include "curl_base.hpp"
 #include "errors.hpp"
+#include "responses_openai.hpp"
 
 #include <expected>
 #include <json.hpp>
 #include <string>
 
 namespace adapters {
-
-class OpenAIResponse {
-public:
-    OpenAIResponse() = default;
-    OpenAIResponse(const std::string &response);
-
-protected:
-    std::string get_text_from_response_();
-    nlohmann::json response_;
-};
 
 struct OpenAIClassificationResponse: public OpenAIResponse {
     OpenAIClassificationResponse() :

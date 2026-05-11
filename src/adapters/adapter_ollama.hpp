@@ -3,21 +3,13 @@
 #include "configs.hpp"
 #include "curl_base.hpp"
 #include "errors.hpp"
+#include "responses_ollama.hpp"
 
 #include <expected>
 #include <json.hpp>
 #include <string>
 
 namespace adapters {
-
-class OllamaResponse {
-public:
-    OllamaResponse() = default;
-    OllamaResponse(const std::string &response);
-
-protected:
-    nlohmann::json response_;
-};
 
 struct OllamaClassificationResponse: public OllamaResponse {
     OllamaClassificationResponse(const std::string &response);

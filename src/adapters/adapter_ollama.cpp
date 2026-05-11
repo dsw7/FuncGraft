@@ -8,23 +8,6 @@
 
 namespace adapters {
 
-OllamaResponse::OllamaResponse(const std::string &response)
-{
-    try {
-        this->response_ = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    if (not this->response_.contains("done")) {
-        throw std::runtime_error("The response from Ollama does not contain the 'done' key");
-    }
-
-    if (not this->response_["done"]) {
-        throw std::runtime_error("The response from Ollama indicates the job is not done");
-    }
-}
-
 OllamaClassificationResponse::OllamaClassificationResponse(const std::string &response) :
     OllamaResponse(response)
 {
