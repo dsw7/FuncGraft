@@ -48,7 +48,7 @@ adapters::OpenAIClassification classify_instructions_openai(const Configurations
 {
     using OpenAIResults = std::expected<adapters::OpenAIClassification, adapters::OpenAIError>;
 
-    OpenAIResults results = adapters::OpenAI(configs).classify_instructions(prompt);
+    OpenAIResults results = queries::OpenAIClassifier(configs).classify_instructions(prompt);
 
     if (not results) {
         throw std::runtime_error(results.error().errmsg);

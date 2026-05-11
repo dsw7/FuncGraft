@@ -60,37 +60,6 @@ std::string OpenAI::query_responses_api_(const std::string &post_fields)
     return response;
 }
 
-std::expected<OpenAIClassification, OpenAIError> OpenAI::classify_instructions(const std::string &prompt)
-{
-    const nlohmann::json response_format = {
-        {
-            "format",
-            {
-                { "name", "instruction_classification" },
-                { "schema", structured_output::schema_classify_instructions() },
-                { "strict", true },
-                { "type", "json_schema" },
-            },
-        }
-    };
-    const nlohmann::json fields = {
-        { "input", prompt },
-        { "instructions", system_prompts::system_prompt_classify_instructions() },
-        { "model", this->model_ },
-        { "store", false },
-        { "temperature", 0.00 },
-        { "text", response_format },
-    };
-
-    const std::string response = this->query_responses_api_(fields.dump());
-
-    long http_status_code = this->get_http_status_code_();
-    if (http_status_code != 200) {
-        return std::unexpected(OpenAIError(response, http_status_code));
-    }
-    return OpenAIClassification(response);
-}
-
 std::expected<OpenAIEdit, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
 {
     const nlohmann::json response_format = {
