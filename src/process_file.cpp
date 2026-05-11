@@ -189,6 +189,7 @@ void process_file(const Configurations &configs)
 
     CodeToEdit content = import_file_to_edit_(configs);
     const std::string original_code = content.get_original_code();
+    const std::string language = utils::extension_to_lang(configs.input_file);
     const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, configs.input_file.extension());
 
     content.overwrite_original_code(modified_code);

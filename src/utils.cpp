@@ -4,6 +4,7 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <sys/ioctl.h>
@@ -129,6 +130,47 @@ bool is_text_empty(const std::string &text)
     return std::all_of(text.begin(), text.end(), [](char c) {
         return std::isspace(static_cast<unsigned char>(c));
     });
+}
+
+std::string extension_to_lang(const std::filesystem::path &filename)
+{
+    static std::map<std::string, std::string> ext_to_label {
+        { ".bash", "bash" },
+        { ".sh", "sh" },
+        { ".c", "c" },
+        { ".cpp", "cpp" },
+        { ".c++", "cpp" },
+        { ".cs", "csharp" },
+        { ".csharp", "csharp" },
+        { ".css", "css" },
+        { ".html", "html" },
+        { ".javascript", "javascript" },
+        { ".js", "javascript" },
+        { ".json", "json" },
+        { ".java", "java" },
+        { ".kotlin", "kotlin" },
+        { ".perl", "perl" },
+        { ".php", "php" },
+        { ".python", "python" },
+        { ".py", "python" },
+        { ".ruby", "ruby" },
+        { ".rust", "rust" },
+        { ".sql", "sql" },
+        { ".swift", "swift" },
+        { ".typescript", "typescript" },
+        { ".ts", "typescript" },
+        { ".xml", "xml" },
+        { ".yaml", "yaml" },
+        { ".yml", "yaml" },
+    };
+
+    const std::string extension = filename.extension();
+
+    if (ext_to_label.contains(extension)) {
+        return ext_to_label[extension];
+    }
+
+    return "";
 }
 
 } // namespace utils
