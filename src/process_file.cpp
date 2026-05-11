@@ -80,13 +80,12 @@ bool check_for_special_command_(const std::string &instructions)
 
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
-    const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
     std::variant<queries::OpenAIClassification, queries::OllamaClassification> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::classify_instructions_openai(configs, prompt);
+        response = core::threading::classify_instructions_openai(configs, instructions);
     } else {
-        response = core::threading::classify_instructions_ollama(configs, prompt);
+        response = core::threading::classify_instructions_ollama(configs, instructions);
     }
 
     return std::visit([](auto &&arg) -> bool {

@@ -30,14 +30,14 @@ struct OpenAIClassifier: public adapters::OpenAI {
     OpenAIClassifier(const Configurations &configs) :
         adapters::OpenAI(configs) {}
 
-    std::expected<OpenAIClassification, OpenAIError> classify_instructions(const std::string &prompt);
+    std::expected<OpenAIClassification, OpenAIError> classify_instructions(const std::string &instructions);
 };
 
 struct OllamaClassifier: public adapters::Ollama {
     OllamaClassifier(const Configurations &configs) :
         adapters::Ollama(configs) {}
 
-    std::expected<OllamaClassification, OllamaError> classify_instructions(const std::string &prompt);
+    std::expected<OllamaClassification, OllamaError> classify_instructions(const std::string &instructions);
 };
 
 } // namespace queries
