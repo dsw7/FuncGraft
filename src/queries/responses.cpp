@@ -1,9 +1,19 @@
-#include "responses_openai.hpp"
+#include "responses.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
 
-namespace adapters {
+namespace queries {
+
+ErrorResponse::ErrorResponse(const std::string &response, const int status_code) :
+    status_code(status_code)
+{
+    try {
+        this->json_ = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse error response: {}", e.what()));
+    }
+}
 
 OpenAIError::OpenAIError(const std::string &response, const int status_code) :
     ErrorResponse(response, status_code)
@@ -17,6 +27,25 @@ OpenAIError::OpenAIError(const std::string &response, const int status_code) :
     }
 
     this->errmsg = this->json_["error"]["message"];
+}
+
+OllamaError::OllamaError(const std::string &response, const int status_code) :
+    ErrorResponse(response, status_code)
+{
+    if (not this->json_.contains("error")) {
+        throw std::runtime_error("An error occurred but 'error' key not found in the response JSON");
+    }
+
+    this->errmsg = this->json_["error"];
+}
+
+SuccessResponse::SuccessResponse(const std::string &response)
+{
+    try {
+        this->response_ = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse success response: {}", e.what()));
+    }
 }
 
 OpenAIResponse::OpenAIResponse(const std::string &response) :
@@ -53,44 +82,16 @@ std::string OpenAIResponse::get_text_from_response_()
     return text;
 }
 
-OpenAIClassification::OpenAIClassification(const std::string &response) :
-    OpenAIResponse(response)
+OllamaResponse::OllamaResponse(const std::string &response) :
+    SuccessResponse(response)
 {
-    nlohmann::json structured_output;
-
-    try {
-        const std::string text = this->get_text_from_response_();
-        structured_output = nlohmann::json::parse(text);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    if (not this->response_.contains("done")) {
+        throw std::runtime_error("The response from Ollama does not contain the 'done' key");
     }
 
-    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
-    this->reasoning = structured_output["reasoning"];
-}
-
-OpenAIEdit::OpenAIEdit(const std::string &response, const double total_t) :
-    OpenAIResponse(response), total_time(total_t)
-{
-    this->input_tokens = this->response_["usage"]["input_tokens"];
-    this->output_tokens = this->response_["usage"]["output_tokens"];
-
-    this->unpack_structured_output_();
-}
-
-void OpenAIEdit::unpack_structured_output_()
-{
-    nlohmann::json structured_output;
-
-    try {
-        const std::string text = this->get_text_from_response_();
-        structured_output = nlohmann::json::parse(text);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    if (not this->response_["done"]) {
+        throw std::runtime_error("The response from Ollama indicates the job is not done");
     }
-
-    this->code = structured_output["code"];
-    this->description_of_changes = structured_output["description_of_changes"];
 }
 
-} // namespace adapters
+} // namespace queries

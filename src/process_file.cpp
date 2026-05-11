@@ -5,7 +5,6 @@
 #include "code.hpp"
 #include "configs.hpp"
 #include "run_queries.hpp"
-#include "user_prompts.hpp"
 #include "utils.hpp"
 
 #include <fmt/color.h>
@@ -80,13 +79,12 @@ bool check_for_special_command_(const std::string &instructions)
 
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
-    const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
-    std::variant<adapters::OpenAIClassification, adapters::OllamaClassification> response;
+    std::variant<queries::OpenAIClassification, queries::OllamaClassification> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::classify_instructions_openai(configs, prompt);
+        response = core::threading::classify_instructions_openai(configs, instructions);
     } else {
-        response = core::threading::classify_instructions_ollama(configs, prompt);
+        response = core::threading::classify_instructions_ollama(configs, instructions);
     }
 
     return std::visit([](auto &&arg) -> bool {
@@ -118,28 +116,15 @@ CodeToEdit import_file_to_edit_(const Configurations &configs)
     return content;
 }
 
-std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
+std::string edit_text_using_llm_(
+    const Configurations &configs, const std::string &instructions, const std::string &code, const std::string &language)
 {
-    const std::string original_code = content.get_original_code();
-    const std::string prompt = core::user_prompts::prompt_edit_code(configs, instructions, original_code);
-
-    if (configs.verbose) {
-        fmt::print(fmt::emphasis::bold, "Prompt:\n");
-        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-        utils::print_separator();
-    }
-
-    return prompt;
-}
-
-std::string edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
-{
-    std::variant<adapters::OpenAIEdit, adapters::OllamaEdit> response;
+    std::variant<queries::OpenAIEdit, queries::OllamaEdit> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::run_openai_query(configs, prompt);
+        response = core::threading::run_openai_query(configs, instructions, code, language);
     } else {
-        response = core::threading::run_ollama_query(configs, prompt);
+        response = core::threading::run_ollama_query(configs, instructions, code, language);
     }
 
     return std::visit([](auto &&arg) -> std::string {
@@ -203,8 +188,9 @@ void process_file(const Configurations &configs)
     }
 
     CodeToEdit content = import_file_to_edit_(configs);
-    const std::string prompt = create_prompt_(configs, content, instructions);
-    const std::string modified_code = edit_text_using_llm_(configs, prompt);
+    const std::string original_code = content.get_original_code();
+    const std::string language = utils::extension_to_lang(configs.input_file);
+    const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, language);
 
     content.overwrite_original_code(modified_code);
     export_edited_file_(configs, content);

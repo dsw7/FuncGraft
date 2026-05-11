@@ -5,7 +5,8 @@ format:
 	@clang-format -i --verbose --style=file \
 		src/*.cpp src/*.hpp \
 		src/adapters/*.cpp src/adapters/*.hpp \
-		src/core/*.cpp src/core/*.hpp
+		src/core/*.cpp src/core/*.hpp \
+		src/queries/*.cpp src/queries/*.hpp
 
 compile: format
 	@cmake -S src -B build/prod

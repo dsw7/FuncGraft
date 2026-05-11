@@ -1,17 +1,21 @@
 #pragma once
 
-#include "adapter_ollama.hpp"
-#include "adapter_openai.hpp"
 #include "configs.hpp"
+#include "query_classify.hpp"
+#include "query_edit_code.hpp"
 
 #include <string>
 
 namespace core {
 namespace threading {
-adapters::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt);
-adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
+queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &instructions);
+queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &instructions);
 
-adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt);
-adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt);
+queries::OpenAIEdit run_openai_query(
+    const Configurations &configs, const std::string &instructions,
+    const std::string &code, const std::string &language);
+queries::OllamaEdit run_ollama_query(
+    const Configurations &configs, const std::string &instructions,
+    const std::string &code, const std::string &language);
 } // namespace threading
 } // namespace core

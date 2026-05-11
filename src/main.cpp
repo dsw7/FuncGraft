@@ -33,7 +33,6 @@ Options:
   -o, --output=FILE                Place output into FILE
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
-  -v, --verbose                    Be more verbose with output
   -p, --provider=PROVIDER          Specify LLM provider. Valid options are [openai, ollama]
 
 Examples:
@@ -60,13 +59,12 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
             { "output", required_argument, 0, 'o' },
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
-            { "verbose", no_argument, 0, 'v' },
             { "provider", required_argument, 0, 'p' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        const int option = getopt_long(argc, argv, "ho:f:i:vp:", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:p:", long_options, &option_index);
 
         if (option == -1) {
             break;
@@ -84,9 +82,6 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
                 break;
             case 'i':
                 configs.instructions_from_cli = optarg;
-                break;
-            case 'v':
-                configs.verbose = true;
                 break;
             case 'p':
                 configs.provider = optarg;

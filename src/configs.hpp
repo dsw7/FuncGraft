@@ -9,7 +9,6 @@ public:
     void validate_configurations();
     void validate_configs_from_cli();
 
-    bool verbose = false;
     std::filesystem::path input_file;
     std::optional<std::filesystem::path> instructions_file;
     std::optional<std::filesystem::path> output_file;

@@ -11,5 +11,7 @@ void print_right_aligned_text(const std::string &message);
 std::string read_from_file(const std::filesystem::path &filename);
 void write_to_file(const std::string &filename, const std::string &text);
 std::string seconds_to_hhmmss(const double seconds);
+bool is_text_empty(const std::string &text);
+std::string extension_to_lang(const std::filesystem::path &filename);
 
 } // namespace utils
