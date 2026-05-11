@@ -45,11 +45,11 @@ void time_api_call_()
 namespace core {
 namespace threading {
 
-queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt)
+queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &instructions)
 {
     using OpenAIResults = std::expected<queries::OpenAIClassification, queries::OpenAIError>;
 
-    OpenAIResults results = queries::OpenAIClassifier(configs).classify_instructions(prompt);
+    OpenAIResults results = queries::OpenAIClassifier(configs).classify_instructions(instructions);
 
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
@@ -57,11 +57,11 @@ queries::OpenAIClassification classify_instructions_openai(const Configurations 
     return *results;
 }
 
-queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
+queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &instructions)
 {
     using OllamaResults = std::expected<queries::OllamaClassification, queries::OllamaError>;
 
-    OllamaResults results = queries::OllamaClassifier(configs).classify_instructions(prompt);
+    OllamaResults results = queries::OllamaClassifier(configs).classify_instructions(instructions);
 
     if (not results) {
         throw std::runtime_error(results.error().errmsg);
