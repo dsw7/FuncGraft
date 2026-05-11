@@ -2,22 +2,6 @@
 
 namespace structured_output {
 
-nlohmann::json schema_classify_instructions()
-{
-    return {
-        { "type", "object" },
-        {
-            "properties",
-            {
-                { "reasoning", { { "type", "string" } } },
-                { "valid_instructions", { { "type", "boolean" } } },
-            },
-        },
-        { "required", { "reasoning", "valid_instructions" } },
-        { "additionalProperties", false },
-    };
-}
-
 nlohmann::json schema_edit_code()
 {
     return {

@@ -1,6 +1,6 @@
 #include "query_classify.hpp"
 
-#include "structured_output.hpp"
+#include <json.hpp>
 
 namespace {
 
@@ -20,6 +20,22 @@ Output:
 )";
 }
 
+nlohmann::json structured_output_classify_instructions_()
+{
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "reasoning", { { "type", "string" } } },
+                { "valid_instructions", { { "type", "boolean" } } },
+            },
+        },
+        { "required", { "reasoning", "valid_instructions" } },
+        { "additionalProperties", false },
+    };
+}
+
 } // namespace
 
 namespace queries {
@@ -31,7 +47,7 @@ std::expected<adapters::OpenAIClassification, adapters::OpenAIError> OpenAIClass
             "format",
             {
                 { "name", "instruction_classification" },
-                { "schema", structured_output::schema_classify_instructions() },
+                { "schema", structured_output_classify_instructions_() },
                 { "strict", true },
                 { "type", "json_schema" },
             },
@@ -65,7 +81,7 @@ std::expected<adapters::OllamaClassification, adapters::OllamaError> OllamaClass
     });
 
     const nlohmann::json fields = {
-        { "format", structured_output::schema_classify_instructions() },
+        { "format", structured_output_classify_instructions_() },
         { "messages", messages },
         { "model", this->model_ },
         { "stream", false },
