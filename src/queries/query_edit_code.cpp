@@ -1,5 +1,6 @@
 #include "query_edit_code.hpp"
 
+#include <fmt/core.h>
 #include <json.hpp>
 
 namespace {
@@ -38,6 +39,54 @@ nlohmann::json structured_output_edit_code_()
 } // namespace
 
 namespace queries {
+
+OpenAIEdit::OpenAIEdit(const std::string &response, const double total_t) :
+    OpenAIResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
+
+    this->unpack_structured_output_();
+}
+
+void OpenAIEdit::unpack_structured_output_()
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->code = structured_output["code"];
+    this->description_of_changes = structured_output["description_of_changes"];
+}
+
+OllamaEdit::OllamaEdit(const std::string &response, const double total_t) :
+    OllamaResponse(response), total_time(total_t)
+{
+    this->input_tokens = this->response_["prompt_eval_count"];
+    this->output_tokens = this->response_["eval_count"];
+
+    this->unpack_structured_output_();
+}
+
+void OllamaEdit::unpack_structured_output_()
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string content = this->response_["message"]["content"];
+        structured_output = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->code = structured_output["code"];
+    this->description_of_changes = structured_output["description_of_changes"];
+}
 
 std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(const std::string &prompt)
 {
