@@ -23,8 +23,6 @@ set(SRC_FILES
   queries/query_classify.cpp
   queries/query_edit_code.cpp
   queries/responses.cpp
-  queries/responses_ollama.cpp
-  queries/responses_openai.cpp
   utils.cpp
 )
 

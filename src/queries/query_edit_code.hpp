@@ -3,8 +3,7 @@
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
 #include "configs.hpp"
-#include "responses_ollama.hpp"
-#include "responses_openai.hpp"
+#include "responses.hpp"
 
 #include <expected>
 #include <string>

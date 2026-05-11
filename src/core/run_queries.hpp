@@ -3,8 +3,6 @@
 #include "configs.hpp"
 #include "query_classify.hpp"
 #include "query_edit_code.hpp"
-#include "responses_ollama.hpp"
-#include "responses_openai.hpp"
 
 #include <string>
 

@@ -4,8 +4,6 @@
 #include "adapter_openai.hpp"
 #include "configs.hpp"
 #include "responses.hpp"
-#include "responses_ollama.hpp"
-#include "responses_openai.hpp"
 
 #include <expected>
 #include <string>
