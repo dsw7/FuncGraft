@@ -3,7 +3,7 @@
 #include <fmt/core.h>
 #include <stdexcept>
 
-namespace adapters {
+namespace queries {
 
 OllamaError::OllamaError(const std::string &response, const int status_code) :
     ErrorResponse(response, status_code)
@@ -67,4 +67,4 @@ void OllamaEdit::unpack_structured_output_()
     this->description_of_changes = structured_output["description_of_changes"];
 }
 
-} // namespace adapters
+} // namespace queries

@@ -3,7 +3,7 @@
 #include <json.hpp>
 #include <string>
 
-namespace adapters {
+namespace queries {
 
 class ErrorResponse {
 public:
@@ -24,4 +24,4 @@ protected:
     nlohmann::json response_;
 };
 
-} // namespace adapters
+} // namespace queries

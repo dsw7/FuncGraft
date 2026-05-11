@@ -39,7 +39,7 @@ nlohmann::json structured_output_edit_code_()
 
 namespace queries {
 
-std::expected<adapters::OpenAIEdit, adapters::OpenAIError> OpenAICodeEditor::edit_code(const std::string &prompt)
+std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(const std::string &prompt)
 {
     const nlohmann::json response_format = {
         {
@@ -66,14 +66,14 @@ std::expected<adapters::OpenAIEdit, adapters::OpenAIError> OpenAICodeEditor::edi
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
-        return std::unexpected(adapters::OpenAIError(response, http_status_code));
+        return std::unexpected(OpenAIError(response, http_status_code));
     }
 
     const double total_time = this->get_rtt_time_();
-    return adapters::OpenAIEdit(response, total_time);
+    return OpenAIEdit(response, total_time);
 }
 
-std::expected<adapters::OllamaEdit, adapters::OllamaError> OllamaCodeEditor::edit_code(const std::string &prompt)
+std::expected<OllamaEdit, OllamaError> OllamaCodeEditor::edit_code(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompt_edit_code_() } },
@@ -91,11 +91,11 @@ std::expected<adapters::OllamaEdit, adapters::OllamaError> OllamaCodeEditor::edi
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
-        return std::unexpected(adapters::OllamaError(response, http_status_code));
+        return std::unexpected(OllamaError(response, http_status_code));
     }
 
     const double total_time = this->get_rtt_time_();
-    return adapters::OllamaEdit(response, total_time);
+    return OllamaEdit(response, total_time);
 }
 
 } // namespace queries

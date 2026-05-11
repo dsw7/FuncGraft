@@ -1,7 +1,5 @@
 #pragma once
 
-#include "adapter_ollama.hpp"
-#include "adapter_openai.hpp"
 #include "configs.hpp"
 #include "responses_ollama.hpp"
 #include "responses_openai.hpp"
@@ -10,10 +8,10 @@
 
 namespace core {
 namespace threading {
-adapters::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt);
-adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
+queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt);
+queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
 
-adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt);
-adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt);
+queries::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt);
+queries::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt);
 } // namespace threading
 } // namespace core

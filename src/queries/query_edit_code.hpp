@@ -15,14 +15,14 @@ struct OpenAICodeEditor: public adapters::OpenAI {
     OpenAICodeEditor(const Configurations &configs) :
         adapters::OpenAI(configs) {}
 
-    std::expected<adapters::OpenAIEdit, adapters::OpenAIError> edit_code(const std::string &prompt);
+    std::expected<OpenAIEdit, OpenAIError> edit_code(const std::string &prompt);
 };
 
 struct OllamaCodeEditor: public adapters::Ollama {
     OllamaCodeEditor(const Configurations &configs) :
         adapters::Ollama(configs) {}
 
-    std::expected<adapters::OllamaEdit, adapters::OllamaError> edit_code(const std::string &prompt);
+    std::expected<OllamaEdit, OllamaError> edit_code(const std::string &prompt);
 };
 
 } // namespace queries

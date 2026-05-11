@@ -40,7 +40,7 @@ nlohmann::json structured_output_classify_instructions_()
 
 namespace queries {
 
-std::expected<adapters::OpenAIClassification, adapters::OpenAIError> OpenAIClassifier::classify_instructions(const std::string &prompt)
+std::expected<OpenAIClassification, OpenAIError> OpenAIClassifier::classify_instructions(const std::string &prompt)
 {
     const nlohmann::json response_format = {
         {
@@ -67,13 +67,13 @@ std::expected<adapters::OpenAIClassification, adapters::OpenAIError> OpenAIClass
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
-        return std::unexpected(adapters::OpenAIError(response, http_status_code));
+        return std::unexpected(OpenAIError(response, http_status_code));
     }
 
-    return adapters::OpenAIClassification(response);
+    return OpenAIClassification(response);
 }
 
-std::expected<adapters::OllamaClassification, adapters::OllamaError> OllamaClassifier::classify_instructions(const std::string &prompt)
+std::expected<OllamaClassification, OllamaError> OllamaClassifier::classify_instructions(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompt_classify_instructions_() } },
@@ -92,10 +92,10 @@ std::expected<adapters::OllamaClassification, adapters::OllamaError> OllamaClass
 
     long http_status_code = this->get_http_status_code_();
     if (http_status_code != 200) {
-        return std::unexpected(adapters::OllamaError(response, http_status_code));
+        return std::unexpected(OllamaError(response, http_status_code));
     }
 
-    return adapters::OllamaClassification(response);
+    return OllamaClassification(response);
 }
 
 } // namespace queries

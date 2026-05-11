@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace adapters {
+namespace queries {
 
 struct OllamaError: public ErrorResponse {
     OllamaError(const std::string &response, const int status_code);
@@ -40,4 +40,4 @@ private:
     void unpack_structured_output_();
 };
 
-} // namespace adapters
+} // namespace queries

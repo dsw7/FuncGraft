@@ -3,7 +3,7 @@
 #include <fmt/core.h>
 #include <stdexcept>
 
-namespace adapters {
+namespace queries {
 
 ErrorResponse::ErrorResponse(const std::string &response, const int status_code) :
     status_code(status_code)
@@ -24,4 +24,4 @@ SuccessResponse::SuccessResponse(const std::string &response)
     }
 }
 
-} // namespace adapters
+} // namespace queries

@@ -45,9 +45,9 @@ void time_api_call_()
 namespace core {
 namespace threading {
 
-adapters::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt)
+queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt)
 {
-    using OpenAIResults = std::expected<adapters::OpenAIClassification, adapters::OpenAIError>;
+    using OpenAIResults = std::expected<queries::OpenAIClassification, queries::OpenAIError>;
 
     OpenAIResults results = queries::OpenAIClassifier(configs).classify_instructions(prompt);
 
@@ -57,9 +57,9 @@ adapters::OpenAIClassification classify_instructions_openai(const Configurations
     return *results;
 }
 
-adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
+queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt)
 {
-    using OllamaResults = std::expected<adapters::OllamaClassification, adapters::OllamaError>;
+    using OllamaResults = std::expected<queries::OllamaClassification, queries::OllamaError>;
 
     OllamaResults results = queries::OllamaClassifier(configs).classify_instructions(prompt);
 
@@ -69,9 +69,9 @@ adapters::OllamaClassification classify_instructions_ollama(const Configurations
     return *results;
 }
 
-adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt)
+queries::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt)
 {
-    using OpenAIResults = std::expected<adapters::OpenAIEdit, adapters::OpenAIError>;
+    using OpenAIResults = std::expected<queries::OpenAIEdit, queries::OpenAIError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);
@@ -103,9 +103,9 @@ adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::
     return *response;
 }
 
-adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt)
+queries::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt)
 {
-    using OllamaResults = std::expected<adapters::OllamaEdit, adapters::OllamaError>;
+    using OllamaResults = std::expected<queries::OllamaEdit, queries::OllamaError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);

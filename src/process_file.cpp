@@ -81,7 +81,7 @@ bool check_for_special_command_(const std::string &instructions)
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
     const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
-    std::variant<adapters::OpenAIClassification, adapters::OllamaClassification> response;
+    std::variant<queries::OpenAIClassification, queries::OllamaClassification> response;
 
     if (configs.provider == "openai") {
         response = core::threading::classify_instructions_openai(configs, prompt);
@@ -134,7 +134,7 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
 
 std::string edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
-    std::variant<adapters::OpenAIEdit, adapters::OllamaEdit> response;
+    std::variant<queries::OpenAIEdit, queries::OllamaEdit> response;
 
     if (configs.provider == "openai") {
         response = core::threading::run_openai_query(configs, prompt);
