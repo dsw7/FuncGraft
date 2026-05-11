@@ -20,4 +20,21 @@ struct OllamaClassification: public OllamaResponse {
     std::string reasoning;
 };
 
+class OllamaEditResponse: public OllamaResponse {
+public:
+    OllamaEditResponse() :
+        OllamaResponse() {} // needed for variants
+    OllamaEditResponse(const std::string &response, const double total_t);
+
+    std::string description_of_changes;
+    std::string code;
+
+    double total_time = 0.0;
+    int input_tokens = 0;
+    int output_tokens = 0;
+
+private:
+    void unpack_structured_output_();
+};
+
 } // namespace adapters

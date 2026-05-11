@@ -8,30 +8,6 @@
 
 namespace adapters {
 
-OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_t) :
-    OllamaResponse(response), total_time(total_t)
-{
-    this->input_tokens = this->response_["prompt_eval_count"];
-    this->output_tokens = this->response_["eval_count"];
-
-    this->unpack_structured_output_();
-}
-
-void OllamaEditResponse::unpack_structured_output_()
-{
-    nlohmann::json structured_output;
-
-    try {
-        const std::string content = this->response_["message"]["content"];
-        structured_output = nlohmann::json::parse(content);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->code = structured_output["code"];
-    this->description_of_changes = structured_output["description_of_changes"];
-}
-
 Ollama::Ollama(const Configurations &configs)
 {
     this->model_ = configs.model_ollama;
