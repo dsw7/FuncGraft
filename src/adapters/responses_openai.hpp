@@ -16,10 +16,10 @@ protected:
     std::string get_text_from_response_();
 };
 
-struct OpenAIClassificationResponse: public OpenAIResponse {
-    OpenAIClassificationResponse() :
+struct OpenAIClassification: public OpenAIResponse {
+    OpenAIClassification() :
         OpenAIResponse() {}
-    OpenAIClassificationResponse(const std::string &response);
+    OpenAIClassification(const std::string &response);
 
     bool valid_instructions = false;
     std::string reasoning;

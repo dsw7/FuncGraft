@@ -81,7 +81,7 @@ bool check_for_special_command_(const std::string &instructions)
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
     const std::string prompt = core::user_prompts::prompt_check_instructions(instructions);
-    std::variant<adapters::OpenAIClassificationResponse, adapters::OllamaClassification> response;
+    std::variant<adapters::OpenAIClassification, adapters::OllamaClassification> response;
 
     if (configs.provider == "openai") {
         response = core::threading::classify_instructions_openai(configs, prompt);

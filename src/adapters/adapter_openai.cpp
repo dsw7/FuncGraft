@@ -60,7 +60,7 @@ std::string OpenAI::query_responses_api_(const std::string &post_fields)
     return response;
 }
 
-std::expected<OpenAIClassificationResponse, OpenAIError> OpenAI::classify_instructions(const std::string &prompt)
+std::expected<OpenAIClassification, OpenAIError> OpenAI::classify_instructions(const std::string &prompt)
 {
     const nlohmann::json response_format = {
         {
@@ -88,7 +88,7 @@ std::expected<OpenAIClassificationResponse, OpenAIError> OpenAI::classify_instru
     if (http_status_code != 200) {
         return std::unexpected(OpenAIError(response, http_status_code));
     }
-    return OpenAIClassificationResponse(response);
+    return OpenAIClassification(response);
 }
 
 std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)

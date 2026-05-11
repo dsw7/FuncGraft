@@ -42,9 +42,9 @@ void time_api_call_()
 namespace core {
 namespace threading {
 
-adapters::OpenAIClassificationResponse classify_instructions_openai(const Configurations &configs, const std::string &prompt)
+adapters::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt)
 {
-    using OpenAIResults = std::expected<adapters::OpenAIClassificationResponse, adapters::OpenAIError>;
+    using OpenAIResults = std::expected<adapters::OpenAIClassification, adapters::OpenAIError>;
 
     OpenAIResults results = adapters::OpenAI(configs).classify_instructions(prompt);
 

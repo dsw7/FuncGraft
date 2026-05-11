@@ -13,7 +13,7 @@ namespace adapters {
 class OpenAI: public CurlBase {
 public:
     OpenAI(const Configurations &configs);
-    std::expected<OpenAIClassificationResponse, OpenAIError> classify_instructions(const std::string &prompt);
+    std::expected<OpenAIClassification, OpenAIError> classify_instructions(const std::string &prompt);
     std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:

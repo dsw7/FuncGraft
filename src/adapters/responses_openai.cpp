@@ -39,7 +39,7 @@ std::string OpenAIResponse::get_text_from_response_()
     return text;
 }
 
-OpenAIClassificationResponse::OpenAIClassificationResponse(const std::string &response) :
+OpenAIClassification::OpenAIClassification(const std::string &response) :
     OpenAIResponse(response)
 {
     nlohmann::json structured_output;
