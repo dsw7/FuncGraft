@@ -1,5 +1,7 @@
 #include "run_queries.hpp"
 
+#include "query_classify.hpp"
+
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -58,7 +60,7 @@ adapters::OllamaClassification classify_instructions_ollama(const Configurations
 {
     using OllamaResults = std::expected<adapters::OllamaClassification, adapters::OllamaError>;
 
-    OllamaResults results = adapters::Ollama(configs).classify_instructions(prompt);
+    OllamaResults results = queries::OllamaClassifier(configs).classify_instructions(prompt);
 
     if (not results) {
         throw std::runtime_error(results.error().errmsg);

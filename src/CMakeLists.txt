@@ -20,6 +20,7 @@ set(SRC_FILES
   core/user_prompts.cpp
   main.cpp
   process_file.cpp
+  queries/query_classify.cpp
   queries/responses.cpp
   queries/responses_ollama.cpp
   queries/responses_openai.cpp
