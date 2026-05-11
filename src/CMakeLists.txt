@@ -21,6 +21,7 @@ set(SRC_FILES
   main.cpp
   process_file.cpp
   queries/query_classify.cpp
+  queries/query_edit_code.cpp
   queries/responses.cpp
   queries/responses_ollama.cpp
   queries/responses_openai.cpp

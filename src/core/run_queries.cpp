@@ -1,6 +1,7 @@
 #include "run_queries.hpp"
 
 #include "query_classify.hpp"
+#include "query_edit_code.hpp"
 
 #include <array>
 #include <atomic>
@@ -114,7 +115,7 @@ adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::
     std::string errmsg;
 
     try {
-        results = adapters::Ollama(configs).query_edit_code(prompt);
+        results = queries::OllamaCodeEditor(configs).edit_code(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;

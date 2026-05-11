@@ -1,8 +1,5 @@
 #include "adapter_ollama.hpp"
 
-#include "structured_output.hpp"
-#include "system_prompts.hpp"
-
 #include <fmt/core.h>
 #include <stdexcept>
 
@@ -39,30 +36,6 @@ std::string Ollama::query_chat_api_(const std::string &post_fields)
     }
 
     return response;
-}
-
-std::expected<OllamaEdit, OllamaError> Ollama::query_edit_code(const std::string &prompt)
-{
-    const auto messages = nlohmann::json::array({
-        { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
-        { { "role", "user" }, { "content", prompt } },
-    });
-    const nlohmann::json fields = {
-        { "format", structured_output::schema_edit_code() },
-        { "messages", messages },
-        { "model", this->model_ },
-        { "stream", false },
-    };
-
-    const std::string response = this->query_chat_api_(fields.dump());
-
-    long http_status_code = this->get_http_status_code_();
-    if (http_status_code != 200) {
-        return std::unexpected(OllamaError(response, http_status_code));
-    }
-
-    const double total_time = this->get_rtt_time_();
-    return OllamaEdit(response, total_time);
 }
 
 } // namespace adapters

@@ -2,9 +2,7 @@
 
 #include "configs.hpp"
 #include "curl_base.hpp"
-#include "responses_ollama.hpp"
 
-#include <expected>
 #include <string>
 
 namespace adapters {
@@ -12,7 +10,6 @@ namespace adapters {
 class Ollama: public CurlBase {
 public:
     Ollama(const Configurations &configs);
-    std::expected<OllamaEdit, OllamaError> query_edit_code(const std::string &prompt);
 
 protected:
     std::string query_chat_api_(const std::string &post_fields);
