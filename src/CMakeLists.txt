@@ -13,11 +13,6 @@ set(SRC_FILES
   adapters/adapter_ollama.cpp
   adapters/adapter_openai.cpp
   adapters/curl_base.cpp
-  adapters/responses.cpp
-  adapters/responses_ollama.cpp
-  adapters/responses_openai.cpp
-  adapters/structured_output.cpp
-  adapters/system_prompts.cpp
   configs.cpp
   core/code.cpp
   core/datadir.cpp
@@ -25,6 +20,11 @@ set(SRC_FILES
   core/user_prompts.cpp
   main.cpp
   process_file.cpp
+  queries/responses.cpp
+  queries/responses_ollama.cpp
+  queries/responses_openai.cpp
+  queries/structured_output.cpp
+  queries/system_prompts.cpp
   utils.cpp
 )
 
@@ -50,7 +50,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/adapters
   ${CMAKE_SOURCE_DIR}/core
   ${CMAKE_SOURCE_DIR}/external
-  ${CMAKE_SOURCE_DIR}/pipeline
+  ${CMAKE_SOURCE_DIR}/queries
 )
 
 # -----------------------------------------------------------------------------------------------------------
