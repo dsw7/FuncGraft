@@ -81,7 +81,7 @@ adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::
     std::string errmsg;
 
     try {
-        results = adapters::OpenAI(configs).query_edit_code(prompt);
+        results = queries::OpenAICodeEditor(configs).edit_code(prompt);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
