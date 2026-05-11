@@ -69,7 +69,9 @@ queries::OllamaClassification classify_instructions_ollama(const Configurations 
     return *results;
 }
 
-queries::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt)
+queries::OpenAIEdit run_openai_query(
+    const Configurations &configs, const std::string &instructions,
+    const std::string &code, const std::string &file_extension)
 {
     using OpenAIResults = std::expected<queries::OpenAIEdit, queries::OpenAIError>;
 
@@ -81,7 +83,7 @@ queries::OpenAIEdit run_openai_query(const Configurations &configs, const std::s
     std::string errmsg;
 
     try {
-        results = queries::OpenAICodeEditor(configs).edit_code(prompt);
+        results = queries::OpenAICodeEditor(configs).edit_code(instructions, code, file_extension);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
@@ -103,7 +105,9 @@ queries::OpenAIEdit run_openai_query(const Configurations &configs, const std::s
     return *response;
 }
 
-queries::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt)
+queries::OllamaEdit run_ollama_query(
+    const Configurations &configs, const std::string &instructions,
+    const std::string &code, const std::string &file_extension)
 {
     using OllamaResults = std::expected<queries::OllamaEdit, queries::OllamaError>;
 
@@ -115,7 +119,7 @@ queries::OllamaEdit run_ollama_query(const Configurations &configs, const std::s
     std::string errmsg;
 
     try {
-        results = queries::OllamaCodeEditor(configs).edit_code(prompt);
+        results = queries::OllamaCodeEditor(configs).edit_code(instructions, code, file_extension);
     } catch (std::runtime_error &e) {
         errmsg = e.what();
         query_failed = true;
