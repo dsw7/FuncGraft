@@ -63,47 +63,23 @@ FuncGraft follows a layered architecture:
 src/
 ├── main.cpp              # CLI entry point, argument parsing
 ├── configs.cpp/.hpp      # Configuration management (provider, models)
-├── adapters/             # LLM provider implementations
+├── adapters/             # LLM provider implementations (curl-based HTTP client)
 │   ├── adapter_openai.cpp/.hpp
 │   ├── adapter_ollama.cpp/.hpp
-│   ├── curl_base.cpp/.hpp          # Shared curl connection logic
-│   ├── system_prompts.cpp/.hpp     # Generate system prompts
-│   ├── structured_output.cpp/.hpp  # All structured output management
+│   ├── curl_base.cpp/.hpp
 ├── core/                 # Core domain logic
-│   ├── prompt.cpp/.hpp   # Prompt generation and building
 │   ├── code.cpp/.hpp     # Code block extraction/manipulation
 │   ├── datadir.cpp/.hpp  # Data directory management
-│   ├── run_queries.cpp/.hpp # Threading support for API queries
-├── utils.cpp/.hpp        # Utility functions (file I/O helpers)
+│   └── run_queries.cpp/.hpp  # Threading support for API queries
+├── queries/              # Query implementations (classification and code editing)
+│   ├── query_classify.cpp/.hpp   # Instruction classification queries
+│   ├── query_edit_code.cpp/.hpp  # Code editing queries
+│   └── responses.cpp/.hpp        # Response parsing (OpenAI/Ollama)
 ├── process_file.cpp/.hpp # Orchestrates editing flow
+├── utils.cpp/.hpp        # Utility functions (file I/O helpers)
 └── external/             # Third-party dependencies
     ├── json.hpp          # nlohmann/json
     └── toml.hpp          # toml++
-```
-
-## Data Flow
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│   Input File    │───>│   File I/O Layer  │───>│  Process File     │
-└─────────────────┘    └──────────────────┘    └──────────────────┘
-                                              │
-                                              v
-┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│  Instructions   │───>│  Prompt Generator │───>│  Adapter Layer    │
-└─────────────────┘    └──────────────────┘    └────────┬─────────┘
-                                              │         │
-                                              │         v
-                                              │   ┌──────────────────┐
-                                              └──>│  LLM Provider    │
-                                                  │ (OpenAI/Ollama)  │
-                                                  └────────┬─────────┘
-                                                            │
-                                                            v
-┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│   Output File   │<───│  File I/O Layer  │<───│  Structured      │
-└─────────────────┘    └──────────────────┘    │  Output Parsing   │
-                                               └──────────────────┘
 ```
 
 ## Key Concepts
@@ -121,7 +97,7 @@ void problematic_function()
 @@@
 ```
 
-The prompt generator wraps instructions and code blocks with Markdown-style fences, including language detection from file extensions.
+The code module detects these delimiters and extracts the code block for processing. In test mode, the edited output includes diff markers (`<<<<<<<`, `=======`, `>>>>>>>`).
 
 ### `Configurations` Class
 
@@ -141,10 +117,17 @@ Central configuration state passed through the pipeline. Includes:
 
 ### Prompt Building
 
-`build_prompt()` in `prompt.cpp` (core/prompt.cpp):
-1. Wraps instructions in a markdown code block
-2. Wraps target code with language-specific markdown fences (detected from file extension)
-3. Returns a formatted prompt: "Apply the following instructions:\n{instructions}\nTo the following code:\n{code}"
+Prompts are generated inline within the query implementations:
+
+1. **Classification prompts** (`query_classify.cpp`):
+   - System prompt: Classifies whether user input is a programming-related request
+   - User prompt: Wraps instructions in `<input>...</input>` tags
+   - Structured output schema for `reasoning` (string) and `valid_instructions` (boolean)
+
+2. **Code editing prompts** (`query_edit_code.cpp`):
+   - System prompt: Assistant persona specialized in programming edits
+   - User prompt: Wraps instructions as plaintext and code with language-specific markdown fences
+   - Structured output schema for `description_of_changes` (string) and `code` (string)
 
 # Testing
 
