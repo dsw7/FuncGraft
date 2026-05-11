@@ -5,6 +5,24 @@
 
 namespace {
 
+std::string user_prompt_edit_code_(
+    const std::string &instructions, const std::string &code, const std::string &file_extension)
+{
+
+    return fmt::format(R"(Apply the following instructions:
+```plaintext
+{}
+```
+To the following code:
+```
+{}
+```
+Here is the filename's extension: `{}`. Use this to deduce the programming
+language if the language is not obvious.
+)",
+        instructions, code, file_extension);
+}
+
 std::string system_prompt_edit_code_()
 {
     return R"(
@@ -88,7 +106,8 @@ void OllamaEdit::unpack_structured_output_()
     this->description_of_changes = structured_output["description_of_changes"];
 }
 
-std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(const std::string &prompt)
+std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(
+    const std::string &instructions, const std::string &code, const std::string &file_extension)
 {
     const nlohmann::json response_format = {
         {
@@ -103,7 +122,7 @@ std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(const std::st
     };
 
     const nlohmann::json fields = {
-        { "input", prompt },
+        { "input", user_prompt_edit_code_(instructions, code, file_extension) },
         { "instructions", system_prompt_edit_code_() },
         { "model", this->model_ },
         { "store", false },
@@ -122,11 +141,12 @@ std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(const std::st
     return OpenAIEdit(response, total_time);
 }
 
-std::expected<OllamaEdit, OllamaError> OllamaCodeEditor::edit_code(const std::string &prompt)
+std::expected<OllamaEdit, OllamaError> OllamaCodeEditor::edit_code(
+    const std::string &instructions, const std::string &code, const std::string &file_extension)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompt_edit_code_() } },
-        { { "role", "user" }, { "content", prompt } },
+        { { "role", "user" }, { "content", user_prompt_edit_code_(instructions, code, file_extension) } },
     });
 
     const nlohmann::json fields = {

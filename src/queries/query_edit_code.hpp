@@ -48,14 +48,16 @@ struct OpenAICodeEditor: public adapters::OpenAI {
     OpenAICodeEditor(const Configurations &configs) :
         adapters::OpenAI(configs) {}
 
-    std::expected<OpenAIEdit, OpenAIError> edit_code(const std::string &prompt);
+    std::expected<OpenAIEdit, OpenAIError> edit_code(
+        const std::string &instructions, const std::string &code, const std::string &file_extension);
 };
 
 struct OllamaCodeEditor: public adapters::Ollama {
     OllamaCodeEditor(const Configurations &configs) :
         adapters::Ollama(configs) {}
 
-    std::expected<OllamaEdit, OllamaError> edit_code(const std::string &prompt);
+    std::expected<OllamaEdit, OllamaError> edit_code(
+        const std::string &instructions, const std::string &code, const std::string &file_extension);
 };
 
 } // namespace queries
