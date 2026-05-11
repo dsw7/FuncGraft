@@ -6,6 +6,10 @@
 
 namespace adapters {
 
+struct OpenAIError: public ErrorResponse {
+    OpenAIError(const std::string &response, const int status_code);
+};
+
 class OpenAIResponse: public SuccessResponse {
 public:
     OpenAIResponse() :

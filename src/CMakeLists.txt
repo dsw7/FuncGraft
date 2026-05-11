@@ -13,7 +13,6 @@ set(SRC_FILES
   adapters/adapter_ollama.cpp
   adapters/adapter_openai.cpp
   adapters/curl_base.cpp
-  adapters/errors.cpp
   adapters/responses.cpp
   adapters/responses_ollama.cpp
   adapters/responses_openai.cpp

@@ -2,7 +2,6 @@
 
 #include "configs.hpp"
 #include "curl_base.hpp"
-#include "errors.hpp"
 #include "responses_ollama.hpp"
 
 #include <expected>

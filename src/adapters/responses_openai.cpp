@@ -5,6 +5,20 @@
 
 namespace adapters {
 
+OpenAIError::OpenAIError(const std::string &response, const int status_code) :
+    ErrorResponse(response, status_code)
+{
+    if (not this->json_.contains("error")) {
+        throw std::runtime_error("An error occurred but 'error' key not found in the response JSON");
+    }
+
+    if (not this->json_["error"].contains("message")) {
+        throw std::runtime_error("An error occurred but 'error.message' not found in the response JSON");
+    }
+
+    this->errmsg = this->json_["error"]["message"];
+}
+
 OpenAIResponse::OpenAIResponse(const std::string &response) :
     SuccessResponse(response)
 {
