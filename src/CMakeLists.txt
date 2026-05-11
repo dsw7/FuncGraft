@@ -17,7 +17,6 @@ set(SRC_FILES
   core/code.cpp
   core/datadir.cpp
   core/run_queries.cpp
-  core/user_prompts.cpp
   main.cpp
   process_file.cpp
   queries/query_classify.cpp

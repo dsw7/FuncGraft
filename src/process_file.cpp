@@ -5,7 +5,6 @@
 #include "code.hpp"
 #include "configs.hpp"
 #include "run_queries.hpp"
-#include "user_prompts.hpp"
 #include "utils.hpp"
 
 #include <fmt/color.h>
@@ -117,20 +116,6 @@ CodeToEdit import_file_to_edit_(const Configurations &configs)
     return content;
 }
 
-std::string create_prompt_(const Configurations &configs, const CodeToEdit &content, const std::string &instructions)
-{
-    const std::string original_code = content.get_original_code();
-    const std::string prompt = core::user_prompts::prompt_edit_code(configs, instructions, original_code);
-
-    if (configs.verbose) {
-        fmt::print(fmt::emphasis::bold, "Prompt:\n");
-        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", prompt);
-        utils::print_separator();
-    }
-
-    return prompt;
-}
-
 std::string edit_text_using_llm_(
     const Configurations &configs, const std::string &instructions, const std::string &code, const std::string &file_extension)
 {
@@ -203,8 +188,6 @@ void process_file(const Configurations &configs)
     }
 
     CodeToEdit content = import_file_to_edit_(configs);
-    const std::string prompt = create_prompt_(configs, content, instructions);
-
     const std::string original_code = content.get_original_code();
     const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, configs.input_file.extension());
 
