@@ -1,7 +1,5 @@
 #include "query_edit_code.hpp"
 
-#include "structured_output.hpp"
-
 #include <json.hpp>
 
 namespace {
@@ -21,6 +19,22 @@ Output:
 )";
 }
 
+nlohmann::json structured_output_edit_code_()
+{
+    return {
+        { "type", "object" },
+        {
+            "properties",
+            {
+                { "description_of_changes", { { "type", "string" } } },
+                { "code", { { "type", "string" } } },
+            },
+        },
+        { "required", { "description_of_changes", "code" } },
+        { "additionalProperties", false },
+    };
+}
+
 } // namespace
 
 namespace queries {
@@ -32,7 +46,7 @@ std::expected<adapters::OpenAIEdit, adapters::OpenAIError> OpenAICodeEditor::edi
             "format",
             {
                 { "name", "updated_code" },
-                { "schema", structured_output::schema_edit_code() },
+                { "schema", structured_output_edit_code_() },
                 { "strict", true },
                 { "type", "json_schema" },
             },
@@ -67,7 +81,7 @@ std::expected<adapters::OllamaEdit, adapters::OllamaError> OllamaCodeEditor::edi
     });
 
     const nlohmann::json fields = {
-        { "format", structured_output::schema_edit_code() },
+        { "format", structured_output_edit_code_() },
         { "messages", messages },
         { "model", this->model_ },
         { "stream", false },

@@ -25,7 +25,6 @@ set(SRC_FILES
   queries/responses.cpp
   queries/responses_ollama.cpp
   queries/responses_openai.cpp
-  queries/structured_output.cpp
   utils.cpp
 )
 
