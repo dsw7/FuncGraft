@@ -91,7 +91,7 @@ std::expected<OpenAIClassification, OpenAIError> OpenAI::classify_instructions(c
     return OpenAIClassification(response);
 }
 
-std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
+std::expected<OpenAIEdit, OpenAIError> OpenAI::query_edit_code(const std::string &prompt)
 {
     const nlohmann::json response_format = {
         {
@@ -121,7 +121,7 @@ std::expected<OpenAIEditResponse, OpenAIError> OpenAI::query_edit_code(const std
     }
 
     const double total_time = this->get_rtt_time_();
-    return OpenAIEditResponse(response, total_time);
+    return OpenAIEdit(response, total_time);
 }
 
 } // namespace adapters

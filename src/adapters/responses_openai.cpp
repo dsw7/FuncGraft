@@ -55,7 +55,7 @@ OpenAIClassification::OpenAIClassification(const std::string &response) :
     this->reasoning = structured_output["reasoning"];
 }
 
-OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double total_t) :
+OpenAIEdit::OpenAIEdit(const std::string &response, const double total_t) :
     OpenAIResponse(response), total_time(total_t)
 {
     this->input_tokens = this->response_["usage"]["input_tokens"];
@@ -64,7 +64,7 @@ OpenAIEditResponse::OpenAIEditResponse(const std::string &response, const double
     this->unpack_structured_output_();
 }
 
-void OpenAIEditResponse::unpack_structured_output_()
+void OpenAIEdit::unpack_structured_output_()
 {
     nlohmann::json structured_output;
 

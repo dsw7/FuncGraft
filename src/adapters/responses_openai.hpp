@@ -25,11 +25,11 @@ struct OpenAIClassification: public OpenAIResponse {
     std::string reasoning;
 };
 
-class OpenAIEditResponse: public OpenAIResponse {
+class OpenAIEdit: public OpenAIResponse {
 public:
-    OpenAIEditResponse() :
+    OpenAIEdit() :
         OpenAIResponse() {}
-    OpenAIEditResponse(const std::string &response, const double total_t);
+    OpenAIEdit(const std::string &response, const double total_t);
 
     std::string description_of_changes;
     std::string code;

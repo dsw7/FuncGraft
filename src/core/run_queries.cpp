@@ -66,9 +66,9 @@ adapters::OllamaClassification classify_instructions_ollama(const Configurations
     return *results;
 }
 
-adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, const std::string &prompt)
+adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt)
 {
-    using OpenAIResults = std::expected<adapters::OpenAIEditResponse, adapters::OpenAIError>;
+    using OpenAIResults = std::expected<adapters::OpenAIEdit, adapters::OpenAIError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);

@@ -14,7 +14,7 @@ class OpenAI: public CurlBase {
 public:
     OpenAI(const Configurations &configs);
     std::expected<OpenAIClassification, OpenAIError> classify_instructions(const std::string &prompt);
-    std::expected<OpenAIEditResponse, OpenAIError> query_edit_code(const std::string &prompt);
+    std::expected<OpenAIEdit, OpenAIError> query_edit_code(const std::string &prompt);
 
 private:
     std::string query_responses_api_(const std::string &post_fields);

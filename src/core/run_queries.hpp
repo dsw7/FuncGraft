@@ -11,7 +11,7 @@ namespace threading {
 adapters::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &prompt);
 adapters::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &prompt);
 
-adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, const std::string &prompt);
+adapters::OpenAIEdit run_openai_query(const Configurations &configs, const std::string &prompt);
 adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt);
 } // namespace threading
 } // namespace core
