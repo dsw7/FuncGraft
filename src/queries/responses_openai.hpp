@@ -20,15 +20,6 @@ protected:
     std::string get_text_from_response_();
 };
 
-struct OpenAIClassification: public OpenAIResponse {
-    OpenAIClassification() :
-        OpenAIResponse() {}
-    OpenAIClassification(const std::string &response);
-
-    bool valid_instructions = false;
-    std::string reasoning;
-};
-
 class OpenAIEdit: public OpenAIResponse {
 public:
     OpenAIEdit() :

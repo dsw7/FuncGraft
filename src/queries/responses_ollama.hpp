@@ -16,13 +16,6 @@ struct OllamaResponse: public SuccessResponse {
     OllamaResponse(const std::string &response);
 };
 
-struct OllamaClassification: public OllamaResponse {
-    OllamaClassification(const std::string &response);
-
-    bool valid_instructions = false;
-    std::string reasoning;
-};
-
 class OllamaEdit: public OllamaResponse {
 public:
     OllamaEdit() :

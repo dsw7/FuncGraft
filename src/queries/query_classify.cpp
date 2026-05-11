@@ -1,5 +1,6 @@
 #include "query_classify.hpp"
 
+#include <fmt/core.h>
 #include <json.hpp>
 
 namespace {
@@ -39,6 +40,38 @@ nlohmann::json structured_output_classify_instructions_()
 } // namespace
 
 namespace queries {
+
+OpenAIClassification::OpenAIClassification(const std::string &response) :
+    OpenAIResponse(response)
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string text = this->get_text_from_response_();
+        structured_output = nlohmann::json::parse(text);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
+
+OllamaClassification::OllamaClassification(const std::string &response) :
+    OllamaResponse(response)
+{
+    nlohmann::json structured_output;
+
+    try {
+        const std::string content = this->response_["message"]["content"];
+        structured_output = nlohmann::json::parse(content);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
+    }
+
+    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
+    this->reasoning = structured_output["reasoning"];
+}
 
 std::expected<OpenAIClassification, OpenAIError> OpenAIClassifier::classify_instructions(const std::string &prompt)
 {

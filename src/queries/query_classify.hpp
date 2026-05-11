@@ -3,6 +3,7 @@
 #include "adapter_ollama.hpp"
 #include "adapter_openai.hpp"
 #include "configs.hpp"
+#include "responses.hpp"
 #include "responses_ollama.hpp"
 #include "responses_openai.hpp"
 
@@ -10,6 +11,22 @@
 #include <string>
 
 namespace queries {
+
+struct OpenAIClassification: public OpenAIResponse {
+    OpenAIClassification() :
+        OpenAIResponse() {}
+    OpenAIClassification(const std::string &response);
+
+    bool valid_instructions = false;
+    std::string reasoning;
+};
+
+struct OllamaClassification: public OllamaResponse {
+    OllamaClassification(const std::string &response);
+
+    bool valid_instructions = false;
+    std::string reasoning;
+};
 
 struct OpenAIClassifier: public adapters::OpenAI {
     OpenAIClassifier(const Configurations &configs) :

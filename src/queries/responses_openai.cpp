@@ -53,22 +53,6 @@ std::string OpenAIResponse::get_text_from_response_()
     return text;
 }
 
-OpenAIClassification::OpenAIClassification(const std::string &response) :
-    OpenAIResponse(response)
-{
-    nlohmann::json structured_output;
-
-    try {
-        const std::string text = this->get_text_from_response_();
-        structured_output = nlohmann::json::parse(text);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse structured output: {}", e.what()));
-    }
-
-    this->valid_instructions = structured_output.at("valid_instructions").get<bool>();
-    this->reasoning = structured_output["reasoning"];
-}
-
 OpenAIEdit::OpenAIEdit(const std::string &response, const double total_t) :
     OpenAIResponse(response), total_time(total_t)
 {
