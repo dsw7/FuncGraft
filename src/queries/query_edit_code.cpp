@@ -1,9 +1,27 @@
 #include "query_edit_code.hpp"
 
 #include "structured_output.hpp"
-#include "system_prompts.hpp"
 
 #include <json.hpp>
+
+namespace {
+
+std::string system_prompt_edit_code_()
+{
+    return R"(
+You are a helpful assistant that specializes in programming.
+The user will provide some code and instructions on what to do with the code.
+
+IMPORTANT: Do not wrap your response in backticks (```). Output the code
+directly without markdown code fences.
+
+Output:
+- description_of_changes: brief summary of the changes you applied
+- code: your updated code
+)";
+}
+
+} // namespace
 
 namespace queries {
 
@@ -23,7 +41,7 @@ std::expected<adapters::OpenAIEdit, adapters::OpenAIError> OpenAICodeEditor::edi
 
     const nlohmann::json fields = {
         { "input", prompt },
-        { "instructions", system_prompts::system_prompt_edit_code() },
+        { "instructions", system_prompt_edit_code_() },
         { "model", this->model_ },
         { "store", false },
         { "temperature", 1.00 },
@@ -44,7 +62,7 @@ std::expected<adapters::OpenAIEdit, adapters::OpenAIError> OpenAICodeEditor::edi
 std::expected<adapters::OllamaEdit, adapters::OllamaError> OllamaCodeEditor::edit_code(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
-        { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
+        { { "role", "system" }, { "content", system_prompt_edit_code_() } },
         { { "role", "user" }, { "content", prompt } },
     });
 
