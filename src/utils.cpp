@@ -1,5 +1,6 @@
 #include "utils.hpp"
 
+#include <algorithm>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
@@ -117,6 +118,17 @@ std::string seconds_to_hhmmss(const double seconds)
     }
 
     return result;
+}
+
+bool is_text_empty(const std::string &text)
+{
+    if (text.empty()) {
+        return true;
+    }
+
+    return std::all_of(text.begin(), text.end(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    });
 }
 
 } // namespace utils

@@ -1,13 +1,23 @@
 #include "query_edit_code.hpp"
 
+#include "utils.hpp"
+
 #include <fmt/core.h>
 #include <json.hpp>
+#include <stdexcept>
 
 namespace {
 
 std::string user_prompt_edit_code_(
     const std::string &instructions, const std::string &code, const std::string &file_extension)
 {
+    if (utils::is_text_empty(instructions)) {
+        throw std::runtime_error("Instructions are empty!");
+    }
+
+    if (utils::is_text_empty(code)) {
+        throw std::runtime_error("Body is empty. Cannot extract code block");
+    }
 
     return fmt::format(R"(Apply the following instructions:
 ```plaintext

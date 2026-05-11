@@ -1,5 +1,7 @@
 #include "query_classify.hpp"
 
+#include "utils.hpp"
+
 #include <fmt/core.h>
 #include <json.hpp>
 
@@ -7,7 +9,7 @@ namespace {
 
 std::string user_prompt_classify_instructions_(const std::string &instructions)
 {
-    if (instructions.empty()) {
+    if (utils::is_text_empty(instructions)) {
         throw std::runtime_error("Instructions are empty!");
     }
 
