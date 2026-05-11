@@ -134,7 +134,7 @@ std::string create_prompt_(const Configurations &configs, const CodeToEdit &cont
 
 std::string edit_text_using_llm_(const Configurations &configs, const std::string &prompt)
 {
-    std::variant<adapters::OpenAIEditResponse, adapters::OllamaEditResponse> response;
+    std::variant<adapters::OpenAIEditResponse, adapters::OllamaEdit> response;
 
     if (configs.provider == "openai") {
         response = core::threading::run_openai_query(configs, prompt);

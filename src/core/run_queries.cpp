@@ -100,9 +100,9 @@ adapters::OpenAIEditResponse run_openai_query(const Configurations &configs, con
     return *response;
 }
 
-adapters::OllamaEditResponse run_ollama_query(const Configurations &configs, const std::string &prompt)
+adapters::OllamaEdit run_ollama_query(const Configurations &configs, const std::string &prompt)
 {
-    using OllamaResults = std::expected<adapters::OllamaEditResponse, adapters::OllamaError>;
+    using OllamaResults = std::expected<adapters::OllamaEdit, adapters::OllamaError>;
 
     TIMER_ENABLED_.store(true);
     std::thread timer(time_api_call_);

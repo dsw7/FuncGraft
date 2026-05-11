@@ -64,7 +64,7 @@ std::expected<OllamaClassification, OllamaError> Ollama::classify_instructions(c
     return OllamaClassification(response);
 }
 
-std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std::string &prompt)
+std::expected<OllamaEdit, OllamaError> Ollama::query_edit_code(const std::string &prompt)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompts::system_prompt_edit_code() } },
@@ -85,7 +85,7 @@ std::expected<OllamaEditResponse, OllamaError> Ollama::query_edit_code(const std
     }
 
     const double total_time = this->get_rtt_time_();
-    return OllamaEditResponse(response, total_time);
+    return OllamaEdit(response, total_time);
 }
 
 } // namespace adapters

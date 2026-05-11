@@ -20,11 +20,11 @@ struct OllamaClassification: public OllamaResponse {
     std::string reasoning;
 };
 
-class OllamaEditResponse: public OllamaResponse {
+class OllamaEdit: public OllamaResponse {
 public:
-    OllamaEditResponse() :
+    OllamaEdit() :
         OllamaResponse() {} // needed for variants
-    OllamaEditResponse(const std::string &response, const double total_t);
+    OllamaEdit(const std::string &response, const double total_t);
 
     std::string description_of_changes;
     std::string code;

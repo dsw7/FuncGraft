@@ -33,7 +33,7 @@ OllamaClassification::OllamaClassification(const std::string &response) :
     this->reasoning = structured_output["reasoning"];
 }
 
-OllamaEditResponse::OllamaEditResponse(const std::string &response, const double total_t) :
+OllamaEdit::OllamaEdit(const std::string &response, const double total_t) :
     OllamaResponse(response), total_time(total_t)
 {
     this->input_tokens = this->response_["prompt_eval_count"];
@@ -42,7 +42,7 @@ OllamaEditResponse::OllamaEditResponse(const std::string &response, const double
     this->unpack_structured_output_();
 }
 
-void OllamaEditResponse::unpack_structured_output_()
+void OllamaEdit::unpack_structured_output_()
 {
     nlohmann::json structured_output;
 
