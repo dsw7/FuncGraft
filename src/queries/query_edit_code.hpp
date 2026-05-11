@@ -49,7 +49,7 @@ struct OpenAICodeEditor: public adapters::OpenAI {
         adapters::OpenAI(configs) {}
 
     std::expected<OpenAIEdit, OpenAIError> edit_code(
-        const std::string &instructions, const std::string &code, const std::string &file_extension);
+        const std::string &instructions, const std::string &code, const std::string &language);
 };
 
 struct OllamaCodeEditor: public adapters::Ollama {
@@ -57,7 +57,7 @@ struct OllamaCodeEditor: public adapters::Ollama {
         adapters::Ollama(configs) {}
 
     std::expected<OllamaEdit, OllamaError> edit_code(
-        const std::string &instructions, const std::string &code, const std::string &file_extension);
+        const std::string &instructions, const std::string &code, const std::string &language);
 };
 
 } // namespace queries

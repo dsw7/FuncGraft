@@ -117,14 +117,14 @@ CodeToEdit import_file_to_edit_(const Configurations &configs)
 }
 
 std::string edit_text_using_llm_(
-    const Configurations &configs, const std::string &instructions, const std::string &code, const std::string &file_extension)
+    const Configurations &configs, const std::string &instructions, const std::string &code, const std::string &language)
 {
     std::variant<queries::OpenAIEdit, queries::OllamaEdit> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::run_openai_query(configs, instructions, code, file_extension);
+        response = core::threading::run_openai_query(configs, instructions, code, language);
     } else {
-        response = core::threading::run_ollama_query(configs, instructions, code, file_extension);
+        response = core::threading::run_ollama_query(configs, instructions, code, language);
     }
 
     return std::visit([](auto &&arg) -> std::string {
@@ -190,7 +190,7 @@ void process_file(const Configurations &configs)
     CodeToEdit content = import_file_to_edit_(configs);
     const std::string original_code = content.get_original_code();
     const std::string language = utils::extension_to_lang(configs.input_file);
-    const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, configs.input_file.extension());
+    const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, language);
 
     content.overwrite_original_code(modified_code);
     export_edited_file_(configs, content);

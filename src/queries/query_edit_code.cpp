@@ -8,8 +8,17 @@
 
 namespace {
 
+std::string get_code_block_(const std::string &body, const std::string &label)
+{
+    if (body.back() == '\n') {
+        return fmt::format("```{}\n{}```", label, body);
+    }
+
+    return fmt::format("```{}\n{}\n```", label, body);
+}
+
 std::string user_prompt_edit_code_(
-    const std::string &instructions, const std::string &code, const std::string &file_extension)
+    const std::string &instructions, const std::string &code, const std::string &language)
 {
     if (utils::is_text_empty(instructions)) {
         throw std::runtime_error("Instructions are empty!");
@@ -20,17 +29,12 @@ std::string user_prompt_edit_code_(
     }
 
     return fmt::format(R"(Apply the following instructions:
-```plaintext
 {}
-```
 To the following code:
-```
 {}
-```
-Here is the filename's extension: `{}`. Use this to deduce the programming
-language if the language is not obvious.
 )",
-        instructions, code, file_extension);
+        get_code_block_(instructions, "plaintext"),
+        get_code_block_(code, language));
 }
 
 std::string system_prompt_edit_code_()
@@ -117,7 +121,7 @@ void OllamaEdit::unpack_structured_output_()
 }
 
 std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(
-    const std::string &instructions, const std::string &code, const std::string &file_extension)
+    const std::string &instructions, const std::string &code, const std::string &language)
 {
     const nlohmann::json response_format = {
         {
@@ -132,7 +136,7 @@ std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(
     };
 
     const nlohmann::json fields = {
-        { "input", user_prompt_edit_code_(instructions, code, file_extension) },
+        { "input", user_prompt_edit_code_(instructions, code, language) },
         { "instructions", system_prompt_edit_code_() },
         { "model", this->model_ },
         { "store", false },
@@ -152,11 +156,11 @@ std::expected<OpenAIEdit, OpenAIError> OpenAICodeEditor::edit_code(
 }
 
 std::expected<OllamaEdit, OllamaError> OllamaCodeEditor::edit_code(
-    const std::string &instructions, const std::string &code, const std::string &file_extension)
+    const std::string &instructions, const std::string &code, const std::string &language)
 {
     const auto messages = nlohmann::json::array({
         { { "role", "system" }, { "content", system_prompt_edit_code_() } },
-        { { "role", "user" }, { "content", user_prompt_edit_code_(instructions, code, file_extension) } },
+        { { "role", "user" }, { "content", user_prompt_edit_code_(instructions, code, language) } },
     });
 
     const nlohmann::json fields = {

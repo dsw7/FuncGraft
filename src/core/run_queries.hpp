@@ -13,9 +13,9 @@ queries::OllamaClassification classify_instructions_ollama(const Configurations 
 
 queries::OpenAIEdit run_openai_query(
     const Configurations &configs, const std::string &instructions,
-    const std::string &code, const std::string &file_extension);
+    const std::string &code, const std::string &language);
 queries::OllamaEdit run_ollama_query(
     const Configurations &configs, const std::string &instructions,
-    const std::string &code, const std::string &file_extension);
+    const std::string &code, const std::string &language);
 } // namespace threading
 } // namespace core
