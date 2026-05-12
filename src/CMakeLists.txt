@@ -17,12 +17,12 @@ set(SRC_FILES
   core/code.cpp
   core/datadir.cpp
   core/run_queries.cpp
+  core/utils.cpp
   main.cpp
   process_file.cpp
   queries/query_classify.cpp
   queries/query_edit_code.cpp
   queries/responses.cpp
-  utils.cpp
 )
 
 add_compile_options(-Wall -Wextra -pedantic -Werror)
