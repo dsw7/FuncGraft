@@ -8,7 +8,6 @@ namespace {
 const std::string DELIMITER_LINE_ = "@@@\n";
 }
 
-namespace core {
 namespace code {
 
 void DelimitedCode::unpack_content_into_parts(const std::string &content)
@@ -132,4 +131,3 @@ std::string CodeToEdit::get_modified_code() const
 }
 
 } // namespace code
-} // namespace core

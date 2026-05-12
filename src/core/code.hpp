@@ -3,7 +3,6 @@
 #include <string>
 #include <variant>
 
-namespace core {
 namespace code {
 
 class DelimitedCode {
@@ -33,4 +32,3 @@ private:
 };
 
 } // namespace code
-} // namespace core

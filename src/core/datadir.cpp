@@ -30,7 +30,6 @@ std::filesystem::path get_project_dir_()
 
 } // namespace
 
-namespace core {
 namespace datadir {
 
 std::filesystem::path get_config_file()
@@ -45,4 +44,3 @@ std::filesystem::path get_config_file()
 }
 
 } // namespace datadir
-} // namespace core

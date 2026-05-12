@@ -104,7 +104,7 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
 
 void load_additional_configs_from_file(Configurations &configs)
 {
-    const std::filesystem::path proj_config = core::datadir::get_config_file();
+    const std::filesystem::path proj_config = datadir::get_config_file();
     toml::table table;
 
     try {

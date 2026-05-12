@@ -17,7 +17,7 @@
 
 namespace {
 
-using core::code::CodeToEdit;
+using code::CodeToEdit;
 
 void print_program_info_(const Configurations &configs)
 {
@@ -98,9 +98,9 @@ std::string edit_text_using_llm_(
     std::variant<queries::OpenAIEdit, queries::OllamaEdit> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::run_openai_query(configs, instructions, code, language);
+        response = threading::run_openai_query(configs, instructions, code, language);
     } else {
-        response = core::threading::run_ollama_query(configs, instructions, code, language);
+        response = threading::run_ollama_query(configs, instructions, code, language);
     }
 
     return std::visit([](auto &&arg) -> std::string {

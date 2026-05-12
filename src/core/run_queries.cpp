@@ -41,7 +41,6 @@ void time_api_call_()
 
 } // namespace
 
-namespace core {
 namespace threading {
 
 queries::OpenAIEdit run_openai_query(
@@ -117,4 +116,3 @@ queries::OllamaEdit run_ollama_query(
 }
 
 } // namespace threading
-} // namespace core
