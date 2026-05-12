@@ -170,18 +170,8 @@ void export_edited_file_(const Configurations &configs, const CodeToEdit &conten
 #endif
 }
 
-} // namespace
-
-void process_file(const Configurations &configs)
+void edit_file_(const Configurations &configs, const std::string &instructions)
 {
-    print_program_info_(configs);
-
-    const std::string instructions = load_instructions_(configs);
-
-    if (not check_for_special_command_(instructions)) {
-        return;
-    }
-
     if (not validate_instructions_(configs, instructions)) {
         utils::print_separator();
         return;
@@ -194,4 +184,19 @@ void process_file(const Configurations &configs)
 
     content.overwrite_original_code(modified_code);
     export_edited_file_(configs, content);
+}
+
+} // namespace
+
+void process_file(const Configurations &configs)
+{
+    print_program_info_(configs);
+
+    const std::string instructions = load_instructions_(configs);
+
+    if (not check_for_special_command_(instructions)) {
+        return;
+    }
+
+    edit_file_(configs, instructions);
 }
