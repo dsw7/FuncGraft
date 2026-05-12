@@ -4,6 +4,7 @@
 #include "adapter_openai.hpp"
 #include "code.hpp"
 #include "configs.hpp"
+#include "query_classify.hpp"
 #include "run_queries.hpp"
 #include "utils.hpp"
 
@@ -41,12 +42,25 @@ void print_program_info_(const Configurations &configs)
 
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
 {
+    auto classify = [&](auto &classifier, auto &response_variant) {
+        using ResultsType = decltype(classifier.classify_instructions(instructions));
+        ResultsType results = classifier.classify_instructions(instructions);
+
+        if (results) {
+            response_variant = *results;
+        } else {
+            throw std::runtime_error(results.error().errmsg);
+        }
+    };
+
     std::variant<queries::OpenAIClassification, queries::OllamaClassification> response;
 
     if (configs.provider == "openai") {
-        response = core::threading::classify_instructions_openai(configs, instructions);
+        queries::OpenAIClassifier classifier(configs);
+        classify(classifier, response);
     } else {
-        response = core::threading::classify_instructions_ollama(configs, instructions);
+        queries::OllamaClassifier classifier(configs);
+        classify(classifier, response);
     }
 
     return std::visit([](auto &&arg) -> bool {

@@ -1,6 +1,5 @@
 #include "run_queries.hpp"
 
-#include "query_classify.hpp"
 #include "query_edit_code.hpp"
 
 #include <array>
@@ -44,30 +43,6 @@ void time_api_call_()
 
 namespace core {
 namespace threading {
-
-queries::OpenAIClassification classify_instructions_openai(const Configurations &configs, const std::string &instructions)
-{
-    using OpenAIResults = std::expected<queries::OpenAIClassification, queries::OpenAIError>;
-
-    OpenAIResults results = queries::OpenAIClassifier(configs).classify_instructions(instructions);
-
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
-    return *results;
-}
-
-queries::OllamaClassification classify_instructions_ollama(const Configurations &configs, const std::string &instructions)
-{
-    using OllamaResults = std::expected<queries::OllamaClassification, queries::OllamaError>;
-
-    OllamaResults results = queries::OllamaClassifier(configs).classify_instructions(instructions);
-
-    if (not results) {
-        throw std::runtime_error(results.error().errmsg);
-    }
-    return *results;
-}
 
 queries::OpenAIEdit run_openai_query(
     const Configurations &configs, const std::string &instructions,
