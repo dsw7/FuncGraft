@@ -13,8 +13,8 @@ set(SRC_FILES
   adapters/adapter_ollama.cpp
   adapters/adapter_openai.cpp
   adapters/curl_base.cpp
-  configs.cpp
   core/code.cpp
+  core/configs.cpp
   core/datadir.cpp
   core/run_queries.cpp
   core/utils.cpp
