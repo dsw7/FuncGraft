@@ -34,6 +34,8 @@ void print_program_info_(const Configurations &configs)
 
     fmt::print("● ");
     fmt::print(fg(fmt::color::yellow_green), "{}\n\n", configs.input_file.string());
+    fmt::print(fg(fmt::color::gray), "Type 'q' or 'quit' to exit program.");
+    fmt::print("\n");
     utils::print_separator();
 }
 
@@ -170,14 +172,14 @@ void process_file(const Configurations &configs)
     std::string instructions;
 
     while (true) {
-        fmt::print(fmt::emphasis::bold, "> ");
+        fmt::print(fmt::emphasis::bold, ">>> ");
         std::getline(std::cin, instructions);
 
         if (instructions.empty()) {
             continue;
-        } else if (instructions == "quit") {
+        } else if (instructions == "q") {
             return;
-        } else if (instructions == "exit") {
+        } else if (instructions == "quit") {
             return;
         } else {
             break;
