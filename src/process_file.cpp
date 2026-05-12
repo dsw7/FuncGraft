@@ -34,47 +34,7 @@ void print_program_info_(const Configurations &configs)
 
     fmt::print("● ");
     fmt::print(fg(fmt::color::yellow_green), "{}\n\n", configs.input_file.string());
-}
-
-std::string load_instructions_(const Configurations &configs)
-{
     utils::print_separator();
-
-    if (configs.instructions_from_cli) {
-        return configs.instructions_from_cli.value();
-    }
-
-    if (configs.instructions_file) {
-        const std::filesystem::path instructions_file = configs.instructions_file.value();
-        fmt::print("Loading instructions from file '{}'\n", instructions_file.string());
-        return utils::read_from_file(instructions_file);
-    }
-
-    std::string instructions;
-
-    while (true) {
-        fmt::print(fmt::emphasis::bold, "> ");
-        std::getline(std::cin, instructions);
-
-        if (not instructions.empty()) {
-            break;
-        }
-    }
-
-    utils::print_separator();
-    return instructions;
-}
-
-bool check_for_special_command_(const std::string &instructions)
-{
-    if (instructions == "quit" or instructions == "exit") {
-#ifdef TESTING_ENABLED
-        fmt::print("Program aborted\n");
-#endif
-        return false;
-    }
-
-    return true;
 }
 
 bool validate_instructions_(const Configurations &configs, const std::string &instructions)
@@ -172,6 +132,8 @@ void export_edited_file_(const Configurations &configs, const CodeToEdit &conten
 
 void edit_file_(const Configurations &configs, const std::string &instructions)
 {
+    utils::print_separator();
+
     if (not validate_instructions_(configs, instructions)) {
         utils::print_separator();
         return;
@@ -192,10 +154,34 @@ void process_file(const Configurations &configs)
 {
     print_program_info_(configs);
 
-    const std::string instructions = load_instructions_(configs);
-
-    if (not check_for_special_command_(instructions)) {
+    if (configs.instructions_from_cli) {
+        edit_file_(configs, configs.instructions_from_cli.value());
         return;
+    }
+
+    if (configs.instructions_file) {
+        const std::filesystem::path instructions_file = configs.instructions_file.value();
+        fmt::print("Loading instructions from file '{}'\n", instructions_file.string());
+        const std::string instructions = utils::read_from_file(instructions_file);
+        edit_file_(configs, instructions);
+        return;
+    }
+
+    std::string instructions;
+
+    while (true) {
+        fmt::print(fmt::emphasis::bold, "> ");
+        std::getline(std::cin, instructions);
+
+        if (instructions.empty()) {
+            continue;
+        } else if (instructions == "quit") {
+            return;
+        } else if (instructions == "exit") {
+            return;
+        } else {
+            break;
+        }
     }
 
     edit_file_(configs, instructions);
