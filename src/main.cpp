@@ -63,11 +63,12 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
             { "provider", required_argument, 0, 'p' },
+            { "model", required_argument, 0, 'm' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        const int option = getopt_long(argc, argv, "ho:f:i:p:", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:p:m:", long_options, &option_index);
 
         if (option == -1) {
             break;
@@ -88,6 +89,9 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
                 break;
             case 'p':
                 configs.provider = optarg;
+                break;
+            case 'm':
+                configs.model_override = optarg;
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
