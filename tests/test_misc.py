@@ -68,3 +68,38 @@ def test_exit_program(dummy_python_file: Path, instruction: str) -> None:
         f"{dummy_python_file}", f"--instructions={instruction}"
     )
     assert "Program aborted" in stdout
+
+
+@mark.parametrize(
+    "provider, model, errmsg",
+    [
+        ("openai", "qwen3.5", "The requested model 'qwen3.5' does not exist."),
+        ("ollama", "gpt-4o", "model 'gpt-4o' not found"),
+    ],
+)
+def test_invalid_model(
+    dummy_python_file: Path, provider: str, model: str, errmsg: str
+) -> None:
+    instruction = "Fix the ValueError"
+    stderr = assert_command_failure(
+        f"{dummy_python_file}",
+        f"--instructions={instruction}",
+        f"--provider={provider}",
+        f"--model={model}",
+    )
+    assert errmsg in stderr
+
+
+@mark.parametrize(
+    "provider",
+    ["openai", "ollama"],
+)
+def test_empty_model(dummy_python_file: Path, provider: str) -> None:
+    instruction = "Fix the ValueError"
+    stderr = assert_command_failure(
+        f"{dummy_python_file}",
+        f"--instructions={instruction}",
+        f"--provider={provider}",
+        "--model=",
+    )
+    assert "Model to override is empty" in stderr

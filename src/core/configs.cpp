@@ -54,6 +54,15 @@ void Configurations::validate_provider_()
     throw std::runtime_error("Invalid LLM provider");
 }
 
+void Configurations::validate_model_override_()
+{
+    if (this->model_override) {
+        if (this->model_override.value().empty()) {
+            throw std::runtime_error("Model to override is empty");
+        }
+    }
+}
+
 void Configurations::validate_configurations()
 {
     this->validate_input_file_();
@@ -61,4 +70,5 @@ void Configurations::validate_configurations()
     this->validate_output_file_();
     this->validate_cli_instructions_();
     this->validate_provider_();
+    this->validate_model_override_();
 }

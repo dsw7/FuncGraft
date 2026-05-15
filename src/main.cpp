@@ -34,6 +34,7 @@ Options:
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
   -p, --provider=PROVIDER          Specify LLM provider. Valid options are [openai, ollama]
+  -m, --model=MODEL                Override configured LLM model for whichever PROVIDER is being used
 
 Examples:
   > Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
@@ -44,6 +45,8 @@ Examples:
     $ edit foo.cpp -o bar.cpp
   > Edit a file in accordance with a long, multiline prompt:
     $ edit foo.cpp -o bar.cpp -f instructions.txt
+  > Edit a file using Ollama and qwen3.5:
+    $ edit foo.cpp -o bar.cpp -p ollama -m qwen3.5
 )";
 
     fmt::print("{}", messages);
@@ -60,11 +63,12 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
             { "file", required_argument, 0, 'f' },
             { "instructions", required_argument, 0, 'i' },
             { "provider", required_argument, 0, 'p' },
+            { "model", required_argument, 0, 'm' },
             { 0, 0, 0, 0 }
         };
 
         int option_index = 0;
-        const int option = getopt_long(argc, argv, "ho:f:i:p:", long_options, &option_index);
+        const int option = getopt_long(argc, argv, "ho:f:i:p:m:", long_options, &option_index);
 
         if (option == -1) {
             break;
@@ -85,6 +89,9 @@ Configurations parse_configs_from_argv(const int argc, char **argv)
                 break;
             case 'p':
                 configs.provider = optarg;
+                break;
+            case 'm':
+                configs.model_override = optarg;
                 break;
             default:
                 fmt::print(stderr, fg(fmt::color::red), "Unknown option passed to command\n");
@@ -121,6 +128,14 @@ void load_additional_configs_from_file(Configurations &configs)
     if (not configs.provider) {
         // i.e. provider was not set via command line
         configs.provider = table["general"]["provider"].value_or("openai");
+    }
+
+    if (configs.model_override) {
+        if (configs.provider == "openai") {
+            configs.model_openai = configs.model_override.value();
+        } else if (configs.provider == "ollama") {
+            configs.model_ollama = configs.model_override.value();
+        }
     }
 }
 
