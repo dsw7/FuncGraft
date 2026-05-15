@@ -88,3 +88,18 @@ def test_invalid_model(
         f"--model={model}",
     )
     assert errmsg in stderr
+
+
+@mark.parametrize(
+    "provider",
+    ["openai", "ollama"],
+)
+def test_empty_model(dummy_python_file: Path, provider: str) -> None:
+    instruction = "Fix the ValueError"
+    stderr = assert_command_failure(
+        f"{dummy_python_file}",
+        f"--instructions={instruction}",
+        f"--provider={provider}",
+        "--model=",
+    )
+    assert "Model to override is empty" in stderr
