@@ -34,6 +34,7 @@ Options:
   -f, --file=FILE                  Read instructions from FILE
   -i, --instructions=INSTRUCTIONS  Read INSTRUCTIONS via command line
   -p, --provider=PROVIDER          Specify LLM provider. Valid options are [openai, ollama]
+  -m, --model=MODEL                Override configured LLM model for whichever PROVIDER is being used
 
 Examples:
   > Edit a file interactively. Program will provide a [y/n] prompt asking whether to overwrite the file:
@@ -44,6 +45,8 @@ Examples:
     $ edit foo.cpp -o bar.cpp
   > Edit a file in accordance with a long, multiline prompt:
     $ edit foo.cpp -o bar.cpp -f instructions.txt
+  > Edit a file using Ollama and qwen3.5:
+    $ edit foo.cpp -o bar.cpp -p ollama -m qwen3.5
 )";
 
     fmt::print("{}", messages);
