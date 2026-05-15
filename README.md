@@ -5,9 +5,18 @@ This program can selectively edit files using the following providers:
 - [OpenAI](https://openai.com/)
 - [Ollama](https://ollama.com/)
 
-I tried [codex](https://github.com/openai/codex) but it felt too bloated, led
-to code sprawl, and did not feel targeted enough for me. So I built my own
-equivalent that operates on individual files.
+# Why?
+Context overload is a known problem that results in performance degradation
+through various mechanisms, such as the [Lost in the
+Middle](https://arxiv.org/abs/2307.03172) problem, hallucinations, context
+confusion, increased latency, among others.
+
+FuncGraft aims to mitigate these problems by keeping the context limited to at
+most a single file, and ideally keeping the context limited to a "function
+level of resolution." This allows me to make edits to individual blocks of code
+at lightning fast inference times, using even locally hosted models.
+
+The name FuncGraft is a _portmanteau_ of **Function** + **Graft**.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
