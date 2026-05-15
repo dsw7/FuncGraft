@@ -129,6 +129,14 @@ void load_additional_configs_from_file(Configurations &configs)
         // i.e. provider was not set via command line
         configs.provider = table["general"]["provider"].value_or("openai");
     }
+
+    if (configs.model_override) {
+        if (configs.provider == "openai") {
+            configs.model_openai = configs.model_override.value();
+        } else if (configs.provider == "ollama") {
+            configs.model_ollama = configs.model_override.value();
+        }
+    }
 }
 
 int main(int argc, char **argv)
