@@ -20,6 +20,7 @@ public:
     std::string model_openai;
 
     std::optional<std::string> provider;
+    std::optional<std::string> model_override;
 
 private:
     void validate_input_file_();
@@ -27,4 +28,5 @@ private:
     void validate_output_file_();
     void validate_cli_instructions_();
     void validate_provider_();
+    void validate_model_override_();
 };
