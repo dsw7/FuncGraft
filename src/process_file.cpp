@@ -76,22 +76,6 @@ bool validate_instructions_(const Configurations &configs, const std::string &in
         response);
 }
 
-CodeToEdit import_file_to_edit_(const Configurations &configs)
-{
-    const std::string raw_text = utils::read_from_file(configs.input_file);
-
-    CodeToEdit content(raw_text);
-
-    if (content.is_delimited()) {
-        utils::print_separator();
-        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-        fmt::print(fg(fmt::terminal_color::bright_blue), "{}", content.get_original_code());
-        fmt::print(fg(fmt::color::dim_gray), "@@@\n");
-    }
-
-    return content;
-}
-
 std::string edit_text_using_llm_(
     const Configurations &configs, const std::string &instructions, const std::string &code, const std::string &language)
 {
@@ -155,7 +139,9 @@ void edit_file_(const Configurations &configs, const std::string &instructions)
         return;
     }
 
-    CodeToEdit content = import_file_to_edit_(configs);
+    const std::string raw_text = utils::read_from_file(configs.input_file);
+    CodeToEdit content(raw_text);
+
     const std::string original_code = content.get_original_code();
     const std::string language = utils::extension_to_lang(configs.input_file);
     const std::string modified_code = edit_text_using_llm_(configs, instructions, original_code, language);
