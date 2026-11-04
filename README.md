@@ -5,6 +5,12 @@ This program can selectively edit files using the following providers:
 - [OpenAI](https://openai.com/)
 - [Ollama](https://ollama.com/)
 
+# Fall 2026 Update - This project has moved!
+- This project has been ported from C/C++ to Rust
+- I have divested from the OpenAI API in favor of the Anthropic API
+
+See [edit](https://github.com/dsw7/edit/) for more information.
+
 # Why?
 Context overload is a known problem that results in performance degradation
 through various mechanisms, such as the [Lost in the
